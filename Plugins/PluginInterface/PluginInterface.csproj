@@ -71,7 +71,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj">
+    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj">
       <Project>{04429829-437D-43D4-AAEB-27A2C0FEE93B}</Project>
       <Name>Discord.Net.WebSocket</Name>
     </ProjectReference>

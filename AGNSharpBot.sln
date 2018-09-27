@@ -14,15 +14,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AGNSharpBot", "AGNSharpBot\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{42CC2C25-EF23-4A17-8F39-44CC276349B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Responses", "Responses\Responses.csproj", "{27EA6681-2443-4FD7-AA13-23AD46D0DFCE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Responses", "Plugins\Responses\Responses.csproj", "{27EA6681-2443-4FD7-AA13-23AD46D0DFCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginInterface", "PluginInterface\PluginInterface.csproj", "{827B77A9-20F8-4C61-A76A-51198FEAB3D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginInterface", "Plugins\PluginInterface\PluginInterface.csproj", "{827B77A9-20F8-4C61-A76A-51198FEAB3D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlobalLogger", "GlobalLogger\GlobalLogger.csproj", "{FC26BC37-D892-4531-ABE2-C3F65CCDC4FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeLabReporting", "HomeLabReporting\HomeLabReporting.csproj", "{BD880FF8-F240-4071-BCF4-7FA0DA3EB230}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeLabReporting", "Plugins\HomeLabReporting\HomeLabReporting.csproj", "{BD880FF8-F240-4071-BCF4-7FA0DA3EB230}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameToRole", "GameToRole\GameToRole.csproj", "{6A326E3F-3663-4510-B2A1-1DDA2F7E6395}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameToRole", "Plugins\GameToRole\GameToRole.csproj", "{6A326E3F-3663-4510-B2A1-1DDA2F7E6395}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logger", "Logger", "{18D1145F-FF2B-4EF0-A419-570026659610}"
 EndProject
@@ -30,9 +30,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interface", "Interface", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Binaries", "Binaries", "{29CBB1BF-CE46-4FDF-9957-7C92FC303E44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyStats", "SpotifyStats\SpotifyStats.csproj", "{A32761B9-129A-495A-8BE1-6BA7064ADA72}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyStats", "Plugins\SpotifyStats\SpotifyStats.csproj", "{A32761B9-129A-495A-8BE1-6BA7064ADA72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinQuitLogger", "JoinQuitLogger\JoinQuitLogger.csproj", "{67B324CC-AB8E-466F-AFCD-F11A709DEFDE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinQuitLogger", "Plugins\JoinQuitLogger\JoinQuitLogger.csproj", "{67B324CC-AB8E-466F-AFCD-F11A709DEFDE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommandHandler", "CommandHandler\CommandHandler.csproj", "{A945612B-37AC-4E68-86BB-2797D2CC3DD7}"
 EndProject

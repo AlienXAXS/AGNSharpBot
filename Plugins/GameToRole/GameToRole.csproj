@@ -75,19 +75,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj">
+    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj">
       <Project>{91e9e7bd-75c9-4e98-84aa-2c271922e5c2}</Project>
       <Name>Discord.Net.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj">
+    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj">
       <Project>{98f3996e-7798-407f-9f7e-ff67b82f6d0d}</Project>
       <Name>Discord.Net.Rest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj">
+    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj">
       <Project>{04429829-437D-43D4-AAEB-27A2C0FEE93B}</Project>
       <Name>Discord.Net.WebSocket</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GlobalLogger\GlobalLogger.csproj">
+    <ProjectReference Include="..\..\GlobalLogger\GlobalLogger.csproj">
       <Project>{fc26bc37-d892-4531-abe2-c3f65ccdc4fb}</Project>
       <Name>GlobalLogger</Name>
     </ProjectReference>
