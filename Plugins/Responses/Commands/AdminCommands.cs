@@ -12,7 +12,6 @@ namespace Responses.Commands
     class AdminCommands
     {
         [Command("userinfo", "Get's otherwise invisible information about a user that the discord client cannot retrieve. USAGE: userinfo <userid>")]
-        [Permissions(Permissions.PermissionTypes.Administrator)]
         public async void GetUserInfo(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
@@ -60,7 +59,6 @@ namespace Responses.Commands
         }
 
         [Command("channelinfo", "Gets the channels info, as well as the current Guild ID that the channel belongs to - execute within the channel you wish to get the info for.")]
-        [Permissions(Permissions.PermissionTypes.Administrator)]
         public async void GetChannelInfo(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
@@ -75,7 +73,6 @@ namespace Responses.Commands
         }
 
         [Command("rmmsg", "rmmsg <userid> <#messages> [from msg id] - Removes the specified number of messages for a user in the channel you execute the command in")]
-        [Permissions(Permissions.PermissionTypes.Administrator)]
         public async void RemoveUserMessages(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {

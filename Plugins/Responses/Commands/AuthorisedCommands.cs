@@ -15,7 +15,6 @@ namespace Responses.Commands
         private readonly AuthorisedCommandsPermission _authCmdsPermissonsHandler = new AuthorisedCommandsPermission();
 
         [Command("move", "Moves a user to your voice channel, mention a user to move them - Usage: !move <username> [username] [username]...")]
-        [Permissions(Permissions.PermissionTypes.Guest)]
         public async void MoveMember(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {

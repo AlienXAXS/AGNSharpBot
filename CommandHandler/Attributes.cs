@@ -20,7 +20,6 @@ namespace CommandHandler
 
         public enum PermissionTypes
         {
-            Administrator,
             Guest
         }
 

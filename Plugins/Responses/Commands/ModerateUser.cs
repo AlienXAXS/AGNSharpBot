@@ -97,7 +97,6 @@ namespace Responses.Commands
     class ModerateUser
     {
         [Command("mod", "!mod <userid> - Moderate a user using an interactive menu")]
-        [Permissions(Permissions.PermissionTypes.Administrator)]
         public async void MenuTest(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
