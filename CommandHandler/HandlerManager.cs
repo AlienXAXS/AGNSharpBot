@@ -80,44 +80,37 @@ namespace CommandHandler
             {
                 foreach (var handler in _registeredHandlers)
                 {
-                    //var namespaceClasses = handler.Assembly.GetTypes().Where(x =>
-                    //    x.Namespace != null && x.Namespace.Equals(handler.Type.Namespace, StringComparison.Ordinal));
+                    foreach (var thisMethod in handler.Type.GetMethods())
+                    {
+                        var cmdString = (Command) thisMethod.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
+                        var cmdAliases = (Alias) thisMethod.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
+                        var cmdPermissions = (Permissions) thisMethod.GetCustomAttributes(typeof(Permission), true)
+                            .FirstOrDefault();
 
-                    //foreach (var thisClass in namespaceClasses)
-                    //{
-                        //var thisClassMethods = thisClass.GetMethods();
-                        foreach (var thisMethod in handler.Type.GetMethods())
+                        var cmdMatch = false;
+                        if (cmdString?.Value == paramCommand)
+                            cmdMatch = true;
+                        else
+                            if ( cmdAliases != null )
+                                if (cmdAliases.Value.Any(aliasEntry => aliasEntry.Equals(paramCommand)))
+                                    cmdMatch = true;
+
+                        //NRE Check
+                        if (!cmdMatch) continue;
+
+                        if (cmdPermissions?.Value == Permissions.PermissionTypes.Guest || Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author, $"{handler.Type}.{thisMethod.Name}"))
                         {
-                            var cmdString = (Command) thisMethod.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
-                            var cmdAliases = (Alias) thisMethod.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
-
-                            var cmdPermissions = (Permissions) thisMethod.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
-
-                            var cmdMatch = false;
-                            if (cmdString?.Value == paramCommand)
-                                cmdMatch = true;
-                            else
-                                if ( cmdAliases != null )
-                                    if (cmdAliases.Value.Any(aliasEntry => aliasEntry.Equals(paramCommand)))
-                                        cmdMatch = true;
-
-                            //NRE Check
-                            if (!cmdMatch) continue;
-
-                            if (Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author, $"{handler.Type}.{thisMethod.Name}"))
-                            {
-                                // Execute the method
-                                var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
-                                var activator = Activator.CreateInstance(handler.Type);
-                                thisMethod.Invoke(activator, paramArray);
-                            }
-                            else
-                            {
-                                socketMessage.Channel.SendMessageAsync(
-                                    $"{socketMessage.Author.Username}, You do not have the permissions to run that command");
-                            }
+                            // Execute the method
+                            var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
+                            var activator = Activator.CreateInstance(handler.Type);
+                            thisMethod.Invoke(activator, paramArray);
                         }
-                    //}
+                        else
+                        {
+                            socketMessage.Channel.SendMessageAsync(
+                                $"{socketMessage.Author.Username}, You do not have the permissions to run that command");
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -125,20 +118,6 @@ namespace CommandHandler
                 socketMessage.Channel.SendMessageAsync(ex.Message);
                 socketMessage.Channel.SendMessageAsync(ex.StackTrace);
             }
-        }
-
-        private bool CheckPermissions(Permissions.PermissionTypes permission, SocketMessage socketMessage)
-        {
-            switch (permission)
-            {
-                case Permissions.PermissionTypes.Administrator:
-                    return ((SocketGuildUser)socketMessage.Author).Roles.Any(x => x.Permissions.Administrator);
-
-                case Permissions.PermissionTypes.Guest:
-                    return true;
-            }
-
-            return false;
         }
 
         private string[] SplitArguments(string commandLine)
