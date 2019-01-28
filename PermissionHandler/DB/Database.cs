@@ -21,6 +21,22 @@ namespace PermissionHandler
             Load();
         }
 
+        /// <summary>
+        /// Adds a new permission node, but only the path
+        /// </summary>
+        /// <param name="path">The path string (Assembly.Namespace.Class.MethodName)</param>
+        /// <returns>The created node</returns>
+        public Node AddPermission(string path)
+        {
+            var existingPathNode = GetRootPermissionNode(path);
+            if (existingPathNode != null) return existingPathNode;
+
+            var newNode = new Node().AssignPath(path);
+            _nodes.Add(newNode);
+            Save();
+            return newNode;
+        }
+
         public Node AddPermission(string path, string owner, NodePermission permission, OwnerType ownerType)
         {
             // first check to see if this path node already exists, if so we must append to it.
