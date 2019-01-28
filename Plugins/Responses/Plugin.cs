@@ -25,6 +25,7 @@ namespace Responses
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminCommands>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Informational.LastOnline>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AuthorisedCommands>();
+            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Permissions>();
         }
 
         Task IPlugin.CommandAsync(string command, string message, SocketMessage sktMessage)
