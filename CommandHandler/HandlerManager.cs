@@ -80,13 +80,13 @@ namespace CommandHandler
             {
                 foreach (var handler in _registeredHandlers)
                 {
-                    var namespaceClasses = handler.Assembly.GetTypes().Where(x =>
-                        x.Namespace != null && x.Namespace.Equals(handler.Type.Namespace, StringComparison.Ordinal));
+                    //var namespaceClasses = handler.Assembly.GetTypes().Where(x =>
+                    //    x.Namespace != null && x.Namespace.Equals(handler.Type.Namespace, StringComparison.Ordinal));
 
-                    foreach (var thisClass in namespaceClasses)
-                    {
-                        var thisClassMethods = thisClass.GetMethods();
-                        foreach (var thisMethod in thisClassMethods)
+                    //foreach (var thisClass in namespaceClasses)
+                    //{
+                        //var thisClassMethods = thisClass.GetMethods();
+                        foreach (var thisMethod in handler.Type.GetMethods())
                         {
                             var cmdString = (Command) thisMethod.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
                             var cmdAliases = (Alias) thisMethod.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
@@ -101,27 +101,23 @@ namespace CommandHandler
                                     if (cmdAliases.Value.Any(aliasEntry => aliasEntry.Equals(paramCommand)))
                                         cmdMatch = true;
 
-                            //NRE Check this bitch!
-                            if (cmdMatch)
+                            //NRE Check
+                            if (!cmdMatch) continue;
+
+                            if (Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author, $"{handler.Type}.{thisMethod.Name}"))
                             {
-
-                                Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author);
-
-                                if (cmdPermissions == null || CheckPermissions(cmdPermissions.Value, socketMessage))
-                                {
-                                    // Execute the method
-                                    var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
-                                    var activator = Activator.CreateInstance(thisClass);
-                                    thisMethod.Invoke(activator, paramArray);
-                                }
-                                else
-                                {
-                                    socketMessage.Channel.SendMessageAsync(
-                                        $"{socketMessage.Author.Username}, You do not have the permissions to run that command");
-                                }
+                                // Execute the method
+                                var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
+                                var activator = Activator.CreateInstance(handler.Type);
+                                thisMethod.Invoke(activator, paramArray);
+                            }
+                            else
+                            {
+                                socketMessage.Channel.SendMessageAsync(
+                                    $"{socketMessage.Author.Username}, You do not have the permissions to run that command");
                             }
                         }
-                    }
+                    //}
                 }
             }
             catch (Exception ex)
