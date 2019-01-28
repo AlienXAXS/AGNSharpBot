@@ -17,7 +17,7 @@ namespace PermissionHandler.DB
         Role
     }
 
-    class SubNode
+    public class SubNode
     {
         public ulong Owner; // Who owns this permission
         public NodePermission Permission; // The permission the owner has
@@ -31,7 +31,7 @@ namespace PermissionHandler.DB
         }
     }
 
-    class Node
+    public class Node
     {
         public string Path;
         public List<SubNode> Permissions = new List<SubNode>();

@@ -36,7 +36,7 @@
     <Compile Include="Commands\Handlers\AuthorisedCommandsPermission.cs" />
     <Compile Include="Commands\ModerateUser.cs" />
     <Compile Include="Commands\AdminCommands.cs" />
-    <Compile Include="Commands\Permissions.cs" />
+    <Compile Include="Commands\AdminPermissions.cs" />
     <Compile Include="Informational\LastOnline.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

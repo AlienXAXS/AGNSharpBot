@@ -49,6 +49,7 @@ namespace PermissionHandler
             if (existingPathNode != null)
             {
                 existingPathNode.AssignOwner(owner, permission, ownerType);
+                Save();
                 return existingPathNode;
             }
 
@@ -71,6 +72,7 @@ namespace PermissionHandler
 
             var updatedNode = node.UpdateOwner(owner, permission, ownerType);
 
+            Save();
             return updatedNode;
         }
 
@@ -82,6 +84,7 @@ namespace PermissionHandler
                 throw new Exception($"Unable to Remove Permission for {owner}, unable to find root node called {path}");
 
             node.RemoveOwner(owner);
+            Save();
         }
 
         private Node GetRootPermissionNode(string path)

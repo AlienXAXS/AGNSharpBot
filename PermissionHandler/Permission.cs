@@ -36,8 +36,10 @@ namespace PermissionHandler
                     var pathName = $"{typeof(T)}.{thisMethod.Name}";
                     _registeredPermissionPaths.Add(pathName);
                     _database.AddPermission(pathName);
-                    Logger.Instance.Log($"Dynamically registered a new permission path node: {pathName}",
-                        Logger.LoggerType.ConsoleAndDiscord);
+
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                    Logger.Instance.Log($"Dynamically registered a new permission path node: {pathName}", Logger.LoggerType.ConsoleAndDiscord);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 }
             }
         }
@@ -45,6 +47,30 @@ namespace PermissionHandler
         public List<string> GetRegisteredPermissionPaths()
         {
             return _registeredPermissionPaths;
+        }
+
+        public Node Add(string path, ulong owner, NodePermission permission, OwnerType ownerType)
+        {
+            var foundPath = _database.GetData().DefaultIfEmpty(null).FirstOrDefault(x => x.Path.Equals(path));
+            if ( foundPath == null )
+                throw new Exception("The supplied path is invalid");
+
+            if ( foundPath.Permissions.Any(x => x.Owner == owner) )
+                throw new Exception("The supplied user is already a member of this permission path, either modify them or remove them");
+
+            return _database.AddPermission(path, owner, permission, ownerType);
+        }
+
+        public void Remove(string path, ulong owner)
+        {
+            var foundPath = _database.GetData().DefaultIfEmpty(null).FirstOrDefault(x => x.Path.Equals(path));
+            if (foundPath == null)
+                throw new Exception("The supplied path is invalid");
+
+            if (foundPath.Permissions.Where(x => x.Owner == owner).DefaultIfEmpty(null).FirstOrDefault() == null)
+                throw new Exception("The supplied user is not a member of this permission path");
+
+            _database.RemovePermission(path,owner);
         }
 
         public bool CheckPermission(SocketGuildUser sktUser,
@@ -59,15 +85,19 @@ namespace PermissionHandler
                 throw new Exception(
                     $"Possible unknown permission path with {path}, user {sktUser.Username} attempted a command that I did not recognise");
 
+            if (permissionNode.Permissions.Count == 0)
+                return false;
+
             var canPermit = false;
-            var foundExplicitDeny = false;
+            bool foundExplicitDeny;
 
             // Check users roles
             foreach (var role in sktUser.Roles)
             {
                 var rolePerm = permissionNode.Permissions.DefaultIfEmpty(null)
                     .FirstOrDefault(x => x.Owner.Equals(role.Id));
-                switch (rolePerm.Permission)
+
+                switch (rolePerm?.Permission)
                 {
                     case NodePermission.Allow:
                         canPermit = true;
@@ -76,7 +106,15 @@ namespace PermissionHandler
                         foundExplicitDeny = true;
                         break;
                 }
+
+                if (canPermit)
+                    break;
             }
+
+            // Find explicit user allow
+            if ( !canPermit )
+            canPermit = permissionNode.Permissions
+                .Any(x => x.Owner.Equals(sktUser.Id) && x.Permission == NodePermission.Allow);
 
             // Find explicit user deny
             foundExplicitDeny = permissionNode.Permissions
