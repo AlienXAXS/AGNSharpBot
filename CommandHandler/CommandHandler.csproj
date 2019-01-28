@@ -74,6 +74,10 @@
       <Project>{04429829-437d-43d4-aaeb-27a2c0fee93b}</Project>
       <Name>Discord.Net.WebSocket</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PermissionHandler\PermissionHandler.csproj">
+      <Project>{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}</Project>
+      <Name>PermissionHandler</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using PermissionHandler;
 
 namespace CommandHandler
 {
@@ -12,8 +13,8 @@ namespace CommandHandler
     {
         private class HandlerType
         {
-            public Assembly assembly;
-            public Type type;
+            public Assembly Assembly;
+            public Type Type;
         }
 
         private static HandlerManager _instance;
@@ -25,7 +26,11 @@ namespace CommandHandler
 
         public void RegisterHandler<T>()
         {
-            _registeredHandlers.Add( new HandlerType() { assembly = Assembly.GetCallingAssembly(), type = typeof(T) });
+            // Register our handler
+            _registeredHandlers.Add( new HandlerType() { Assembly = Assembly.GetCallingAssembly(), Type = typeof(T) });
+
+            // Register it with the permission system
+            Permission.Instance.RegisterPermission<T>(Assembly.GetCallingAssembly());
         }
 
         public void RegisterDiscord(DiscordSocketClient discordSocketClient)
@@ -75,20 +80,18 @@ namespace CommandHandler
             {
                 foreach (var handler in _registeredHandlers)
                 {
-                    var namespaceClasses = handler.assembly.GetTypes().Where(x =>
-                        x.Namespace != null && x.Namespace.Equals(handler.type.Namespace, StringComparison.Ordinal));
+                    var namespaceClasses = handler.Assembly.GetTypes().Where(x =>
+                        x.Namespace != null && x.Namespace.Equals(handler.Type.Namespace, StringComparison.Ordinal));
 
                     foreach (var thisClass in namespaceClasses)
                     {
                         var thisClassMethods = thisClass.GetMethods();
                         foreach (var thisMethod in thisClassMethods)
                         {
-                            var cmdString =
-                                (Command) thisMethod.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
-                            var cmdPermissions =
-                                (Permissions) thisMethod.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
-                            var cmdAliases =
-                                (Alias) thisMethod.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
+                            var cmdString = (Command) thisMethod.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
+                            var cmdAliases = (Alias) thisMethod.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
+
+                            var cmdPermissions = (Permissions) thisMethod.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
 
                             var cmdMatch = false;
                             if (cmdString?.Value == paramCommand)
@@ -101,6 +104,9 @@ namespace CommandHandler
                             //NRE Check this bitch!
                             if (cmdMatch)
                             {
+
+                                Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author);
+
                                 if (cmdPermissions == null || CheckPermissions(cmdPermissions.Value, socketMessage))
                                 {
                                     // Execute the method

@@ -40,25 +40,29 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordMenu", "DiscordMenu\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DIscord", "DIscord", "{73F183B5-8051-48C0-BEFB-270E23957A05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj", "{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "..\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj", "{91E9E7BD-75C9-4E98-84AA-2C271922E5C2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Impls", "Impls", "{288C363D-A636-4EAE-9AC1-4698B641B26E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Rest", "..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj", "{98F3996E-7798-407F-9F7E-FF67B82F6D0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Rest", "..\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj", "{98F3996E-7798-407F-9F7E-FF67B82F6D0D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Commands", "..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Commands\Discord.Net.Commands.csproj", "{6CB2A33F-FEF9-4254-9DA5-54FE2A7B6F54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Commands", "..\Discord.Net\src\Discord.Net.Commands\Discord.Net.Commands.csproj", "{6CB2A33F-FEF9-4254-9DA5-54FE2A7B6F54}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.WebSocket", "..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj", "{04429829-437D-43D4-AAEB-27A2C0FEE93B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.WebSocket", "..\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj", "{04429829-437D-43D4-AAEB-27A2C0FEE93B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{CC3D4B1C-9DE0-448B-8AE7-F3F1F3EC5C3A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Webhook", "..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Webhook\Discord.Net.Webhook.csproj", "{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Webhook", "..\Discord.Net\src\Discord.Net.Webhook\Discord.Net.Webhook.csproj", "{9AFAB80E-D2D3-4EDB-B58C-BACA78D1EA30}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01_basic_ping_bot", "..\..\..\Documents\GitHub\Discord.Net\samples\01_basic_ping_bot\01_basic_ping_bot.csproj", "{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01_basic_ping_bot", "..\Discord.Net\samples\01_basic_ping_bot\01_basic_ping_bot.csproj", "{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02_commands_framework", "..\..\..\Documents\GitHub\Discord.Net\samples\02_commands_framework\02_commands_framework.csproj", "{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02_commands_framework", "..\Discord.Net\samples\02_commands_framework\02_commands_framework.csproj", "{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{15E02852-F438-42CD-A860-1A9F2BDC968C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PermissionHandler", "PermissionHandler\PermissionHandler.csproj", "{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -274,6 +278,18 @@ Global
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}.Release|x64.Build.0 = Release|Any CPU
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}.Release|x86.ActiveCfg = Release|Any CPU
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76}.Release|x86.Build.0 = Release|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Debug|x64.Build.0 = Debug|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Debug|x86.Build.0 = Debug|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Release|x64.ActiveCfg = Release|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Release|x64.Build.0 = Release|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Release|x86.ActiveCfg = Release|Any CPU
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -288,6 +304,8 @@ Global
 		{29CBB1BF-CE46-4FDF-9957-7C92FC303E44} = {42CC2C25-EF23-4A17-8F39-44CC276349B8}
 		{A32761B9-129A-495A-8BE1-6BA7064ADA72} = {29CBB1BF-CE46-4FDF-9957-7C92FC303E44}
 		{67B324CC-AB8E-466F-AFCD-F11A709DEFDE} = {29CBB1BF-CE46-4FDF-9957-7C92FC303E44}
+		{A945612B-37AC-4E68-86BB-2797D2CC3DD7} = {15E02852-F438-42CD-A860-1A9F2BDC968C}
+		{C0F4B4CE-57F7-444E-ACD4-E73C1E20421C} = {15E02852-F438-42CD-A860-1A9F2BDC968C}
 		{91E9E7BD-75C9-4E98-84AA-2C271922E5C2} = {73F183B5-8051-48C0-BEFB-270E23957A05}
 		{288C363D-A636-4EAE-9AC1-4698B641B26E} = {73F183B5-8051-48C0-BEFB-270E23957A05}
 		{98F3996E-7798-407F-9F7E-FF67B82F6D0D} = {288C363D-A636-4EAE-9AC1-4698B641B26E}
@@ -298,6 +316,7 @@ Global
 		{BB59D5B5-E7B0-4BF4-8F82-D14431B2799B} = {73F183B5-8051-48C0-BEFB-270E23957A05}
 		{F2FF84FB-F6AD-47E5-9EE5-18206CAE136E} = {BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}
 		{4E1F1F40-B1DD-40C9-A4B1-A2046A4C9C76} = {BB59D5B5-E7B0-4BF4-8F82-D14431B2799B}
+		{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35} = {15E02852-F438-42CD-A860-1A9F2BDC968C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D2404771-EEC8-45F2-9D71-F3373F6C1495}
