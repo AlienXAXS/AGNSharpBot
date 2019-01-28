@@ -26,7 +26,6 @@ namespace Responses.Commands
                 return;
             }
 
-
             switch (parameters[1].ToLower())
             {
                 case "help":
