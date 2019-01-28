@@ -37,7 +37,12 @@ namespace PermissionHandler
             return newNode;
         }
 
-        public Node AddPermission(string path, string owner, NodePermission permission, OwnerType ownerType)
+        public List<Node> GetData()
+        {
+            return _nodes;
+        }
+
+        public Node AddPermission(string path, ulong owner, NodePermission permission, OwnerType ownerType)
         {
             // first check to see if this path node already exists, if so we must append to it.
             var existingPathNode = GetRootPermissionNode(path);
@@ -56,7 +61,7 @@ namespace PermissionHandler
             return newNode;
         }
 
-        public Node UpdatePermission(string path, string owner, NodePermission permission, OwnerType ownerType)
+        public Node UpdatePermission(string path, ulong owner, NodePermission permission, OwnerType ownerType)
         {
             // Find the root path node
             var node = GetRootPermissionNode(path);
@@ -69,7 +74,7 @@ namespace PermissionHandler
             return updatedNode;
         }
 
-        public void RemovePermission(string path, string owner)
+        public void RemovePermission(string path, ulong owner)
         {
             // Find the root path node
             var node = GetRootPermissionNode(path);
