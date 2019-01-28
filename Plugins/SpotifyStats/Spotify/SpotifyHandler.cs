@@ -21,6 +21,7 @@ namespace SpotifyStats.Spotify
         {
             _discordSocketClient = discordSocket;
             _discordSocketClient.GuildMemberUpdated += OnGuildMemberUpdated;
+
             await Database.SpotifySongDatabase.Instance.LoadTracks();
         }
 

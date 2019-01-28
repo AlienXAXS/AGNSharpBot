@@ -15,11 +15,20 @@ namespace DiscordMenu
         public int Id;
         public string Caption;
         public Emoji Emoji;
+        public string Metadata;
 
         public MenuOption(int id, string caption)
         {
             Id = id;
             Caption = caption;
+            Metadata = null;
+        }
+
+        public MenuOption(int id, string caption, string metaData)
+        {
+            Id = id;
+            Caption = caption;
+            Metadata = metaData;
         }
     }
 
@@ -42,6 +51,16 @@ namespace DiscordMenu
                 throw new Exception("DiscordSocket is not set");
 
             MenuOptions.Add(new MenuOption(-1, "Cancel Task"));
+        }
+
+        public MenuHandler AddOption(string caption, string metaData)
+        {
+            if (MenuOptions.Count == 10)
+                throw new IndexOutOfRangeException("List is too large, can only contain 10 items");
+
+            MenuOptions.Add(new MenuOption(MenuOptions.Count, caption, metaData));
+
+            return this;
         }
 
         public MenuHandler AddOption(string caption)
