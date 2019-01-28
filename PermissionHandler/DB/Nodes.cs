@@ -34,7 +34,7 @@ namespace PermissionHandler.DB
     class Node
     {
         public string Path;
-        private List<SubNode> _nodes;
+        private List<SubNode> _nodes = new List<SubNode>();
 
         public Node AssignPath(string path)
         {
@@ -44,12 +44,7 @@ namespace PermissionHandler.DB
 
         public Node AssignOwner(string owner, NodePermission permission, OwnerType ownerType)
         {
-            // Init our list if we need to
-            if (_nodes == null)
-                _nodes = new List<SubNode>();
-
             _nodes.Add(new SubNode(owner, permission, ownerType));
-
             return this;
         }
 
