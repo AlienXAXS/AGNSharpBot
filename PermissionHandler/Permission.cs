@@ -20,31 +20,34 @@ namespace PermissionHandler
 
         public void RegisterPermission<T>(Assembly assembly)
         {
-            var namespaceClasses = assembly.GetTypes().Where(x =>
-                x.Namespace != null && x.Namespace.Equals(typeof(T).Namespace, StringComparison.Ordinal));
-                
-            foreach (var thisClass in namespaceClasses)
-            {
-                var thisClassMethods = thisClass.GetMethods();
-                foreach (var thisMethod in thisClassMethods)
-                {
-                    var requiredAttributeFound = thisMethod.GetCustomAttributesData().Any(x => x.AttributeType.Name.Equals("Command"));
+            var t = typeof(T);
 
-                    if (requiredAttributeFound)
-                    {
-                        var pathName = $"{typeof(T)}.{thisMethod.Name}";
-                        _registeredPermissionPaths.Add(pathName);
-                        Logger.Instance.Log($"Dynamically registered a new permission path node: {pathName}", Logger.LoggerType.ConsoleAndDiscord).Wait();
-                    }
+            //var namespaceClasses = assembly.GetTypes().Where(x => x.Namespace != null && x.Namespace.Equals(typeof(T).Namespace, StringComparison.Ordinal) && x.IsClass);
+
+            foreach (var thisMethod in t.GetMethods())
+            {
+                var requiredAttributeFound = thisMethod.GetCustomAttributesData().Any(x => x.AttributeType.Name.Equals("Command"));
+
+                if (requiredAttributeFound)
+                {
+                    var pathName = $"{typeof(T)}.{thisMethod.Name}";
+                    _registeredPermissionPaths.Add(pathName);
+                    _database.AddPermission(pathName);
+                    Logger.Instance.Log($"Dynamically registered a new permission path node: {pathName}", Logger.LoggerType.ConsoleAndDiscord).Wait();
                 }
             }
         }
 
-        public void CheckPermission(SocketGuildUser sktUser,
+        public bool CheckPermission(SocketGuildUser sktUser,
             [System.Runtime.CompilerServices.CallerMemberName]
             string memberName = "")
         {
-            
+            if (sktUser.Roles.Any(x => x.Permissions.Administrator))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
