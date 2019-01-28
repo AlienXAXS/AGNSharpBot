@@ -19,11 +19,11 @@ namespace PermissionHandler.DB
 
     class SubNode
     {
-        public string Owner; // Who owns this permission
+        public ulong Owner; // Who owns this permission
         public NodePermission Permission; // The permission the owner has
         public OwnerType OwnerType;
 
-        public SubNode(string owner, NodePermission permission, OwnerType ownerType)
+        public SubNode(ulong owner, NodePermission permission, OwnerType ownerType)
         {
             Owner = owner;
             Permission = permission;
@@ -34,7 +34,7 @@ namespace PermissionHandler.DB
     class Node
     {
         public string Path;
-        private List<SubNode> _nodes = new List<SubNode>();
+        public List<SubNode> Permissions = new List<SubNode>();
 
         public Node AssignPath(string path)
         {
@@ -42,15 +42,15 @@ namespace PermissionHandler.DB
             return this;
         }
 
-        public Node AssignOwner(string owner, NodePermission permission, OwnerType ownerType)
+        public Node AssignOwner(ulong owner, NodePermission permission, OwnerType ownerType)
         {
-            _nodes.Add(new SubNode(owner, permission, ownerType));
+            Permissions.Add(new SubNode(owner, permission, ownerType));
             return this;
         }
 
-        public Node UpdateOwner(string owner, NodePermission permission, OwnerType ownerType)
+        public Node UpdateOwner(ulong owner, NodePermission permission, OwnerType ownerType)
         {
-            var ownerNode = _nodes.Where(x => x.Owner.Equals(owner)).DefaultIfEmpty(null).FirstOrDefault();
+            var ownerNode = Permissions.Where(x => x.Owner.Equals(owner)).DefaultIfEmpty(null).FirstOrDefault();
 
             if (ownerNode == null)
                 throw new Exception(
@@ -62,10 +62,10 @@ namespace PermissionHandler.DB
             return this;
         }
 
-        public Node RemoveOwner(string owner)
+        public Node RemoveOwner(ulong owner)
         {
             // Removes all of the owner nodes from this permission path that match the owner param
-            _nodes.RemoveAll(node => node.Owner.Equals(owner));
+            Permissions.RemoveAll(node => node.Owner.Equals(owner));
             return this;
         }
     }
