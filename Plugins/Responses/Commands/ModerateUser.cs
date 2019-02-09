@@ -58,7 +58,7 @@ namespace Responses.Commands
             _myTask.Start();
         }
 
-        private async void MenuHandlerOnOnMenuOptionSelected(MenuOption menuOption)
+        private async void MenuHandlerOnOnMenuOptionSelected(object sender, MenuOption menuOption)
         {
             IsFinished = true;
             if (Victim.Roles.Any(x => x.Permissions.Administrator))
