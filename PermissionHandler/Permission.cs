@@ -89,7 +89,7 @@ namespace PermissionHandler
                 return false;
 
             var canPermit = false;
-            bool foundExplicitDeny;
+            bool foundExplicitRoleDeny = false;
 
             // Check users roles
             foreach (var role in sktUser.Roles)
@@ -103,7 +103,7 @@ namespace PermissionHandler
                         canPermit = true;
                         break;
                     case NodePermission.Deny:
-                        foundExplicitDeny = true;
+                        foundExplicitRoleDeny = true;
                         break;
                 }
 
@@ -117,10 +117,10 @@ namespace PermissionHandler
                 .Any(x => x.Owner.Equals(sktUser.Id) && x.Permission == NodePermission.Allow);
 
             // Find explicit user deny
-            foundExplicitDeny = permissionNode.Permissions
+            var foundExplicitDeny = permissionNode.Permissions
                 .Any(x => x.Owner.Equals(sktUser.Id) && x.Permission == NodePermission.Deny);
 
-            return canPermit && !foundExplicitDeny;
+            return canPermit && !foundExplicitDeny && !foundExplicitRoleDeny;
         }
     }
 }
