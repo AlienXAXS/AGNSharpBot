@@ -19,8 +19,11 @@ namespace SpotifyStats
         {
             GlobalLogger.Logger.Instance.WriteConsole($"SpotifyStats.dll Plugin Loading...");
 
+            // DB stuff
+            SQLite.SqLiteHandler.Instance.InitDatabase();
+
             // Setup our discordclient link to spotifystats
-                await Spotify.SpotifyHandler.Instance.SetupDiscordInstance(DiscordClient);
+            Spotify.SpotifyHandler.Instance.SetupDiscordInstance(DiscordClient);
         }
 
         public void Dispose()
