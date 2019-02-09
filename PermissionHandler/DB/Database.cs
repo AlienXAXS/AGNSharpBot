@@ -95,31 +95,39 @@ namespace PermissionHandler
         #region Save / Load Functionality
         public void Load()
         {
-            try
+            lock (_nodes)
             {
-                if ( !System.IO.File.Exists(StorageLocation) )
-                    throw new Exception("Unable to load permissions database as the database has yet to be used, this error should go away once you use it");
-                _nodes = JsonConvert.DeserializeObject<List<Node>>(System.IO.File.ReadAllText(StorageLocation));
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.Log(
-                    $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to load permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}",
-                    Logger.LoggerType.ConsoleAndDiscord).Wait();
+                try
+                {
+                    if (!System.IO.File.Exists(StorageLocation))
+                        throw new Exception(
+                            "Unable to load permissions database as the database has yet to be used, this error should go away once you use it");
+                    _nodes = JsonConvert.DeserializeObject<List<Node>>(System.IO.File.ReadAllText(StorageLocation));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance.Log(
+                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to load permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}",
+                        Logger.LoggerType.ConsoleAndDiscord).Wait();
+                }
             }
         }
 
         public void Save()
         {
-            try
+            lock (_nodes)
             {
-                System.IO.File.WriteAllText(StorageLocation, JsonConvert.SerializeObject(_nodes, Formatting.Indented));
-            }
-            catch (Exception ex)
-            {
-                Logger.Instance.Log(
-                    $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to save permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}",
-                    Logger.LoggerType.ConsoleAndDiscord).Wait();
+                try
+                {
+                    System.IO.File.WriteAllText(StorageLocation,
+                        JsonConvert.SerializeObject(_nodes, Formatting.Indented));
+                }
+                catch (Exception ex)
+                {
+                    Logger.Instance.Log(
+                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to save permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}",
+                        Logger.LoggerType.ConsoleAndDiscord).Wait();
+                }
             }
         }
         #endregion
