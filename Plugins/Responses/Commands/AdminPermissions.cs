@@ -77,7 +77,7 @@ namespace Responses.Commands
             }
         }
 
-        private async void Help(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
+        private void Help(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
             SendMessage("\r\n`Permissions System Help`\r\n" +
                       "AGN Sharp Bot has a new Permission system, it's in Alpha stage and could be buggy, below is how to use it - please note that any Discord role that has the Administrator permission automatically has access to every permission.\r\n\r\n" +
@@ -89,7 +89,7 @@ namespace Responses.Commands
                       "`!perm listpaths`\r\nLists the current registered permission path nodes", sktMessage);
         }
 
-        private async void ListPaths(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
+        private void ListPaths(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
             var output = "`Current registered permission paths`\r\n";
             foreach (var path in Permission.Instance.GetRegisteredPermissionPaths())
@@ -100,7 +100,7 @@ namespace Responses.Commands
             SendMessage(output, sktMessage);
         }
 
-        private async void Add(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
+        private void Add(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
             // Integrity check against length of params, expecting at least 4
             // will do deny check using last param, check if boolean.
@@ -135,7 +135,7 @@ namespace Responses.Commands
             }
         }
 
-        private async void LookupRole(string[] parameters, SocketMessage sktMessage,
+        private void LookupRole(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
             if (sktMessage.MentionedRoles.Count == 0)
@@ -151,7 +151,7 @@ namespace Responses.Commands
                 $"Role ID: {mentionedRole.Id}", sktMessage);
         }
 
-        private async void NotReadyCommand(string[] parameters, SocketMessage sktMessage,
+        private void NotReadyCommand(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
             SendMessage("Sorry, but this command is not available at this time.", sktMessage);
