@@ -9,7 +9,7 @@ using GlobalLogger;
 namespace JoinQuitLogger
 {
     [Export(typeof(IPlugin))]
-    public class Plugin : IPlugin
+    public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "JoinQuitLogger";
         public DiscordSocketClient DiscordClient { get; set; }

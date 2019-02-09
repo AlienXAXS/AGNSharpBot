@@ -8,7 +8,7 @@
     using PluginInterface;
 
     [Export(typeof(IPlugin))]
-    public class Plugin : IPlugin
+    public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "AlienX's HomeLab Reporting";
         public DiscordSocketClient DiscordClient { get; set; }

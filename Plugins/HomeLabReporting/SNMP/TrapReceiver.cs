@@ -37,7 +37,7 @@ namespace HomeLabReporting.SNMP
         private DiscordSocketClient _discordSocketClient;
         private TrapReceiverConfiguration _trapReceiverConfiguration;
 
-        public delegate void EventRaiser(IpAddress ipAddress, VbCollection snmpVbCollection);
+        public delegate void EventRaiser(object sender, IpAddress ipAddress, VbCollection snmpVbCollection);
 
         public event EventRaiser OnTrapReceived;
 
@@ -138,7 +138,7 @@ namespace HomeLabReporting.SNMP
                         var pkt = new SnmpV1TrapPacket();
                         pkt.decode(inData, inLength);
 
-                        OnTrapReceived?.Invoke(pkt.Pdu.AgentAddress, pkt.Pdu.VbList);
+                        OnTrapReceived?.Invoke(this, pkt.Pdu.AgentAddress, pkt.Pdu.VbList);
                     }
                     else
                     {

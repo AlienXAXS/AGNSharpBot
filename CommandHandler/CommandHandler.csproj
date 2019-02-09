@@ -66,5 +66,11 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PermissionHandler\PermissionHandler.csproj">
+      <Project>{79D98CA3-6292-476A-A7E2-47D25C272342}</Project>
+      <Name>PermissionHandler</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

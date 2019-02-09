@@ -42,7 +42,7 @@ namespace DiscordMenu
         private readonly List<MenuOption> MenuOptions = new List<MenuOption>();
         private RestUserMessage Message = null;
 
-        public delegate void MenuOptionSelected(MenuOption menuOption);
+        public delegate void MenuOptionSelected(object sender, MenuOption menuOption);
         public event MenuOptionSelected OnMenuOptionSelected;
 
         public void Init()
@@ -110,7 +110,7 @@ namespace DiscordMenu
             if ( foundMenuOption.Id == -1 )
                 Dispose("User Canceled Task");
             else
-                OnMenuOptionSelected?.Invoke(foundMenuOption);
+                OnMenuOptionSelected?.Invoke(this, foundMenuOption);
 
             return Task.CompletedTask;
         }

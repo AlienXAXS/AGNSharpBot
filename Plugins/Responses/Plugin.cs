@@ -8,7 +8,7 @@ using Discord.WebSocket;
 namespace Responses
 {
     [Export(typeof(IPlugin))]
-    public class Plugin : IPlugin
+    public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "Discord Responses";
         DiscordSocketClient IPlugin.DiscordClient { get; set; }

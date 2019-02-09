@@ -8,7 +8,7 @@ using Discord.WebSocket;
 namespace SpotifyStats
 {
     [Export(typeof(IPlugin))]
-    public class Plugin : IPlugin
+    public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "Spotify Stats";
         public DiscordSocketClient DiscordClient { get; set; }

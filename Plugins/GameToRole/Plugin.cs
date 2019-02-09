@@ -10,7 +10,7 @@ using PluginInterface;
 namespace GameToRole
 {
     [Export(typeof(IPlugin))]
-    public class Plugin : IPlugin
+    public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "Game 2 Roles";
         List<string> IPlugin.Commands => new List<string>() { "game2role" };
@@ -32,19 +32,6 @@ namespace GameToRole
                 {DiscordSocket = sktMessage};
 
             commandHandler.Parse(splitCommandString, DiscordClient);
-
-            return;
-
-            if (((SocketGuildUser) sktMessage.Author).Roles.Any(x => x.Permissions.Administrator))
-            {
-                await sktMessage.Channel.SendMessageAsync("Attempting to scan all users for games...");
-                await Games.GameManager.Instance.ScanAllUsers(sktMessage);
-            }
-            else
-            {
-                await sktMessage.Channel.SendMessageAsync(
-                    $"Sorry {sktMessage.Author.Username}, You do not have permission to run that command");
-            }
         }
 
         public static string[] SplitArguments(string commandLine)
