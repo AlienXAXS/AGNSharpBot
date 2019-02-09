@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
@@ -16,16 +17,20 @@ namespace SpotifyStats.Spotify
         private static SpotifyHandler _instance;
         public static SpotifyHandler Instance = _instance ?? (_instance = new SpotifyHandler());
 
-        private DiscordSocketClient _discordSocketClient;
-        public async Task SetupDiscordInstance(DiscordSocketClient discordSocket)
+        public DiscordSocketClient _discordSocketClient;
+        public void SetupDiscordInstance(DiscordSocketClient discordSocket)
         {
             _discordSocketClient = discordSocket;
             _discordSocketClient.GuildMemberUpdated += OnGuildMemberUpdated;
-
-            await Database.SpotifySongDatabase.Instance.LoadTracks();
         }
 
-        private static async Task OnGuildMemberUpdated(SocketGuildUser oldMember, SocketGuildUser newMember)
+        private struct TopPlayEntry
+        {
+            public string Username;
+            public int PlayCount;
+        }
+
+        private async Task OnGuildMemberUpdated(SocketGuildUser oldMember, SocketGuildUser newMember)
         {
             try
             {
@@ -48,26 +53,43 @@ namespace SpotifyStats.Spotify
 
                     if (newMember.Activity is SpotifyGame spotifyGame)
                     {
-                        var artistName = spotifyGame.Artists.First();
-                        var dbEntry =
-                            Database.SpotifySongDatabase.Instance.AddTrack(artistName, spotifyGame.TrackTitle);
+                        var returnedSong = SQLite.SqLiteHandler.Instance.AddSongAndListener(spotifyGame.TrackId, spotifyGame.Artists.First(), spotifyGame.TrackTitle, newMember.Id);
+                        var group = returnedSong.Listeners.GroupBy(x => x.DiscordId).OrderByDescending(x => x.Count());
+
+                        var top = group.Take(3);
+
+                        var topUsersList = (from topEntry in top let foundUser = ((SocketGuild) newMember.Guild).GetUser((ulong) topEntry.Key) where foundUser != null select new TopPlayEntry() {Username = foundUser.Username, PlayCount = topEntry.Count()}).ToList();
 
                         var discordEmbedBuilder = new EmbedBuilder();
-                        discordEmbedBuilder.WithTitle($"{artistName} - {spotifyGame.TrackTitle}")
+                        discordEmbedBuilder.WithTitle($"{returnedSong.Song.Artist} - {returnedSong.Song.Name}")
                             .WithThumbnailUrl(spotifyGame.AlbumArtUrl).WithUrl(spotifyGame.TrackUrl);
 
-                        discordEmbedBuilder.AddField("Play Count", dbEntry.PlayCount, true);
+                        discordEmbedBuilder.AddField("Play Count", returnedSong.Listeners.Count, true);
                         discordEmbedBuilder.AddField("Person Listening",
                             newMember?.Nickname ?? newMember.Username, true);
 
+                        await Logger.Instance.Log(
+                            $"User {newMember.Username} Listening to Spotify | SID:{spotifyGame.SessionId} | ID: {spotifyGame.TrackId} | A:{spotifyGame.Artists.First()} | T: {spotifyGame.TrackTitle}",
+                            Logger.LoggerType.ConsoleOnly);
+
+                        var outputString = "";
+                        for (var i = 0; i <= topUsersList.Count - 1; i++)
+                        {
+                            outputString +=
+                                $"{i + 1}. {topUsersList[i].Username}: Played {topUsersList[i].PlayCount} time(s)\r\n";
+                        }
+
+                        discordEmbedBuilder.AddField("Top Users", outputString, true);
+                        
                         await Logger.Instance.Log(null, Logger.LoggerType.ConsoleAndDiscord,
                             discordEmbed: discordEmbedBuilder.Build());
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                // ignored
+                await Logger.Instance.Log($"FATAL EXCEPTION\r\n{ex.Message}\r\n\r\nSTACK:\r\n{ex.StackTrace}))",
+                    Logger.LoggerType.ConsoleAndDiscord);
             }
         }
     }
