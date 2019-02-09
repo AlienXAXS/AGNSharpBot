@@ -30,6 +30,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Discord.Net.Core, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.Core.2.0.1\lib\net46\Discord.Net.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Rest, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.Rest.2.0.1\lib\net46\Discord.Net.Rest.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.WebSocket, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.WebSocket.2.0.1\lib\net46\Discord.Net.WebSocket.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -58,22 +67,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Commands\Discord.Net.Commands.csproj">
-      <Project>{6cb2a33f-fef9-4254-9da5-54fe2a7b6f54}</Project>
-      <Name>Discord.Net.Commands</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj">
-      <Project>{91e9e7bd-75c9-4e98-84aa-2c271922e5c2}</Project>
-      <Name>Discord.Net.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj">
-      <Project>{98f3996e-7798-407f-9f7e-ff67b82f6d0d}</Project>
-      <Name>Discord.Net.Rest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj">
-      <Project>{04429829-437d-43d4-aaeb-27a2c0fee93b}</Project>
-      <Name>Discord.Net.WebSocket</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PermissionHandler\PermissionHandler.csproj">
       <Project>{A333CF7A-A5FA-44EB-86D1-F7C4D649AA35}</Project>
       <Name>PermissionHandler</Name>

@@ -42,18 +42,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj">
-      <Project>{91e9e7bd-75c9-4e98-84aa-2c271922e5c2}</Project>
-      <Name>Discord.Net.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj">
-      <Project>{98f3996e-7798-407f-9f7e-ff67b82f6d0d}</Project>
-      <Name>Discord.Net.Rest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj">
-      <Project>{04429829-437D-43D4-AAEB-27A2C0FEE93B}</Project>
-      <Name>Discord.Net.WebSocket</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\CommandHandler\CommandHandler.csproj">
       <Project>{a945612b-37ac-4e68-86bb-2797d2cc3dd7}</Project>
       <Name>CommandHandler</Name>
@@ -80,6 +68,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Discord.Net.Core, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Discord.Net.Core.2.0.1\lib\net46\Discord.Net.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.Rest, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Discord.Net.Rest.2.0.1\lib\net46\Discord.Net.Rest.dll</HintPath>
+    </Reference>
+    <Reference Include="Discord.Net.WebSocket, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Discord.Net.WebSocket.2.0.1\lib\net46\Discord.Net.WebSocket.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.DependencyInjection.2.1.1\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
     </Reference>
