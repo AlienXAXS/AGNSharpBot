@@ -17,6 +17,14 @@ namespace CommandHandler
             public Type Type;
         }
 
+        private class MethodInfoHelper
+        {
+            public MethodInfo MethodInfo { get; set; }
+            public Command Command { get; set; }
+            public Alias Alias { get; set; }
+            public Permissions Permissions { get; set; }
+        }
+
         private static HandlerManager _instance;
         public static HandlerManager Instance = _instance ?? (_instance = new HandlerManager());
 
@@ -69,47 +77,75 @@ namespace CommandHandler
             
             var paramCommand = parameters[0].Replace("!","");
 
+            // Compile a list of methods we can use
+            var methodHelpers = new List<MethodInfoHelper>();
+            foreach (var handler in _registeredHandlers)
+            {
+                foreach (var method in handler.Type.GetMethods())
+                {
+                    var cmdString = (Command) method.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
+                    var cmdAliases = (Alias) method.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
+                    var cmdPermissions = (Permissions) method.GetCustomAttributes(typeof(Permission), true).FirstOrDefault();
+
+                    if (cmdString != null)
+                        methodHelpers.Add(new MethodInfoHelper()
+                        {
+                            Alias = cmdAliases,
+                            Command = cmdString,
+                            MethodInfo = method,
+                            Permissions = cmdPermissions
+                        });
+                }
+            }
+
             if (paramCommand.Equals("help", StringComparison.OrdinalIgnoreCase))
             {
-                socketMessage.Channel.SendMessageAsync(
-                    "This command is not yet working, but soon it will dynamically load all modules and compile a help section for you.");
+
+                var discordEmbedBuilder = new EmbedBuilder();
+                discordEmbedBuilder.WithTitle("Kitty Cat Commands");
+                discordEmbedBuilder.Color = Color.Blue;
+                discordEmbedBuilder.Description = "You'll only be shown the commands that you can execute";
+
+                foreach (var thisMethod in methodHelpers)
+                {
+                    if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
+                        Permission.Instance.CheckPermission((SocketGuildUser) socketMessage.Author,
+                            $"!{thisMethod.MethodInfo.GetType()}.{thisMethod.MethodInfo.Name}"))
+                    {
+                        discordEmbedBuilder.AddField($"!{thisMethod.Command.Value}", $"{thisMethod.Command.Description}\r\n\r\n");
+                    }
+                }
+
+                socketMessage.Channel.SendMessageAsync(null, false, discordEmbedBuilder.Build());
                 return;
             }
 
             try
             {
-                foreach (var handler in _registeredHandlers)
+                foreach (var thisMethod in methodHelpers)
                 {
-                    foreach (var thisMethod in handler.Type.GetMethods())
+                    var cmdMatch = false;
+                    if (thisMethod.Command?.Value == paramCommand)
+                        cmdMatch = true;
+                    else
+                        if ( thisMethod.Alias != null )
+                            if (thisMethod.Alias.Value.Any(aliasEntry => aliasEntry.Equals(paramCommand)))
+                                cmdMatch = true;
+
+                    //NRE Check
+                    if (!cmdMatch) continue;
+
+                    if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest || Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author, $"{thisMethod.MethodInfo.GetType()}.{thisMethod.MethodInfo.Name}"))
                     {
-                        var cmdString = (Command) thisMethod.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
-                        var cmdAliases = (Alias) thisMethod.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
-                        var cmdPermissions = (Permissions) thisMethod.GetCustomAttributes(typeof(Permission), true)
-                            .FirstOrDefault();
-
-                        var cmdMatch = false;
-                        if (cmdString?.Value == paramCommand)
-                            cmdMatch = true;
-                        else
-                            if ( cmdAliases != null )
-                                if (cmdAliases.Value.Any(aliasEntry => aliasEntry.Equals(paramCommand)))
-                                    cmdMatch = true;
-
-                        //NRE Check
-                        if (!cmdMatch) continue;
-
-                        if (cmdPermissions?.Value == Permissions.PermissionTypes.Guest || Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author, $"{handler.Type}.{thisMethod.Name}"))
-                        {
-                            // Execute the method
-                            var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
-                            var activator = Activator.CreateInstance(handler.Type);
-                            thisMethod.Invoke(activator, paramArray);
-                        }
-                        else
-                        {
-                            socketMessage.Channel.SendMessageAsync(
-                                $"{socketMessage.Author.Username}, You do not have the permissions to run that command");
-                        }
+                        // Execute the method
+                        var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
+                        var activator = Activator.CreateInstance(thisMethod.MethodInfo.GetType());
+                        thisMethod.MethodInfo.Invoke(activator, paramArray);
+                    }
+                    else
+                    {
+                        socketMessage.Channel.SendMessageAsync(
+                            $"{socketMessage.Author.Username}, You do not have the permissions to run that command");
                     }
                 }
             }
