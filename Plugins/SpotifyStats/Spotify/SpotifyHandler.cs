@@ -58,7 +58,7 @@ namespace SpotifyStats.Spotify
 
                         var top = group.Take(3);
 
-                        var topUsersList = (from topEntry in top let foundUser = ((SocketGuild) newMember.Guild).GetUser((ulong) topEntry.Key) where foundUser != null select new TopPlayEntry() {Username = foundUser.Username, PlayCount = topEntry.Count()}).ToList();
+                        var topUsersList = (from topEntry in top let foundUser = newMember.Guild.GetUser((ulong) topEntry.Key) where foundUser != null select new TopPlayEntry() {Username = foundUser.Username, PlayCount = topEntry.Count()}).ToList();
 
                         var discordEmbedBuilder = new EmbedBuilder();
                         discordEmbedBuilder.WithTitle($"{returnedSong.Song.Artist} - {returnedSong.Song.Name}")
