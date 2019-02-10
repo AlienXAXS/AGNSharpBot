@@ -38,6 +38,18 @@
         <member name="M:Discord.API.DiscordRestApiClient.GetPrefixedToken(Discord.TokenType,System.String)">
             <exception cref="T:System.ArgumentException">Unknown OAuth token type.</exception>
         </member>
+        <member name="M:Discord.API.DiscordRestApiClient.ModifyGuildChannelAsync(System.UInt64,Discord.API.Rest.ModifyGuildChannelParams,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException">
+            <paramref name="channelId"/> must not be equal to zero.
+            -and-
+            <paramref name="args.Position.Position"/> must be greater than zero.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+            <paramref name="args"/> must not be <see langword="null"/>.
+            -and-
+            <paramref name="args.Name.Name"/> must not be <see langword="null"/> or empty.
+            </exception>
+        </member>
         <member name="M:Discord.API.DiscordRestApiClient.CreateMessageAsync(System.UInt64,Discord.API.Rest.CreateMessageParams,Discord.RequestOptions)">
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
@@ -54,6 +66,54 @@
         </member>
         <member name="M:Discord.API.DiscordRestApiClient.ModifyMessageAsync(System.UInt64,System.UInt64,Discord.API.Rest.ModifyMessageParams,Discord.RequestOptions)">
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.CreateGuildBanAsync(System.UInt64,System.UInt64,Discord.API.Rest.CreateGuildBanParams,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException">
+            <paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.
+            -and-
+            <paramref name="args.DeleteMessageDays.DeleteMessageDays"/> must be between 0 to 7.
+            </exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.RemoveGuildBanAsync(System.UInt64,System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> and <paramref name="userId"/> must not be equal to zero.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.GetGuildEmbedAsync(System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.ModifyGuildEmbedAsync(System.UInt64,Discord.API.Rest.ModifyGuildEmbedParams,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.GetGuildIntegrationsAsync(System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> must not be equal to zero.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.CreateGuildIntegrationAsync(System.UInt64,Discord.API.Rest.CreateGuildIntegrationParams,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> and <paramref name="args.Id.Id"/> must not be equal to zero.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.GetInviteAsync(System.String,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="inviteId"/> cannot be blank.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="inviteId"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.GetVanityInviteAsync(System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> may not be equal to zero.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.GetGuildInvitesAsync(System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="guildId"/> may not be equal to zero.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.GetChannelInvitesAsync(System.UInt64,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException"><paramref name="channelId"/> may not be equal to zero.</exception>
+        </member>
+        <member name="M:Discord.API.DiscordRestApiClient.CreateChannelInviteAsync(System.UInt64,Discord.API.Rest.CreateChannelInviteParams,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException">
+            <paramref name="channelId"/> may not be equal to zero.
+            -and-
+            <paramref name="args.MaxAge.MaxAge"/> and <paramref name="args.MaxUses.MaxUses"/> must be greater than zero.
+            -and-
+            <paramref name="args.MaxAge.MaxAge"/> must be lesser than 86400.
+            </exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="args"/> must not be <see langword="null"/>.</exception>
         </member>
         <member name="M:Discord.API.DiscordRestApiClient.CheckState">
             <exception cref="T:System.InvalidOperationException">Client is not logged in.</exception>
@@ -1232,6 +1292,15 @@
         <member name="P:Discord.Rest.RestAuditLogEntry.Reason">
             <inheritdoc/>
         </member>
+        <member name="M:Discord.Rest.ChannelHelper.CreateInviteAsync(Discord.IGuildChannel,Discord.Rest.BaseDiscordClient,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
+            <exception cref="T:System.ArgumentException">
+            <paramref name="channel.Id.Id"/> may not be equal to zero.
+            -and-
+            <paramref name="maxAge"/> and <paramref name="maxUses"/> must be greater than zero.
+            -and-
+            <paramref name="maxAge"/> must be lesser than 86400.
+            </exception>
+        </member>
         <member name="M:Discord.Rest.ChannelHelper.SendMessageAsync(Discord.IMessageChannel,Discord.Rest.BaseDiscordClient,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
@@ -1270,6 +1339,9 @@
         <member name="M:Discord.Rest.ChannelHelper.GetUsersAsync(Discord.IGuildChannel,Discord.IGuild,Discord.Rest.BaseDiscordClient,System.Nullable{System.UInt64},System.Nullable{System.Int32},Discord.RequestOptions)">
             <exception cref="T:System.InvalidOperationException">Resolving permissions requires the parent guild to be downloaded.</exception>
         </member>
+        <member name="M:Discord.Rest.ChannelHelper.SyncPermissionsAsync(Discord.INestedChannel,Discord.Rest.BaseDiscordClient,Discord.RequestOptions)">
+            <exception cref="T:System.InvalidOperationException">This channel does not have a parent channel.</exception>
+        </member>
         <member name="T:Discord.Rest.IRestMessageChannel">
             <summary>
                 Represents a REST-based channel that can send and receive messages.
@@ -1279,6 +1351,10 @@
             <summary>
                 Sends a message to this message channel.
             </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
@@ -1293,12 +1369,9 @@
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method sends a file as if you are uploading an attachment directly from your Discord client.
-                <note>
-                    If you wish to upload an image and have it embedded in a <see cref="F:Discord.EmbedType.Rich"/>embed,
-                    you may upload the file and refer to the file with "attachment://filename.ext" in the
-                    <see cref="P:Discord.EmbedBuilder.ImageUrl"/>.
-                </note>
+                This method follows the same behavior as described in 
+                <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>. Please visit
+                its documentation for more details on this method.
             </remarks>
             <param name="filePath">The file path of the file.</param>
             <param name="text">The message to be sent.</param>
@@ -1315,12 +1388,8 @@
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method sends a file as if you are uploading an attachment directly from your Discord client.
-                <note>
-                    If you wish to upload an image and have it embedded in a <see cref="F:Discord.EmbedType.Rich"/>embed,
-                    you may upload the file and refer to the file with "attachment://filename.ext" in the
-                    <see cref="P:Discord.EmbedBuilder.ImageUrl"/>.
-                </note>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
             <param name="stream">The <see cref="T:System.IO.Stream" /> of the file to be sent.</param>
             <param name="filename">The name of the attachment.</param>
@@ -1337,6 +1406,10 @@
             <summary>
                 Gets a message from this message channel.
             </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessageAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
             <param name="id">The snowflake identifier of the message.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -1349,30 +1422,9 @@
                 Gets the last N messages from this message channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/>. The
-                library will attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example downloads 300 messages and gets messages that belong to the user 
-                <c>53905483156684800</c>.
-                <code lang="cs">
-                var messages = await messageChannel.GetMessagesAsync(300).FlattenAsync();
-                var userMessages = messages.Where(x =&gt; x.Author.Id == 53905483156684800);
-                </code>
-            </example>
             <param name="limit">The numbers of message to be gotten from.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -1384,34 +1436,12 @@
                 Gets a collection of messages in this channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-                the message <paramref name="fromMessageId"/> depending on the <paramref name="dir"/>. The library will
-                attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(442012544660537354, Direction.Before, 5).FlattenAsync();
-                </code>
-            </example>
             <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
             <param name="limit">The numbers of message to be gotten from.</param>
-            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from
-            cache.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 Paged collection of messages.
@@ -1422,34 +1452,12 @@
                 Gets a collection of messages in this channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-                the message <paramref name="fromMessage"/> depending on the <paramref name="dir"/>. The library will
-                attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example gets 5 message prior to a specific message, <c>oldMessage</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(oldMessage, Direction.Before, 5).FlattenAsync();
-                </code>
-            </example>
             <param name="fromMessage">The starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
             <param name="limit">The numbers of message to be gotten from.</param>
-            <param name="mode">The <see cref="T:Discord.CacheMode"/> that determines whether the object should be fetched from
-            cache.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 Paged collection of messages.
@@ -1459,6 +1467,10 @@
             <summary>
                 Gets a collection of pinned messages in this channel.
             </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetPinnedMessagesAsync(Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous get operation for retrieving pinned messages in this channel.
@@ -1876,6 +1888,9 @@
         <member name="P:Discord.Rest.RestTextChannel.Topic">
             <inheritdoc />
         </member>
+        <member name="P:Discord.Rest.RestTextChannel.SlowModeInterval">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.Rest.RestTextChannel.CategoryId">
             <inheritdoc />
         </member>
@@ -2030,6 +2045,9 @@
                 representing the parent of this channel; <c>null</c> if none is set.
             </returns>
         </member>
+        <member name="M:Discord.Rest.RestTextChannel.SyncPermissionsAsync(Discord.RequestOptions)">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Rest.RestTextChannel.CreateInviteAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
             <inheritdoc />
         </member>
@@ -2113,6 +2131,9 @@
                 A task that represents the asynchronous get operation. The task result contains the category channel
                 representing the parent of this channel; <c>null</c> if none is set.
             </returns>
+        </member>
+        <member name="M:Discord.Rest.RestVoiceChannel.SyncPermissionsAsync(Discord.RequestOptions)">
+            <inheritdoc />
         </member>
         <member name="M:Discord.Rest.RestVoiceChannel.CreateInviteAsync(System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,Discord.RequestOptions)">
             <inheritdoc />
@@ -3507,9 +3528,7 @@
             <inheritdoc />
         </member>
         <member name="T:Discord.Attachment">
-            <summary>
-                An attachment file seen in a <see cref="T:Discord.IUserMessage"/>.
-            </summary>
+            <inheritdoc/>
         </member>
         <member name="P:Discord.Attachment.Id">
             <inheritdoc />

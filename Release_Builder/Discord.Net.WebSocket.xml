@@ -917,6 +917,22 @@
             <summary>
                 Represents a configuration class for <see cref="T:Discord.WebSocket.DiscordSocketClient"/>.
             </summary>
+            <remarks>
+                This configuration, based on <see cref="T:Discord.Rest.DiscordRestConfig"/>, helps determine several key configurations the
+                socket client depend on. For instance, shards and connection timeout.
+            </remarks>
+            <example>
+                The following config enables the message cache and configures the client to always download user upon guild
+                availability.
+                <code language="cs">
+                var config = new DiscordSocketConfig
+                {
+                    AlwaysDownloadUsers = true,
+                    MessageCacheSize = 100
+                };
+                var client = new DiscordSocketClient(config);
+                </code>
+            </example>
         </member>
         <member name="F:Discord.WebSocket.DiscordSocketConfig.GatewayEncoding">
             <summary>
@@ -970,6 +986,30 @@
             <summary>
                 Gets or sets whether or not all users should be downloaded as guilds come available.
             </summary>
+            <remarks>
+                <para>
+                    By default, the Discord gateway will only send offline members if a guild has less than a certain number
+                    of members (determined by <see cref="P:Discord.WebSocket.DiscordSocketConfig.LargeThreshold"/> in this library). This behaviour is why
+                    sometimes a user may be missing from the WebSocket cache for collections such as 
+                    <see cref="P:Discord.WebSocket.SocketGuild.Users"/>.
+                </para>
+                <para>
+                    This property ensures that whenever a guild becomes available (determined by
+                    <see cref="E:Discord.WebSocket.BaseSocketClient.GuildAvailable"/>), incomplete user chunks will be
+                    downloaded to the WebSocket cache.
+                </para>
+                <para>
+                    For more information, please see 
+                    <see href="https://discordapp.com/developers/docs/topics/gateway#request-guild-members">Request Guild Members</see>
+                    on the official Discord API documentation.
+                </para>
+                <note>
+                    Please note that it can be difficult to fill the cache completely on large guilds depending on the
+                    traffic. If you are using the command system, the default user TypeReader may fail to find the user
+                    due to this issue. This may be resolved at v3 of the library. Until then, you may want to consider
+                    overriding the TypeReader and use <see cref="M:Discord.Rest.DiscordRestClient.GetGuildUserAsync(System.UInt64,System.UInt64,Discord.RequestOptions)"/> as a backup.
+                </note>
+            </remarks>
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketConfig.HandlerTimeout">
             <summary>
@@ -1004,6 +1044,10 @@
             <summary>
                 Sends a message to this message channel.
             </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
@@ -1018,12 +1062,8 @@
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method sends a file as if you are uploading an attachment directly from your Discord client.
-                <note>
-                    If you wish to upload an image and have it embedded in a <see cref="F:Discord.EmbedType.Rich"/>embed,
-                    you may upload the file and refer to the file with "attachment://filename.ext" in the
-                    <see cref="P:Discord.EmbedBuilder.ImageUrl"/>.
-                </note>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
             <param name="filePath">The file path of the file.</param>
             <param name="text">The message to be sent.</param>
@@ -1040,12 +1080,8 @@
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method sends a file as if you are uploading an attachment directly from your Discord client.
-                <note>
-                    If you wish to upload an image and have it embedded in a <see cref="F:Discord.EmbedType.Rich"/>embed,
-                    you may upload the file and refer to the file with "attachment://filename.ext" in the
-                    <see cref="P:Discord.EmbedBuilder.ImageUrl"/>.
-                </note>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
             <param name="stream">The <see cref="T:System.IO.Stream" /> of the file to be sent.</param>
             <param name="filename">The name of the attachment.</param>
@@ -1060,17 +1096,42 @@
         </member>
         <member name="M:Discord.WebSocket.ISocketMessageChannel.GetCachedMessage(System.UInt64)">
             <summary>
-                Gets the cached message if one exists.
+                Gets a cached message from this channel.
             </summary>
-            <param name="id">The ID of the message.</param>
+            <remarks>
+                <note type="warning">
+                    This method requires the use of cache, which is not enabled by default; if caching is not enabled,
+                    this method will always return <c>null</c>. Please refer to
+                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> for more details.
+                </note>
+                <para>
+                    This method retrieves the message from the local WebSocket cache and does not send any additional
+                    request to Discord. This message may be a message that has been deleted.
+                </para>
+            </remarks>
+            <param name="id">The snowflake identifier of the message.</param>
             <returns>
-                Cached message object; <c>null</c> if it doesn't exist in the cache.
+                A WebSocket-based message object; <c>null</c> if it does not exist in the cache or if caching is not
+                enabled.
             </returns>
         </member>
         <member name="M:Discord.WebSocket.ISocketMessageChannel.GetCachedMessages(System.Int32)">
             <summary>
-                Gets the last N messages from this message channel.
+                Gets the last N cached messages from this message channel.
             </summary>
+            <remarks>
+                <note type="warning">
+                    This method requires the use of cache, which is not enabled by default; if caching is not enabled,
+                    this method will always return an empty collection. Please refer to
+                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> for more details.
+                </note>
+                <para>
+                    This method retrieves the message(s) from the local WebSocket cache and does not send any additional
+                    request to Discord. This read-only collection may include messages that have been deleted. The
+                    maximum number of messages that can be retrieved from this method depends on the
+                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> set.
+                </para>
+            </remarks>
             <param name="limit">The number of messages to get.</param>
             <returns>
                 A read-only collection of WebSocket-based messages.
@@ -1078,8 +1139,21 @@
         </member>
         <member name="M:Discord.WebSocket.ISocketMessageChannel.GetCachedMessages(System.UInt64,Discord.Direction,System.Int32)">
             <summary>
-                Gets a collection of messages in this channel.
+                Gets the last N cached messages starting from a certain message in this message channel.
             </summary>
+            <remarks>
+                <note type="warning">
+                    This method requires the use of cache, which is not enabled by default; if caching is not enabled,
+                    this method will always return an empty collection. Please refer to
+                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> for more details.
+                </note>
+                <para>
+                    This method retrieves the message(s) from the local WebSocket cache and does not send any additional
+                    request to Discord. This read-only collection may include messages that have been deleted. The
+                    maximum number of messages that can be retrieved from this method depends on the
+                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> set.
+                </para>
+            </remarks>
             <param name="fromMessageId">The message ID to start the fetching from.</param>
             <param name="dir">The direction of which the message should be gotten from.</param>
             <param name="limit">The number of messages to get.</param>
@@ -1089,8 +1163,21 @@
         </member>
         <member name="M:Discord.WebSocket.ISocketMessageChannel.GetCachedMessages(Discord.IMessage,Discord.Direction,System.Int32)">
             <summary>
-                Gets a collection of messages in this channel.
+                Gets the last N cached messages starting from a certain message in this message channel.
             </summary>
+            <remarks>
+                <note type="warning">
+                    This method requires the use of cache, which is not enabled by default; if caching is not enabled,
+                    this method will always return an empty collection. Please refer to
+                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> for more details.
+                </note>
+                <para>
+                    This method retrieves the message(s) from the local WebSocket cache and does not send any additional
+                    request to Discord. This read-only collection may include messages that have been deleted. The
+                    maximum number of messages that can be retrieved from this method depends on the
+                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.MessageCacheSize" /> set.
+                </para>
+            </remarks>
             <param name="fromMessage">The message to start the fetching from.</param>
             <param name="dir">The direction of which the message should be gotten from.</param>
             <param name="limit">The number of messages to get.</param>
@@ -1100,12 +1187,16 @@
         </member>
         <member name="M:Discord.WebSocket.ISocketMessageChannel.GetPinnedMessagesAsync(Discord.RequestOptions)">
             <summary>
-                Gets a collection of pinned messages in this channel.
+                Gets a read-only collection of pinned messages in this channel.
             </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetPinnedMessagesAsync(Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous get operation for retrieving pinned messages in this channel.
-                The task result contains a collection of messages found in the pinned messages.
+                The task result contains a read-only collection of messages found in the pinned messages.
             </returns>
         </member>
         <member name="T:Discord.WebSocket.ISocketPrivateChannel">
@@ -1227,30 +1318,9 @@
                 Gets the last N messages from this message channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/>. The
-                library will attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example downloads 300 messages and gets messages that belong to the user 
-                <c>53905483156684800</c>.
-                <code lang="cs">
-                var messages = await messageChannel.GetMessagesAsync(300).FlattenAsync();
-                var userMessages = messages.Where(x =&gt; x.Author.Id == 53905483156684800);
-                </code>
-            </example>
             <param name="limit">The numbers of message to be gotten from.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -1262,29 +1332,9 @@
                 Gets a collection of messages in this channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-                the message <paramref name="fromMessageId"/> depending on the <paramref name="dir"/>. The library will
-                attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(442012544660537354, Direction.Before, 5).FlattenAsync();
-                </code>
-            </example>
             <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
             <param name="limit">The numbers of message to be gotten from.</param>
@@ -1298,29 +1348,9 @@
                 Gets a collection of messages in this channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-                the message <paramref name="fromMessage"/> depending on the <paramref name="dir"/>. The library will
-                attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example gets 5 message prior to a specific message, <c>oldMessage</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(oldMessage, Direction.Before, 5).FlattenAsync();
-                </code>
-            </example>
             <param name="fromMessage">The starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
             <param name="limit">The numbers of message to be gotten from.</param>
@@ -1445,6 +1475,67 @@
         </member>
         <member name="M:Discord.WebSocket.SocketGroupChannel.GetCachedMessage(System.UInt64)">
             <inheritdoc />
+        </member>
+        <member name="M:Discord.WebSocket.SocketGroupChannel.GetMessageAsync(System.UInt64,Discord.RequestOptions)">
+            <summary>
+                Gets a message from this message channel.
+            </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessageAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
+            <param name="id">The snowflake identifier of the message.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task that represents an asynchronous get operation for retrieving the message. The task result contains
+                the retrieved message; <c>null</c> if no message is found with the specified identifier.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGroupChannel.GetMessagesAsync(System.Int32,Discord.RequestOptions)">
+            <summary>
+                Gets the last N messages from this message channel.
+            </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
+            <param name="limit">The numbers of message to be gotten from.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                Paged collection of messages.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGroupChannel.GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.RequestOptions)">
+            <summary>
+                Gets a collection of messages in this channel.
+            </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
+            <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
+            <param name="dir">The direction of the messages to be gotten from.</param>
+            <param name="limit">The numbers of message to be gotten from.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                Paged collection of messages.
+            </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketGroupChannel.GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.RequestOptions)">
+            <summary>
+                Gets a collection of messages in this channel.
+            </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
+            <param name="fromMessage">The starting message to get the messages from.</param>
+            <param name="dir">The direction of the messages to be gotten from.</param>
+            <param name="limit">The numbers of message to be gotten from.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                Paged collection of messages.
+            </returns>
         </member>
         <member name="M:Discord.WebSocket.SocketGroupChannel.GetCachedMessages(System.Int32)">
             <inheritdoc />
@@ -1697,6 +1788,9 @@
         <member name="P:Discord.WebSocket.SocketTextChannel.Topic">
             <inheritdoc />
         </member>
+        <member name="P:Discord.WebSocket.SocketTextChannel.SlowModeInterval">
+            <inheritdoc />
+        </member>
         <member name="P:Discord.WebSocket.SocketTextChannel.CategoryId">
             <inheritdoc />
         </member>
@@ -1707,6 +1801,9 @@
             <returns>
                 An <see cref="T:Discord.ICategoryChannel"/> representing the parent of this channel; <c>null</c> if none is set.
             </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketTextChannel.SyncPermissionsAsync(Discord.RequestOptions)">
+            <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketTextChannel.IsNsfw">
             <inheritdoc />
@@ -1730,6 +1827,10 @@
             <summary>
                 Gets a message from this message channel.
             </summary>
+            <remarks>
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessageAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
+            </remarks>
             <param name="id">The snowflake identifier of the message.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -1742,30 +1843,9 @@
                 Gets the last N messages from this message channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/>. The
-                library will attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example downloads 300 messages and gets messages that belong to the user 
-                <c>53905483156684800</c>.
-                <code lang="cs">
-                var messages = await messageChannel.GetMessagesAsync(300).FlattenAsync();
-                var userMessages = messages.Where(x =&gt; x.Author.Id == 53905483156684800);
-                </code>
-            </example>
             <param name="limit">The numbers of message to be gotten from.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -1777,29 +1857,9 @@
                 Gets a collection of messages in this channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-                the message <paramref name="fromMessageId"/> depending on the <paramref name="dir"/>. The library will
-                attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.UInt64,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(442012544660537354, Direction.Before, 5).FlattenAsync();
-                </code>
-            </example>
             <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
             <param name="limit">The numbers of message to be gotten from.</param>
@@ -1813,29 +1873,9 @@
                 Gets a collection of messages in this channel.
             </summary>
             <remarks>
-                <note type="important">
-                    The returned collection is an asynchronous enumerable object; one must call 
-                    <see cref="M:Discord.AsyncEnumerableExtensions.FlattenAsync``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})"/> to access the individual messages as a
-                    collection.
-                </note>
-                <note type="warning">
-                    Do not fetch too many messages at once! This may cause unwanted preemptive rate limit or even actual
-                    rate limit, causing your bot to freeze!
-                </note>
-                This method will attempt to fetch the number of messages specified under <paramref name="limit"/> around
-                the message <paramref name="fromMessage"/> depending on the <paramref name="dir"/>. The library will
-                attempt to split up the requests according to your <paramref name="limit"/> and 
-                <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/>. In other words, should the user request 500 messages,
-                and the <see cref="F:Discord.DiscordConfig.MaxMessagesPerBatch"/> constant is <c>100</c>, the request will
-                be split into 5 individual requests; thus returning 5 individual asynchronous responses, hence the need
-                of flattening.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.GetMessagesAsync(Discord.IMessage,Discord.Direction,System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>.
+                Please visit its documentation for more details on this method.
             </remarks>
-            <example>
-                The following example gets 5 message prior to a specific message, <c>oldMessage</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(oldMessage, Direction.Before, 5).FlattenAsync();
-                </code>
-            </example>
             <param name="fromMessage">The starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
             <param name="limit">The numbers of message to be gotten from.</param>
@@ -1990,6 +2030,9 @@
             <returns>
                 A category channel representing the parent of this channel; <c>null</c> if none is set.
             </returns>
+        </member>
+        <member name="M:Discord.WebSocket.SocketVoiceChannel.SyncPermissionsAsync(Discord.RequestOptions)">
+            <inheritdoc />
         </member>
         <member name="P:Discord.WebSocket.SocketVoiceChannel.Users">
             <inheritdoc />
@@ -3233,6 +3276,11 @@
         </member>
         <member name="P:Discord.WebSocket.SocketUser.Status">
             <inheritdoc />
+        </member>
+        <member name="P:Discord.WebSocket.SocketUser.MutualGuilds">
+            <summary>
+                Gets mutual guilds shared with this user.
+            </summary>
         </member>
         <member name="M:Discord.WebSocket.SocketUser.GetOrCreateDMChannelAsync(Discord.RequestOptions)">
             <inheritdoc />

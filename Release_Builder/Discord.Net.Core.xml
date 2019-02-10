@@ -396,10 +396,10 @@
         </member>
         <member name="M:Discord.Game.#ctor(System.String,Discord.ActivityType)">
             <summary>
-                Creates a <see cref="T:Discord.Game"/> with the provided <paramref name="name"/> and <see cref="T:Discord.ActivityType"/>.
+                Creates a <see cref="T:Discord.Game"/> with the provided name and <see cref="T:Discord.ActivityType"/>.
             </summary>
             <param name="name">The name of the game.</param>
-            <param name="type">The type of activity. Default is <see cref="F:Discord.ActivityType.Playing"/>.</param>
+            <param name="type">The type of activity.</param>
         </member>
         <member name="M:Discord.Game.ToString">
             <summary> Returns the name of the <see cref="T:Discord.Game"/>. </summary>
@@ -879,8 +879,16 @@
         </member>
         <member name="T:Discord.Direction">
             <summary>
-                Specifies the direction of where message(s) should be gotten from.
+                Specifies the direction of where message(s) should be retrieved from.
             </summary>
+            <remarks>
+                This enum is used to specify the direction for retrieving messages.
+                <note type="important">
+                    At the time of writing, <see cref="F:Discord.Direction.Around"/> is not yet implemented into 
+                    <see cref="M:Discord.IMessageChannel.GetMessagesAsync(System.Int32,Discord.CacheMode,Discord.RequestOptions)"/>. Attempting to use the method with <see cref="F:Discord.Direction.Around"/>
+                    as its direction will throw a <see cref="T:System.NotImplementedException"/>.
+                </note>
+            </remarks>
         </member>
         <member name="F:Discord.Direction.Before">
             <summary>
@@ -924,6 +932,11 @@
             <summary>
                 Gets or sets the category ID for this channel.
             </summary>
+            <remarks>
+                Setting this value to a category's snowflake identifier will change or set this channel's parent to the
+                specified channel; setting this value to <c>0</c> will detach this channel from its parent if one
+                is set.
+            </remarks>
         </member>
         <member name="T:Discord.IAudioChannel">
             <summary>
@@ -1074,6 +1087,10 @@
             <summary>
                 Modifies this guild channel.
             </summary>
+            <remarks>
+                This method modifies the current guild channel with the specified properties. To see an example of this
+                method and what properties are available, please refer to <see cref="T:Discord.GuildChannelProperties"/>.
+            </remarks>
             <param name="func">The delegate containing the properties to modify the channel with.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -1119,26 +1136,71 @@
             </returns>
         </member>
         <member name="M:Discord.IGuildChannel.AddPermissionOverwriteAsync(Discord.IRole,Discord.OverwritePermissions,Discord.RequestOptions)">
-            <summary>
-                Adds or updates the permission overwrite for the given role.
-            </summary>
-            <param name="role">The role to add the overwrite to.</param>
-            <param name="permissions">The overwrite to add to the role.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                A task representing the asynchronous permission operation for adding the specified permissions to the channel.
-            </returns>
+             <summary>
+                 Adds or updates the permission overwrite for the given role.
+             </summary>
+             <example>
+                 The following example fetches a role via <see cref="M:Discord.IGuild.GetRole(System.UInt64)"/> and a channel via 
+                 <see cref="M:Discord.IGuild.GetChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>. Next, it checks if an overwrite had already been set via 
+                 <see cref="M:Discord.IGuildChannel.GetPermissionOverwrite(Discord.IRole)"/>; if not, it denies the role from sending any
+                 messages to the channel.
+                 <code lang="cs">
+                 // Fetches the role and channels
+                 var role = guild.GetRole(339805618376540160);
+                 var channel = await guild.GetChannelAsync(233937283911385098);
+             
+                 // If either the of the object does not exist, bail
+                 if (role == null || channel == null) return;
+            
+                 // Fetches the previous overwrite and bail if one is found
+                 var previousOverwrite = channel.GetPermissionOverwrite(role);
+                 if (previousOverwrite.HasValue) return;
+             
+                 // Creates a new OverwritePermissions with send message set to deny and pass it into the method
+                 await channel.AddPermissionOverwriteAsync(role,
+                     new OverwritePermissions(sendMessage: PermValue.Deny));
+                 </code>
+             </example>
+             <param name="role">The role to add the overwrite to.</param>
+             <param name="permissions">The overwrite to add to the role.</param>
+             <param name="options">The options to be used when sending the request.</param>
+             <returns>
+                 A task representing the asynchronous permission operation for adding the specified permissions to the
+                 channel.
+             </returns>
         </member>
         <member name="M:Discord.IGuildChannel.AddPermissionOverwriteAsync(Discord.IUser,Discord.OverwritePermissions,Discord.RequestOptions)">
-            <summary>
-                Adds or updates the permission overwrite for the given user.
-            </summary>
-            <param name="user">The user to add the overwrite to.</param>
-            <param name="permissions">The overwrite to add to the user.</param>
-            <param name="options">The options to be used when sending the request.</param>
-            <returns>
-                A task representing the asynchronous permission operation for adding the specified permissions to the channel.
-            </returns>
+             <summary>
+                 Adds or updates the permission overwrite for the given user.
+             </summary>
+             <example>
+                 The following example fetches a user via <see cref="M:Discord.IGuild.GetUserAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/> and a channel via 
+                 <see cref="M:Discord.IGuild.GetChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>. Next, it checks if an overwrite had already been set via 
+                 <see cref="M:Discord.IGuildChannel.GetPermissionOverwrite(Discord.IUser)"/>; if not, it denies the user from sending any
+                 messages to the channel.
+                 <code lang="cs">
+                 // Fetches the role and channels
+                 var user = await guild.GetUserAsync(168693960628371456);
+                 var channel = await guild.GetChannelAsync(233937283911385098);
+             
+                 // If either the of the object does not exist, bail
+                 if (user == null || channel == null) return;
+            
+                 // Fetches the previous overwrite and bail if one is found
+                 var previousOverwrite = channel.GetPermissionOverwrite(user);
+                 if (previousOverwrite.HasValue) return;
+             
+                 // Creates a new OverwritePermissions with send message set to deny and pass it into the method
+                 await channel.AddPermissionOverwriteAsync(role,
+                     new OverwritePermissions(sendMessage: PermValue.Deny));
+                 </code>
+             </example>
+             <param name="user">The user to add the overwrite to.</param>
+             <param name="permissions">The overwrite to add to the user.</param>
+             <param name="options">The options to be used when sending the request.</param>
+             <returns>
+                 A task representing the asynchronous permission operation for adding the specified permissions to the channel.
+             </returns>
         </member>
         <member name="M:Discord.IGuildChannel.GetUsersAsync(Discord.CacheMode,Discord.RequestOptions)">
             <summary>
@@ -1706,23 +1768,34 @@
             <summary>
                 Gets or sets the topic of the channel.
             </summary>
+            <remarks>
+                Setting this value to any string other than <c>null</c> or <see cref="F:System.String.Empty"/> will set the
+                channel topic or description to the desired value.
+            </remarks>
         </member>
         <member name="P:Discord.TextChannelProperties.IsNsfw">
             <summary>
                 Gets or sets whether this channel should be flagged as NSFW.
             </summary>
+            <remarks>
+                Setting this value to <c>true</c> will mark the channel as NSFW (Not Safe For Work) and will prompt the
+                user about its possibly mature nature before they may view the channel; setting this value to <c>false</c> will
+                remove the NSFW indicator.
+            </remarks>
         </member>
         <member name="P:Discord.TextChannelProperties.SlowModeInterval">
             <summary>
                 Gets or sets the slow-mode ratelimit in seconds for this channel.
             </summary>
             <remarks>
-                Setting this value to <c>0</c> will disable slow-mode for this channel.
+                Setting this value to anything above zero will require each user to wait X seconds before
+                sending another message; setting this value to <c>0</c> will disable slow-mode for this channel.
                 <note>
-                    Users with <see cref="F:Discord.ChannelPermission.ManageMessages" /> will be exempt from slow-mode.
+                    Users with <see cref="F:Discord.ChannelPermission.ManageMessages"/> or 
+                    <see cref="F:Discord.ChannelPermission.ManageChannels"/> will be exempt from slow-mode.
                 </note>
             </remarks>
-            <exception cref="!:ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 120].</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown if the value does not fall within [0, 120].</exception>
         </member>
         <member name="T:Discord.VoiceChannelProperties">
             <summary>
@@ -1871,6 +1944,15 @@
             </summary>
             <returns>
                 A read-only list containing snowflake identifiers for roles that are allowed to use this emoji.
+            </returns>
+        </member>
+        <member name="P:Discord.GuildEmote.CreatorId">
+            <summary>
+                Gets the user ID associated with the creation of this emoji.
+            </summary>
+            <returns>
+                An <see cref="T:System.UInt64"/> snowflake identifier representing the user who created this emoji; 
+                <c>null</c> if unknown.
             </returns>
         </member>
         <member name="M:Discord.GuildEmote.ToString">
@@ -3201,7 +3283,9 @@
             </returns>
         </member>
         <member name="P:Discord.IInvite.ChannelType">
-            <summary> Gets the type of the channel this invite is linked to. </summary>
+            <summary>
+                Gets the type of the channel this invite is linked to.
+            </summary>
         </member>
         <member name="P:Discord.IInvite.ChannelId">
             <summary>
@@ -4203,7 +4287,7 @@
         </member>
         <member name="T:Discord.IAttachment">
             <summary>
-                Represents a Discord attachment.
+                Represents a message attachment found in a <see cref="T:Discord.IUserMessage"/>.
             </summary>
         </member>
         <member name="P:Discord.IAttachment.Id">
@@ -4424,7 +4508,7 @@
                 Gets the time of this message's last edit.
             </summary>
             <returns>
-                Time of when the message was last edited; <c>null</c> when the message is never edited.
+                Time of when the message was last edited; <c>null</c> if the message is never edited.
             </returns>
         </member>
         <member name="P:Discord.IMessage.Channel">
@@ -4439,28 +4523,38 @@
         </member>
         <member name="P:Discord.IMessage.Attachments">
             <summary>
-                Returns all attachments included in this message.
+                Gets all attachments included in this message.
             </summary>
+            <remarks>
+                This property gets a read-only collection of attachments associated with this message. Depending on the
+                user's end-client, a sent message may contain one or more attachments. For example, mobile users may
+                attach more than one file in their message, while the desktop client only allows for one.
+            </remarks>
             <returns>
                 A read-only collection of attachments.
             </returns>
         </member>
         <member name="P:Discord.IMessage.Embeds">
             <summary>
-                Returns all embeds included in this message.
+                Gets all embeds included in this message.
             </summary>
+            <remarks>
+            </remarks>
+                This property gets a read-only collection of embeds associated with this message. Depending on the
+                message, a sent message may contain one or more embeds. This is usually true when multiple link previews
+                are generated; however, only one <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> can be featured.
             <returns>
                 A read-only collection of embed objects.
             </returns>
         </member>
         <member name="P:Discord.IMessage.Tags">
             <summary>
-                Returns all tags included in this message's content.
+                Gets all tags included in this message's content.
             </summary>
         </member>
         <member name="P:Discord.IMessage.MentionedChannelIds">
             <summary>
-                Returns the IDs of channels mentioned in this message.
+                Gets the IDs of channels mentioned in this message.
             </summary>
             <returns>
                 A read-only collection of channel IDs.
@@ -4468,7 +4562,7 @@
         </member>
         <member name="P:Discord.IMessage.MentionedRoleIds">
             <summary>
-                Returns the IDs of roles mentioned in this message.
+                Gets the IDs of roles mentioned in this message.
             </summary>
             <returns>
                 A read-only collection of role IDs.
@@ -4476,7 +4570,7 @@
         </member>
         <member name="P:Discord.IMessage.MentionedUserIds">
             <summary>
-                Returns the IDs of users mentioned in this message.
+                Gets the IDs of users mentioned in this message.
             </summary>
             <returns>
                 A read-only collection of user IDs.
@@ -4484,10 +4578,11 @@
         </member>
         <member name="P:Discord.IMessage.Activity">
             <summary>
-                Returns the Activity associated with a message.
+                Gets the activity associated with a message.
             </summary>
             <remarks>
-                Sent with Rich Presence-related chat embeds.
+                Sent with Rich Presence-related chat embeds. This often refers to activity that requires end-user's
+                interaction, such as a Spotify Invite activity.
             </remarks>
             <returns>
                 A message's activity, if any is associated.
@@ -4495,7 +4590,7 @@
         </member>
         <member name="P:Discord.IMessage.Application">
             <summary>
-                Returns the Application associated with a messsage.
+                Gets the application associated with a message.
             </summary>
             <remarks>
                 Sent with Rich-Presence-related chat embeds.
@@ -4528,10 +4623,15 @@
             <summary>
                 Modifies this message.
             </summary>
+            <remarks>
+                This method modifies this message with the specified properties. To see an example of this
+                method and what properties are available, please refer to <see cref="T:Discord.MessageProperties"/>.
+            </remarks>
             <example>
-            <code language="cs">
-            await msg.ModifyAsync(x =&gt; x.Content = "Hello World!");
-            </code>
+                The following example replaces the content of the message with <c>Hello World!</c>.
+                <code language="cs">
+                await msg.ModifyAsync(x =&gt; x.Content = "Hello World!");
+                </code>
             </example>
             <param name="func">A delegate containing the properties to modify the message with.</param>
             <param name="options">The options to be used when sending the request.</param>
@@ -4567,9 +4667,10 @@
                 Adds a reaction to this message.
             </summary>
             <example>
-            <code language="cs">
-            await msg.AddReactionAsync(new Emoji("\U0001f495"));
-            </code>
+                The following example adds the reaction, <c>💕</c>, to the message.
+                <code language="cs">
+                await msg.AddReactionAsync(new Emoji("\U0001f495"));
+                </code>
             </example>
             <param name="emote">The emoji used to react to this message.</param>
             <param name="options">The options to be used when sending the request.</param>
@@ -4583,9 +4684,10 @@
                 Removes a reaction from message.
             </summary>
             <example>
-            <code language="cs">
-            await msg.RemoveReactionAsync(new Emoji("\U0001f495"), msg.Author);
-            </code>
+                The following example removes the reaction, <c>💕</c>, added by the message author from the message.
+                <code language="cs">
+                await msg.RemoveReactionAsync(new Emoji("\U0001f495"), msg.Author);
+                </code>
             </example>
             <param name="emote">The emoji used to react to this message.</param>
             <param name="user">The user that added the emoji.</param>
@@ -4609,6 +4711,7 @@
                 Gets all users that reacted to a message with a given emote.
             </summary>
             <example>
+                The following example gets the users that have reacted with the emoji <c>💕</c> to the message.
                 <code language="cs">
                 var emoji = new Emoji("\U0001f495");
                 var reactedUsers = await message.GetReactionUsersAsync(emoji, 100).FlattenAsync();
@@ -4632,6 +4735,18 @@
             <param name="roleHandling">Determines how the role tag should be handled.</param>
             <param name="everyoneHandling">Determines how the @everyone tag should be handled.</param>
             <param name="emojiHandling">Determines how the emoji tag should be handled.</param>
+        </member>
+        <member name="T:Discord.MessageActivity">
+            <summary>
+                An activity object found in a sent message.
+            </summary>
+            <remarks>
+                <para>
+                    This class refers to an activity object, visually similar to an embed within a message. However, a message
+                    activity is interactive as opposed to a standard static embed.
+                </para>
+                <para>For example, a Spotify party invitation counts as a message activity.</para>
+            </remarks>
         </member>
         <member name="P:Discord.MessageActivity.Type">
             <summary>
@@ -4678,7 +4793,8 @@
                 Properties that are used to modify an <see cref="T:Discord.IUserMessage" /> with the specified changes.
             </summary>
             <remarks>
-                The content of a message can be cleared with <see cref="F:System.String.Empty"/> if and only if an <see cref="T:Discord.Embed"/> is present.
+                The content of a message can be cleared with <see cref="F:System.String.Empty"/> if and only if an 
+                <see cref="T:Discord.Embed"/> is present.
             </remarks>
             <seealso cref="M:Discord.IUserMessage.ModifyAsync(System.Action{Discord.MessageProperties},Discord.RequestOptions)"/>
         </member>
@@ -5752,16 +5868,10 @@
             <summary>
                 Modifies this role.
             </summary>
-            <example>
-                <code language="cs">
-                await role.ModifyAsync(x =&gt;
-                {
-                    x.Name = "Sonic";
-                    x.Color = new Color(0x1A50BC);
-                    x.Mentionable = true;
-                });
-                </code>
-            </example>
+            <remarks>
+                This method modifies this role with the specified properties. To see an example of this
+                method and what properties are available, please refer to <see cref="T:Discord.RoleProperties"/>.
+            </remarks>
             <param name="func">A delegate containing the properties to modify the role with.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -5800,6 +5910,18 @@
             <summary>
                 Properties that are used to modify an <see cref="T:Discord.IRole" /> with the specified changes.
             </summary>
+            <example>
+                The following example modifies the role to a mentionable one, renames the role into <c>Sonic</c>, and
+                changes the color to a light-blue.
+                <code language="cs">
+                await role.ModifyAsync(x =&gt;
+                {
+                    x.Name = "Sonic";
+                    x.Color = new Color(0x1A50BC);
+                    x.Mentionable = true;
+                });
+                </code>
+            </example>
             <seealso cref="M:Discord.IRole.ModifyAsync(System.Action{Discord.RoleProperties},Discord.RequestOptions)" />
         </member>
         <member name="P:Discord.RoleProperties.Name">
@@ -6064,15 +6186,28 @@
             <summary>
                 Gets a collection of IDs for the roles that this user currently possesses in the guild.
             </summary>
+            <remarks>
+                This property returns a read-only collection of the identifiers of the roles that this user possesses.
+                For WebSocket users, a Roles property can be found in place of this property. Due to the REST
+                implementation, only a collection of identifiers can be retrieved instead of the full role objects.
+            </remarks>
             <returns>
                 A read-only collection of <see cref="T:System.UInt64"/>, each representing a snowflake identifier for a role that
-                this user posesses.
+                this user possesses.
             </returns>
         </member>
         <member name="M:Discord.IGuildUser.GetPermissions(Discord.IGuildChannel)">
             <summary>
                 Gets the level permissions granted to this user to a given channel.
             </summary>
+            <example>
+                The following example checks if the current user has the ability to send a message with attachment in
+                this channel; if so, uploads a file via <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                <code language="cs">
+                if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
+                    await targetChannel.SendFileAsync("fortnite.png");
+                </code>
+            </example>
             <param name="channel">The channel to get the permission from.</param>
             <returns>
                 A <see cref="T:Discord.ChannelPermissions"/> structure representing the permissions that a user has in the
@@ -6093,16 +6228,19 @@
             <summary>
                 Modifies this user's properties in this guild.
             </summary>
+            <remarks>
+                This method modifies the current guild user with the specified properties. To see an example of this
+                method and what properties are available, please refer to <see cref="T:Discord.GuildUserProperties"/>.
+            </remarks>
             <param name="func">The delegate containing the properties to modify the user with.</param>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
                 A task that represents the asynchronous modification operation.
             </returns>
-            <seealso cref="T:Discord.GuildUserProperties"/>
         </member>
         <member name="M:Discord.IGuildUser.AddRoleAsync(Discord.IRole,Discord.RequestOptions)">
             <summary>
-                Adds the specified <paramref name="role"/> to this user in this guild.
+                Adds the specified role to this user in the guild.
             </summary>
             <param name="role">The role to be added to the user.</param>
             <param name="options">The options to be used when sending the request.</param>
@@ -6112,7 +6250,7 @@
         </member>
         <member name="M:Discord.IGuildUser.AddRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
             <summary>
-                Adds the specified <paramref name="roles"/> to this user in this guild.
+                Adds the specified <paramref name="roles"/> to this user in the guild.
             </summary>
             <param name="roles">The roles to be added to the user.</param>
             <param name="options">The options to be used when sending the request.</param>
@@ -6122,7 +6260,7 @@
         </member>
         <member name="M:Discord.IGuildUser.RemoveRoleAsync(Discord.IRole,Discord.RequestOptions)">
             <summary>
-                Removes the specified <paramref name="role"/> from this user in this guild.
+                Removes the specified <paramref name="role"/> from this user in the guild.
             </summary>
             <param name="role">The role to be removed from the user.</param>
             <param name="options">The options to be used when sending the request.</param>
@@ -6132,7 +6270,7 @@
         </member>
         <member name="M:Discord.IGuildUser.RemoveRolesAsync(System.Collections.Generic.IEnumerable{Discord.IRole},Discord.RequestOptions)">
             <summary>
-                Removes the specified <paramref name="roles"/> from this user in this guild.
+                Removes the specified <paramref name="roles"/> from this user in the guild.
             </summary>
             <param name="roles">The roles to be removed from the user.</param>
             <param name="options">The options to be used when sending the request.</param>
@@ -6193,23 +6331,46 @@
         </member>
         <member name="P:Discord.IUser.AvatarId">
             <summary>
-                Gets the ID of this user's avatar.
+                Gets the identifier of this user's avatar.
             </summary>
         </member>
         <member name="M:Discord.IUser.GetAvatarUrl(Discord.ImageFormat,System.UInt16)">
             <summary>
-                Returns a URL to this user's avatar.
+                Gets the avatar URL for this user.
             </summary>
+            <remarks>
+                This property retrieves a URL for this user's avatar. In event that the user does not have a valid avatar
+                (i.e. their avatar identifier is not set), this property will return <c>null</c>. If you wish to
+                retrieve the default avatar for this user, consider using <see cref="M:Discord.IUser.GetDefaultAvatarUrl"/> (see
+                example).
+            </remarks>
+            <example>
+                The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
+                not set, a default avatar for this user will be returned instead.
+                <code language="cs">
+                var userAvatarUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();
+                await textChannel.SendMessageAsync(userAvatarUrl);
+                </code>
+            </example>
             <param name="format">The format to return.</param>
-            <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.</param>
+            <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
+            </param>
             <returns>
-                User's avatar URL.
+                A string representing the user's avatar URL; <c>null</c> if the user does not have an avatar in place.
             </returns>
         </member>
         <member name="M:Discord.IUser.GetDefaultAvatarUrl">
             <summary>
-                Returns the URL to this user's default avatar.
+                Gets the default avatar URL for this user.
             </summary>
+            <remarks>
+                This property retrieves a URL for this user's default avatar generated by Discord (Discord logo followed
+                by a random color as its background). This property will always return a value as it is calculated based
+                on the user's <see cref="P:Discord.IUser.DiscriminatorValue"/> (<c>discriminator % 5</c>).
+            </remarks>
+            <returns>
+                A string representing the user's avatar URL.
+            </returns>
         </member>
         <member name="P:Discord.IUser.Discriminator">
             <summary>
@@ -6223,10 +6384,14 @@
         </member>
         <member name="P:Discord.IUser.IsBot">
             <summary>
-                Gets a value that indicates whether this user is a bot user.
+                Gets a value that indicates whether this user is identified as a bot.
             </summary>
+            <remarks>
+                This property retrieves a value that indicates whether this user is a registered bot application
+                (indicated by the blue BOT tag within the official chat client).
+            </remarks>
             <returns>
-                <c>true</c> if the user is a bot; otherwise <c>false</c>.
+                <c>true</c> if the user is a bot application; otherwise <c>false</c>.
             </returns>
         </member>
         <member name="P:Discord.IUser.IsWebhook">
@@ -6244,11 +6409,37 @@
         </member>
         <member name="M:Discord.IUser.GetOrCreateDMChannelAsync(Discord.RequestOptions)">
             <summary>
-                Returns a direct message channel to this user, or create one if it does not already exist.
+                Gets the direct message channel of this user, or create one if it does not already exist.
             </summary>
+            <remarks>
+                This method is used to obtain or create a channel used to send a direct message.
+                <note type="warning">
+                In event that the current user cannot send a message to the target user, a channel can and will still be
+                created by Discord. However, attempting to send a message will yield a 
+                <see cref="T:Discord.Net.HttpException"/> with a 403 as its 
+                <see cref="P:Discord.Net.HttpException.HttpCode"/>. There are currently no official workarounds by
+                Discord.
+                </note>
+            </remarks>
+            <example>
+                The following example attempts to send a direct message to the target user and logs the incident should
+                it fail.
+                <code language="cs">
+                var channel = await user.GetOrCreateDMChannelAsync();
+                try
+                {
+                    await channel.SendMessageAsync("Awesome stuff!");
+                }
+                catch (Discord.Net.HttpException ex) when (ex.HttpCode == 403)
+                {
+                    Console.WriteLine($"Boo, I cannot message {user}");
+                }
+                </code>
+            </example>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
-                A task that represents the asynchronous operation for getting or creating a DM channel.
+                A task that represents the asynchronous operation for getting or creating a DM channel. The task result
+                contains the DM channel associated with this user.
             </returns>
         </member>
         <member name="T:Discord.IVoiceState">
@@ -6258,33 +6449,55 @@
         </member>
         <member name="P:Discord.IVoiceState.IsDeafened">
             <summary>
-                Returns <c>true</c> if the guild has deafened this user.
+                Gets a value that indicates whether this user is deafened by the guild.
             </summary>
+            <returns>
+                <c>true</c> if the user is deafened (i.e. not permitted to listen to or speak to others) by the guild;
+                otherwise <c>false</c>.
+            </returns>
         </member>
         <member name="P:Discord.IVoiceState.IsMuted">
             <summary>
-                Returns <c>true</c> if the guild has muted this user.
+                Gets a value that indicates whether this user is muted (i.e. not permitted to speak via voice) by the
+                guild.
             </summary>
+            <returns>
+                <c>true</c> if this user is muted by the guild; otherwise <c>false</c>.
+            </returns>
         </member>
         <member name="P:Discord.IVoiceState.IsSelfDeafened">
             <summary>
-                Returns <c>true</c> if this user has marked themselves as deafened.
+                Gets a value that indicates whether this user has marked themselves as deafened.
             </summary>
+            <returns>
+                <c>true</c> if this user has deafened themselves (i.e. not permitted to listen to or speak to others); otherwise <c>false</c>.
+            </returns>
         </member>
         <member name="P:Discord.IVoiceState.IsSelfMuted">
             <summary>
-                Returns <c>true</c> if this user has marked themselves as muted.
+                Gets a value that indicates whether this user has marked themselves as muted (i.e. not permitted to
+                speak via voice).
             </summary>
+            <returns>
+                <c>true</c> if this user has muted themselves; otherwise <c>false</c>.
+            </returns>
         </member>
         <member name="P:Discord.IVoiceState.IsSuppressed">
             <summary>
-                Returns <c>true</c> if the guild is temporarily blocking audio to/from this user.
+                Gets a value that indicates whether the user is muted by the current user.
             </summary>
+            <returns>
+                <c>true</c> if the guild is temporarily blocking audio to/from this user; otherwise <c>false</c>.
+            </returns>
         </member>
         <member name="P:Discord.IVoiceState.VoiceChannel">
             <summary>
-                Gets the voice channel this user is currently in, or <c>null</c> if none.
+                Gets the voice channel this user is currently in.
             </summary>
+            <returns>
+                A generic voice channel object representing the voice channel that the user is currently in; <c>null</c>
+                if none.
+            </returns>
         </member>
         <member name="P:Discord.IVoiceState.VoiceSessionId">
             <summary>
@@ -6502,6 +6715,17 @@
         <member name="M:Discord.EmbedBuilderExtensions.ToEmbedBuilder(Discord.IEmbed)">
             <summary> Converts a <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.IEmbed"/> object to a <see cref="T:Discord.EmbedBuilder"/>. </summary>
             <exception cref="T:System.InvalidOperationException">The embed type is not <see cref="F:Discord.EmbedType.Rich"/>.</exception>
+        </member>
+        <member name="M:Discord.EmbedBuilderExtensions.WithFields(Discord.EmbedBuilder,System.Collections.Generic.IEnumerable{Discord.EmbedFieldBuilder})">
+            <summary>
+                Adds the specified fields into this <see cref="T:Discord.EmbedBuilder"/>.
+            </summary>
+            <exception cref="T:System.ArgumentException">Field count exceeds <see cref="F:Discord.EmbedBuilder.MaxFieldCount"/>.</exception>
+        </member>
+        <member name="M:Discord.EmbedBuilderExtensions.WithFields(Discord.EmbedBuilder,Discord.EmbedFieldBuilder[])">
+            <summary>
+                Adds the specified fields into this <see cref="T:Discord.EmbedBuilder"/>.
+            </summary>
         </member>
         <member name="T:Discord.MessageExtensions">
             <summary>
@@ -7474,6 +7698,322 @@
         </member>
         <member name="M:Discord.Optional`1.#ctor(`0)">
             <summary> Creates a new Parameter with the provided value. </summary>
+        </member>
+        <member name="M:Discord.Preconditions.NotNull``1(``0,System.String,System.String)">
+            <exception cref="T:System.ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotNull``1(Discord.Optional{``0},System.String,System.String)">
+            <exception cref="T:System.ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEmpty(System.String,System.String,System.String)">
+            <exception cref="T:System.ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEmpty(Discord.Optional{System.String},System.String,System.String)">
+            <exception cref="T:System.ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotNullOrEmpty(System.String,System.String,System.String)">
+            <exception cref="T:System.ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotNullOrEmpty(Discord.Optional{System.String},System.String,System.String)">
+            <exception cref="T:System.ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotNullOrWhitespace(System.String,System.String,System.String)">
+            <exception cref="T:System.ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotNullOrWhitespace(Discord.Optional{System.String},System.String,System.String)">
+            <exception cref="T:System.ArgumentException"><paramref name="obj"/> cannot be blank.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="obj"/> must not be <see langword="null"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.SByte,System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Byte,System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Int16,System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.UInt16,System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Int32,System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.UInt32,System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Int64,System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.UInt64,System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.SByte},System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Byte},System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Int16},System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.UInt16},System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Int32},System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.UInt32},System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Int64},System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.UInt64},System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.SByte},System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.Byte},System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.Int16},System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.UInt16},System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.Int32},System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.UInt32},System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.Int64},System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(System.Nullable{System.UInt64},System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.SByte}},System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.Byte}},System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.Int16}},System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.UInt16}},System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.Int32}},System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.UInt32}},System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.Int64}},System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.NotEqual(Discord.Optional{System.Nullable{System.UInt64}},System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value may not be equal to <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.SByte,System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.Byte,System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.Int16,System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.UInt16,System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.Int32,System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.UInt32,System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.Int64,System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(System.UInt64,System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.SByte},System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.Byte},System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.Int16},System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.UInt16},System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.Int32},System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.UInt32},System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.Int64},System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtLeast(Discord.Optional{System.UInt64},System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at least <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.SByte,System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.Byte,System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.Int16,System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.UInt16,System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.Int32,System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.UInt32,System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.Int64,System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(System.UInt64,System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.SByte},System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.Byte},System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.Int16},System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.UInt16},System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.Int32},System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.UInt32},System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.Int64},System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.GreaterThan(Discord.Optional{System.UInt64},System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be greater than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.SByte,System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.Byte,System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.Int16,System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.UInt16,System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.Int32,System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.UInt32,System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.Int64,System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(System.UInt64,System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.SByte},System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.Byte},System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.Int16},System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.UInt16},System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.Int32},System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.UInt32},System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.Int64},System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.AtMost(Discord.Optional{System.UInt64},System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be at most <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.SByte,System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.Byte,System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.Int16,System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.UInt16,System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.Int32,System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.UInt32,System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.Int64,System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(System.UInt64,System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.SByte},System.SByte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.Byte},System.Byte,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.Int16},System.Int16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.UInt16},System.UInt16,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.Int32},System.Int32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.UInt32},System.UInt32,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.Int64},System.Int64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
+        </member>
+        <member name="M:Discord.Preconditions.LessThan(Discord.Optional{System.UInt64},System.UInt64,System.String,System.String)">
+            <exception cref="T:System.ArgumentException">Value must be less than <paramref name="value"/>.</exception>
         </member>
         <member name="M:Discord.Preconditions.YoungerThanTwoWeeks(System.UInt64[],System.String)">
             <exception cref="T:System.ArgumentOutOfRangeException">Messages are younger than 2 weeks.</exception>

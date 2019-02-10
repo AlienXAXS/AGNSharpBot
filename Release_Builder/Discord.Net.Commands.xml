@@ -831,6 +831,44 @@
                 Gets or sets a value that indicates whether extra parameters should be ignored.
             </summary>
         </member>
+        <member name="T:Discord.Commands.CommandServiceExtensions">
+            <summary>
+                Provides extension methods for the <see cref="T:Discord.Commands.CommandService"/> class.
+            </summary>
+        </member>
+        <member name="M:Discord.Commands.CommandServiceExtensions.GetExecutableCommandsAsync(System.Collections.Generic.ICollection{Discord.Commands.CommandInfo},Discord.Commands.ICommandContext,System.IServiceProvider)">
+            <summary>
+                Returns commands that can be executed under the current context.
+            </summary>
+            <param name="commands">The set of commands to be checked against.</param>
+            <param name="context">The current command context.</param>
+            <param name="provider">The service provider used for dependency injection upon precondition check.</param>
+            <returns>
+                A read-only collection of commands that can be executed under the current context.
+            </returns>
+        </member>
+        <member name="M:Discord.Commands.CommandServiceExtensions.GetExecutableCommandsAsync(Discord.Commands.CommandService,Discord.Commands.ICommandContext,System.IServiceProvider)">
+            <summary>
+                Returns commands that can be executed under the current context.
+            </summary>
+            <param name="commandService">The desired command service class to check against.</param>
+            <param name="context">The current command context.</param>
+            <param name="provider">The service provider used for dependency injection upon precondition check.</param>
+            <returns>
+                A read-only collection of commands that can be executed under the current context.
+            </returns>
+        </member>
+        <member name="M:Discord.Commands.CommandServiceExtensions.GetExecutableCommandsAsync(Discord.Commands.ModuleInfo,Discord.Commands.ICommandContext,System.IServiceProvider)">
+            <summary>
+                Returns commands that can be executed under the current context.
+            </summary>
+            <param name="module">The module to be checked against.</param>
+            <param name="context">The current command context.</param>
+            <param name="provider">The service provider used for dependency injection upon precondition check.</param>
+            <returns>
+                A read-only collection of commands that can be executed under the current context.
+            </returns>
+        </member>
         <member name="T:Discord.Commands.MessageExtensions">
             <summary>
                 Provides extension methods for <see cref="T:Discord.IUserMessage" /> that relates to commands.
