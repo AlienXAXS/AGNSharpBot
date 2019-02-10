@@ -7,8 +7,12 @@ mkdir .\Release_Builder > NUL
 
 echo Copying new files...
 copy /Y .\AGNSharpBot\bin\Release .\Release_Builder > NUL
+mkdir .\Release_Builder\x64 > NUL
+mkdir .\Release_Builder\x86 > NUL
+copy /Y .\AGNSharpBot\bin\Release\x64\* .\Release_Builder\x64\* > NUL
+copy /Y .\AGNSharpBot\bin\Release\x86\* .\Release_Builder\x86\* > NUL
 
-echo Creating plugins directory
+echo Creating plugins directory 
 mkdir .\Release_Builder\Plugins > NUL
 
 echo Copying Plugins...
