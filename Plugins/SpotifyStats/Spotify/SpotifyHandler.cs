@@ -79,7 +79,7 @@ namespace SpotifyStats.Spotify
                                 $"{i + 1}. {topUsersList[i].Username}: Played {topUsersList[i].PlayCount} time(s)\r\n";
                         }
 
-                        discordEmbedBuilder.AddField("Top Users", outputString, true);
+                        discordEmbedBuilder.AddField("Top Users", outputString);
                         
                         await Logger.Instance.Log(null, Logger.LoggerType.ConsoleAndDiscord,
                             discordEmbed: discordEmbedBuilder.Build());
