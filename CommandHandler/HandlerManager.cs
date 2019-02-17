@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -23,6 +24,7 @@ namespace CommandHandler
             public Command Command { get; set; }
             public Alias Alias { get; set; }
             public Permissions Permissions { get; set; }
+            public Type Type { get; set; }
         }
 
         private static HandlerManager _instance;
@@ -93,7 +95,8 @@ namespace CommandHandler
                             Alias = cmdAliases,
                             Command = cmdString,
                             MethodInfo = method,
-                            Permissions = cmdPermissions
+                            Permissions = cmdPermissions,
+                            Type = handler.Type
                         });
                 }
             }
@@ -139,7 +142,7 @@ namespace CommandHandler
                     {
                         // Execute the method
                         var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
-                        var activator = Activator.CreateInstance(thisMethod.MethodInfo.GetType());
+                        var activator = Activator.CreateInstance(thisMethod.Type);
                         thisMethod.MethodInfo.Invoke(activator, paramArray);
                     }
                     else
