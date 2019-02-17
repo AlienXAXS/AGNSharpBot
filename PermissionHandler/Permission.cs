@@ -77,8 +77,11 @@ namespace PermissionHandler
             [System.Runtime.CompilerServices.CallerMemberName]
             string path = "")
         {
+
+#if !DEBUG
             if (sktUser.Roles.Any(x => x.Permissions.Administrator))
                 return true;
+#endif
 
             var permissionNode = _database.GetData().DefaultIfEmpty(null).FirstOrDefault(x => x.Path.Equals(path));
             if (permissionNode == null)

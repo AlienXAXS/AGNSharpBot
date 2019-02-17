@@ -138,7 +138,7 @@ namespace CommandHandler
                     //NRE Check
                     if (!cmdMatch) continue;
 
-                    if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest || Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author, $"{thisMethod.MethodInfo.GetType()}.{thisMethod.MethodInfo.Name}"))
+                    if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest || Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author, $"{thisMethod.Type}.{thisMethod.MethodInfo.Name}"))
                     {
                         // Execute the method
                         var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
