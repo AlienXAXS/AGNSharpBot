@@ -71,12 +71,14 @@ namespace CommandHandler
         {
             // Param layout:
             /*
-             * 0 = param name (game2role)
-             * 1 = param command
-             * 2 = param args
-             * 3... = more args?
-             */
-            
+            * 0 = param name (game2role)
+            * 1 = param command
+            * 2 = param args
+            * 3... = more args?
+            */
+
+            // Ensures command must start with a !
+            if (!parameters[0].StartsWith("!")) return;
             var paramCommand = parameters[0].Replace("!","");
 
             // Compile a list of methods we can use
@@ -87,7 +89,7 @@ namespace CommandHandler
                 {
                     var cmdString = (Command) method.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
                     var cmdAliases = (Alias) method.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
-                    var cmdPermissions = (Permissions) method.GetCustomAttributes(typeof(Permission), true).FirstOrDefault();
+                    var cmdPermissions = (Permissions) method.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
 
                     if (cmdString != null)
                         methodHelpers.Add(new MethodInfoHelper()

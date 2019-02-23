@@ -33,6 +33,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\AuthorisedCommands.cs" />
+    <Compile Include="Commands\Global\DogCommand.cs" />
+    <Compile Include="Commands\Global\CatCommand.cs" />
     <Compile Include="Commands\Handlers\AuthorisedCommandsPermission.cs" />
     <Compile Include="Commands\ModerateUser.cs" />
     <Compile Include="Commands\AdminCommands.cs" />
