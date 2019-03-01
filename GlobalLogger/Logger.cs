@@ -90,6 +90,17 @@ namespace GlobalLogger
             Console.WriteLine($"{DateTime.Now:g} [{memberName}|{System.IO.Path.GetFileName(memberFilePath)}|{memberLineNumber}] - {msg}");
         }
 
+        public void LogDiscordUserMessageToFile(SocketGuild guild, SocketGuildUser user, SocketMessage message)
+        {
+            if (!System.IO.Directory.Exists("ChatLogs"))
+                System.IO.Directory.CreateDirectory("ChatLogs");
+
+            var filePath = $@".\ChatLogs\{guild.Name}-{message.Channel.Name}.log";
+            System.IO.File.AppendAllText(filePath, $"{user.Username}: {message.Content}");
+
+            Console.WriteLine($"{message.Channel.Name} - {user.Username}: {message.Content}");
+        }
+
         private async Task OutToDiscord(string msg, string memberName, string memberFilePath, int memberLineNumber,
             Embed discordEmbed = null, DiscordMention discordMention = null)
         {

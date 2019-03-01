@@ -110,7 +110,7 @@ namespace HomeLabReporting.SNMP
                         if (resultEntry.Oid.ToString() == oidEntry.Oid)
                         {
                             oidEntry.LastValue = new SnmpHostValueDefinition(resultEntry.Value.ToString());
-                            GlobalLogger.Logger.Instance.WriteConsole($"[SNMP Communication] - {Name} | OID {oidEntry.Oid} ({oidEntry.ReadableName}) updated with value {resultEntry.Value}");
+                            //GlobalLogger.Logger.Instance.WriteConsole($"[SNMP Communication] - {Name} | OID {oidEntry.Oid} ({oidEntry.ReadableName}) updated with value {resultEntry.Value}");
                         }
                     }
                 }

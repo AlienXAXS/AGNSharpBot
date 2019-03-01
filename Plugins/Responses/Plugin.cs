@@ -15,7 +15,7 @@ namespace Responses
         List<string> IPlugin.Commands => new List<string> { "test_plugin" };
 
         List<PluginRequestTypes.PluginRequestType> IPlugin.RequestTypes =>
-            new List<PluginRequestTypes.PluginRequestType> {PluginRequestTypes.PluginRequestType.COMMAND};
+            new List<PluginRequestTypes.PluginRequestType> {PluginRequestTypes.PluginRequestType.COMMAND, PluginRequestTypes.PluginRequestType.MESSAGE};
 
         void IPlugin.ExecutePlugin()
         {
@@ -38,6 +38,11 @@ namespace Responses
 
         Task IPlugin.Message(string message, SocketMessage sktMessage)
         {
+            var socketUser = (SocketGuildUser)sktMessage.Author;
+            var socketGuild = (SocketGuild)sktMessage.Channel;
+
+            GlobalLogger.Logger.Instance.LogDiscordUserMessageToFile(socketGuild, socketUser, sktMessage);
+
             return Task.CompletedTask;
         }
 
