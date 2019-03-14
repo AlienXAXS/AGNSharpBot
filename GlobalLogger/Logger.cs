@@ -90,13 +90,13 @@ namespace GlobalLogger
             Console.WriteLine($"{DateTime.Now:g} [{memberName}|{System.IO.Path.GetFileName(memberFilePath)}|{memberLineNumber}] - {msg}");
         }
 
-        public void LogDiscordUserMessageToFile(SocketGuild guild, SocketGuildUser user, SocketMessage message)
+        public void LogDiscordUserMessageToFile(SocketGuildUser user, SocketMessage message)
         {
             if (!System.IO.Directory.Exists("ChatLogs"))
                 System.IO.Directory.CreateDirectory("ChatLogs");
 
-            var filePath = $@".\ChatLogs\{guild.Name}-{message.Channel.Name}.log";
-            System.IO.File.AppendAllText(filePath, $"{user.Username}: {message.Content}");
+            var filePath = $@".\ChatLogs\{message.Channel.Id}.log";
+            System.IO.File.AppendAllText(filePath, $"[{DateTime.Now} @ {message.Channel.Name}] {user.Username}: {message.Content}{Environment.NewLine}");
 
             Console.WriteLine($"{message.Channel.Name} - {user.Username}: {message.Content}");
         }

@@ -39,9 +39,8 @@ namespace Responses
         Task IPlugin.Message(string message, SocketMessage sktMessage)
         {
             var socketUser = (SocketGuildUser)sktMessage.Author;
-            var socketGuild = (SocketGuild)sktMessage.Channel;
 
-            GlobalLogger.Logger.Instance.LogDiscordUserMessageToFile(socketGuild, socketUser, sktMessage);
+            GlobalLogger.Logger.Instance.LogDiscordUserMessageToFile(socketUser, sktMessage);
 
             return Task.CompletedTask;
         }
