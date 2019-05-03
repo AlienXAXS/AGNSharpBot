@@ -100,6 +100,9 @@ namespace AGNSharpBot.PluginHandler
 
                         var cmdWord = sktMessage.Content.Split(' ').First()
                             .TrimStart(Configuration.Discord.Instance.CommandPrefix);
+
+                        // Sometimes our plugins have no commands registered, but they are listening for commands wrongly, handle that here.
+                        if ( plugin.Commands == null ) continue;
                         if (plugin.Commands.Any(x => x.Equals(cmdWord, StringComparison.CurrentCultureIgnoreCase)))
                             await plugin.CommandAsync(cmdWord, sktMessage.Content, sktMessage);
                     }

@@ -186,14 +186,11 @@
   <ItemGroup>
     <Compile Include="Configuration\Discord.cs" />
     <Compile Include="DiscordHandler\Client.cs" />
-    <Compile Include="DiscordHandler\Modules\RandomCommands.cs" />
     <Compile Include="DiscordHandler\Services.cs" />
-    <Compile Include="DiscordHandler\Services\PictureService.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="PluginHandler\PluginManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DiscordHandler\Services\CommandHandlingService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

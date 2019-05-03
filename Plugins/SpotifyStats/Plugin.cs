@@ -24,6 +24,7 @@ namespace SpotifyStats
 
             // Setup our discordclient link to spotifystats
             Spotify.SpotifyHandler.Instance.SetupDiscordInstance(DiscordClient);
+            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.SpotifyCommandHandler>();
         }
 
         public void Dispose()

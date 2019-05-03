@@ -14,10 +14,17 @@ namespace Responses.Commands.Global
     {
         public async Task<Stream> GetCatPictureAsync(string text, bool gif)
         {
-            HttpClient http = new HttpClient();
-            var url = gif ? "https://cataas.com/cat/gif/says/" + text : $"https://cataas.com/cat/says/" + text;
-            var resp = await http.GetAsync(url);
-            return await resp.Content.ReadAsStreamAsync();
+            try
+            {
+                HttpClient http = new HttpClient();
+                var url = gif ? "https://cataas.com/cat/gif/says/" + text : $"https://cataas.com/cat/says/" + text;
+                var resp = await http.GetAsync(url);
+                return await resp.Content.ReadAsStreamAsync();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         [Command("cat", "Posts an image of a cat into the channel you put the command in - you can also request a GIF by saying !cat gif")]
@@ -32,9 +39,27 @@ namespace Responses.Commands.Global
                 nickname = sktGuildUser.Username;
 
             var gif = sktMessage.Content.ToLower().Contains("gif");
-            var stream = await GetCatPictureAsync($"A Kitty For {nickname}", gif);
 
-            await sktMessage.Channel.SendFileAsync(stream, (gif ? "cat.gif" : "cat.png"));
+            var message =
+                await sktMessage.Channel.SendMessageAsync("Obtaining a cute fluffy image for you now, please wait...");
+
+            var stream = await GetCatPictureAsync($"A Kitty For {nickname}", gif);
+            if (stream == null)
+                await message.ModifyAsync(properties => properties.Content = "Unable to connect to the Cat Service, try again later");
+            else
+            {
+                try
+                {
+                    await message.DeleteAsync();
+                    await sktMessage.Channel.SendFileAsync(stream, (gif ? "cat.gif" : "cat.png"));
+                }
+                catch (Exception ex)
+                {
+                    await message.ModifyAsync(properties =>
+                        properties.Content =
+                            $"Unable to get the image for you, perhaps the cat sat on the network cable... Error is:\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                }
+            }
         }
 
         public bool ContainsUnicodeCharacter(string input)

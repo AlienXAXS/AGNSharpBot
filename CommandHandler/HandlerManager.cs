@@ -115,7 +115,7 @@ namespace CommandHandler
                 {
                     if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
                         Permission.Instance.CheckPermission((SocketGuildUser) socketMessage.Author,
-                            $"!{thisMethod.MethodInfo.GetType()}.{thisMethod.MethodInfo.Name}"))
+                            $"{thisMethod.MethodInfo.ReflectedType?.FullName}.{thisMethod.MethodInfo.Name}"))
                     {
                         discordEmbedBuilder.AddField($"!{thisMethod.Command.Value}", $"{thisMethod.Command.Description}\r\n\r\n");
                     }

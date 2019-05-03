@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using AGNSharpBot.DiscordHandler.Services;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,8 +25,6 @@ namespace AGNSharpBot.DiscordHandler
             return new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddSingleton<PictureService>()
                 .AddSingleton<HttpClient>()
                 .BuildServiceProvider();
         }

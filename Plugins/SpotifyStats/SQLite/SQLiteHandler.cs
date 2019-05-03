@@ -36,6 +36,8 @@ namespace SpotifyStats.SQLite
             _connection.CreateTable<Tables.Song>();
         }
 
+        public SQLiteConnection GetConnection() => _connection;
+
         public SongEntry AddSongAndListener(string songId, string artist, string name, ulong discordId)
         {
             var song = _connection.Table<Tables.Song>().Where(x => x.SongId.Equals(songId)).DefaultIfEmpty(null)

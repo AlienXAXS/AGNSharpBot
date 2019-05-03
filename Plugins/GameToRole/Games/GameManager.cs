@@ -78,18 +78,28 @@ namespace GameToRole.Games
 
         public async Task DeleteGameEntry(GameEntry gameEntry, SocketGuild guild)
         {
-            await Logger.Instance.Log(
-                $"Attempting to delete game entry {gameEntry.Name} | {gameEntry.DiscordRoleId} from Guild {guild.Id}", Logger.LoggerType.ConsoleOnly);
+            try
+            {
+                await Logger.Instance.Log(
+                    $"Attempting to delete game entry {gameEntry.Name} | {gameEntry.DiscordRoleId} from Guild {guild.Id}",
+                    Logger.LoggerType.ConsoleOnly);
 
-            var _role = guild.GetRole(gameEntry.DiscordRoleId);
-            if (_role == null) return;
+                var _role = guild.GetRole(gameEntry.DiscordRoleId);
+                if (_role == null) return;
 
-            await _role.DeleteAsync();
-            _gameEntries.Remove(gameEntry);
-            await SaveGameEntries();
+                await _role.DeleteAsync();
+                _gameEntries.Remove(gameEntry);
+                await SaveGameEntries();
 
-            await Logger.Instance.Log(
-                $"Game Entry {gameEntry.Name} | {gameEntry.DiscordRoleId} was deleted from Guild {guild.Id} - {guild.Name}", Logger.LoggerType.ConsoleAndDiscord);
+                await Logger.Instance.Log(
+                    $"Game Entry {gameEntry.Name} | {gameEntry.DiscordRoleId} was deleted from Guild {guild.Id} - {guild.Name}",
+                    Logger.LoggerType.ConsoleAndDiscord);
+            }
+            catch (Exception ex)
+            {
+                await Logger.Instance.Log(
+                    $"Unhandled Exception while running task\r\n{ex.Message}\r\n\r\n\r\n{ex.StackTrace}", Logger.LoggerType.ConsoleOnly);
+            }
         }
 
         private async Task DiscordSocketOnGuildMemberUpdatedAsync(SocketGuildUser guildUserBefore, SocketGuildUser guildUserAfter)

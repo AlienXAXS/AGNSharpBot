@@ -32,7 +32,6 @@ namespace AGNSharpBot.DiscordHandler
             };
 
             _discordSocket.MessageReceived += DiscordSocketOnMessageReceived;
-            await _services.GetRequiredService<Services.CommandHandlingService>().InitializeAsync();
         }
 
         private async Task DiscordSocketOnMessageReceived(SocketMessage socketMessage)

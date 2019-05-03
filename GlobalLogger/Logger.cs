@@ -109,6 +109,8 @@ namespace GlobalLogger
 
             var discordGuild = _discordSocketClient.GetGuild(discordMention?.GuildId ?? Configuration.Discord.Instance.GetDiscordGuildId());
 
+            if (discordGuild == null) return;
+
             if (discordGuild.GetChannel(discordMention?.ChannelId ?? Configuration.Discord.Instance.GetDiscordLoggerChannelId()) is ISocketMessageChannel discordChannel)
             {
                 if ( discordEmbed != null )

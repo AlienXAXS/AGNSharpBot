@@ -22,6 +22,23 @@ namespace SpotifyStats.Spotify
         {
             _discordSocketClient = discordSocket;
             _discordSocketClient.GuildMemberUpdated += OnGuildMemberUpdated;
+            _discordSocketClient.UserLeft += DiscordSocketClientOnUserLeft;
+        }
+
+        private Task DiscordSocketClientOnUserLeft(SocketGuildUser socketGuildUser)
+        {
+            try
+            {
+                long lId = (long) socketGuildUser.Id;
+                SQLite.SqLiteHandler.Instance.GetConnection().Table<SQLite.Tables.Listener>()
+                    .Delete(x => x.DiscordId == lId);
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return Task.CompletedTask;
         }
 
         private struct TopPlayEntry

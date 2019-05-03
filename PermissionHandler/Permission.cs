@@ -77,16 +77,12 @@ namespace PermissionHandler
             [System.Runtime.CompilerServices.CallerMemberName]
             string path = "")
         {
-
-#if !DEBUG
             if (sktUser.Roles.Any(x => x.Permissions.Administrator))
                 return true;
-#endif
 
             var permissionNode = _database.GetData().DefaultIfEmpty(null).FirstOrDefault(x => x.Path.Equals(path));
             if (permissionNode == null)
-                throw new Exception(
-                    $"Possible unknown permission path with {path}, user {sktUser.Username} attempted a command that I did not recognise");
+                return false;
 
             if (permissionNode.Permissions.Count == 0)
                 return false;
