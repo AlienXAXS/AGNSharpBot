@@ -68,8 +68,8 @@ namespace SpotifyStats.Commands
 
         private async Task RemoveStaleSpotifyUsers(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
-            var listeners = SQLite.SqLiteHandler.Instance.GetConnection();
-            var listenersTable = listeners.Table<SQLite.Tables.Listener>();
+            var listeners = InternalDatabase.Handler.Instance.GetConnection();
+            var listenersTable = listeners.DbConnection.Table<SQLite.Tables.Listener>();
 
             var unknownUsers = (from listener in listenersTable.GroupBy(x => x.DiscordId) where discordSocketClient.GetUser((ulong) listener.Key) == null select (ulong) listener.Key).ToList();
 
@@ -102,7 +102,9 @@ namespace SpotifyStats.Commands
                 }
             }
 
-            var listeners = SQLite.SqLiteHandler.Instance.GetConnection().Table<SQLite.Tables.Listener>();
+            var listeners = InternalDatabase.Handler.Instance.GetConnection()?.DbConnection.Table<SQLite.Tables.Listener>();
+            if ( listeners == null ) throw new Exception("DB FAIL IN SPOTIFY");
+
             var group = listeners.GroupBy(x => x.DiscordId);
             var topTake = group.OrderByDescending(x => x.Count()).Take(topLength);
 

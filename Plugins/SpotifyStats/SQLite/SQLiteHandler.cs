@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InternalDatabase;
 using SQLite;
 using SQLitePCL;
 
@@ -15,32 +16,12 @@ namespace SpotifyStats.SQLite
         public List<Tables.Listener> Listeners;
     }
 
-    class SqLiteHandler
+    static class SQLiteHandler
     {
-        // Instanced
-        private static SqLiteHandler _instance;
-        public static SqLiteHandler Instance = _instance ?? (_instance = new SqLiteHandler());
 
-        private SQLiteConnection _connection;
-        private const string DatabasePath = "Plugins\\Config\\SpotifyStats.db";
-
-        public void InitDatabase()
+        public static SongEntry AddSongAndListener(Connection connection, string songId, string artist, string name, ulong discordId)
         {
-            if (!System.IO.File.Exists(DatabasePath))
-                System.Data.SQLite.SQLiteConnection.CreateFile(DatabasePath);
-
-            _connection = new SQLiteConnection(DatabasePath);
-
-            // Create our tables
-            _connection.CreateTable<Tables.Listener>();
-            _connection.CreateTable<Tables.Song>();
-        }
-
-        public SQLiteConnection GetConnection() => _connection;
-
-        public SongEntry AddSongAndListener(string songId, string artist, string name, ulong discordId)
-        {
-            var song = _connection.Table<Tables.Song>().Where(x => x.SongId.Equals(songId)).DefaultIfEmpty(null)
+            var song = connection.DbConnection.Table<Tables.Song>().Where(x => x.SongId.Equals(songId)).DefaultIfEmpty(null)
                 .FirstOrDefault();
 
             if (song == null)
@@ -51,7 +32,7 @@ namespace SpotifyStats.SQLite
                     SongId = songId,
                     Name = name
                 };
-                _connection.Insert(song);
+                connection.DbConnection.Insert(song);
             }
 
             var listener = new Tables.Listener()
@@ -60,12 +41,12 @@ namespace SpotifyStats.SQLite
                 DiscordId = (long) discordId,
                 DateTime = DateTime.Now
             };
-            _connection.Insert(listener);
+            connection.DbConnection.Insert(listener);
 
             return new SongEntry()
             {
                 Song = song,
-                Listeners = _connection.Table<Tables.Listener>().Where(x => x.SongId == song.Id).ToList()
+                Listeners = connection.DbConnection.Table<Tables.Listener>().Where(x => x.SongId == song.Id).ToList()
             };
         }
     }

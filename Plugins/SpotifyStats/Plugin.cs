@@ -18,9 +18,11 @@ namespace SpotifyStats
         public async void ExecutePlugin()
         {
             GlobalLogger.Logger.Instance.WriteConsole($"SpotifyStats.dll Plugin Loading...");
-
-            // DB stuff
-            SQLite.SqLiteHandler.Instance.InitDatabase();
+            
+            // Register our tables with the SQLHandler
+            var dbConn = InternalDatabase.Handler.Instance.NewConnection();
+            dbConn.RegisterTable<SQLite.Tables.Listener>();
+            dbConn.RegisterTable<SQLite.Tables.Song>();
 
             // Setup our discordclient link to spotifystats
             Spotify.SpotifyHandler.Instance.SetupDiscordInstance(DiscordClient);

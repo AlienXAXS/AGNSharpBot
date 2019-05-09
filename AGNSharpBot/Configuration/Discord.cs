@@ -6,7 +6,7 @@ namespace AGNSharpBot.Configuration
     class Discord
     {
         public static Discord Instance = _instance ?? (_instance = new Discord());
-        private static Discord _instance;
+        private static readonly Discord _instance;
 
         public string Token { get; set; }
         public char CommandPrefix { get; set; }
@@ -38,22 +38,21 @@ namespace AGNSharpBot.Configuration
                 throw new Exceptions.MissingConfigurationFile();
             }
         }
-
-        public class Exceptions
+    }
+    public class Exceptions
+    {
+        public class MissingConfigurationFile : Exception
         {
-            public class MissingConfigurationFile : Exception
+        }
+
+        public class InvalidConfigurationFile : Exception
+        {
+            public InvalidConfigurationFile(string message) : base(message)
             {
             }
 
-            public class InvalidConfigurationFile : Exception
+            public InvalidConfigurationFile()
             {
-                public InvalidConfigurationFile(string message) : base(message)
-                {
-                }
-
-                public InvalidConfigurationFile()
-                {
-                }
             }
         }
     }

@@ -17,7 +17,7 @@ namespace AGNSharpBot.DiscordHandler
 
         public DiscordSocketClient GetDiscordSocket() => _discordSocket;
 
-        public async Task InitDiscordClient(IServiceProvider services)
+        public void InitDiscordClient(IServiceProvider services)
         {
             _services = services;
 

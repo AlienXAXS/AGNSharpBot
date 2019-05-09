@@ -17,12 +17,16 @@ namespace SpotifyStats.Spotify
         private static SpotifyHandler _instance;
         public static SpotifyHandler Instance = _instance ?? (_instance = new SpotifyHandler());
 
+        private InternalDatabase.Connection dbConnection;
+
         public DiscordSocketClient _discordSocketClient;
         public void SetupDiscordInstance(DiscordSocketClient discordSocket)
         {
             _discordSocketClient = discordSocket;
             _discordSocketClient.GuildMemberUpdated += OnGuildMemberUpdated;
             _discordSocketClient.UserLeft += DiscordSocketClientOnUserLeft;
+
+            dbConnection = InternalDatabase.Handler.Instance.GetConnection();
         }
 
         private Task DiscordSocketClientOnUserLeft(SocketGuildUser socketGuildUser)
@@ -30,7 +34,7 @@ namespace SpotifyStats.Spotify
             try
             {
                 long lId = (long) socketGuildUser.Id;
-                SQLite.SqLiteHandler.Instance.GetConnection().Table<SQLite.Tables.Listener>()
+                dbConnection.DbConnection.Table<SQLite.Tables.Listener>()
                     .Delete(x => x.DiscordId == lId);
             }
             catch (Exception)
@@ -70,7 +74,7 @@ namespace SpotifyStats.Spotify
 
                     if (newMember.Activity is SpotifyGame spotifyGame)
                     {
-                        var returnedSong = SQLite.SqLiteHandler.Instance.AddSongAndListener(spotifyGame.TrackId, spotifyGame.Artists.First(), spotifyGame.TrackTitle, newMember.Id);
+                        var returnedSong = SQLite.SQLiteHandler.AddSongAndListener(dbConnection, spotifyGame.TrackId, spotifyGame.Artists.First(), spotifyGame.TrackTitle, newMember.Id);
                         var group = returnedSong.Listeners.GroupBy(x => x.DiscordId).OrderByDescending(x => x.Count());
 
                         var top = group.Take(3);
