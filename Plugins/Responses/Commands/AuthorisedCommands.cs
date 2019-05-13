@@ -39,10 +39,16 @@ namespace Responses.Commands
             {
                 foreach (var user in sktMessage.MentionedUsers)
                 {
-                    var sktUser = (SocketGuildUser) user;
+                    if (!(user is SocketGuildUser sktUser))
+                    {
+                        await sktMessage.Channel.SendMessageAsync(
+                            $"Unable to move {user.Username} as I am unable to find this user.");
+                        continue;
+                    }
 
                     // If their trying to move an admin, and they are not an admin deny this access.
-                    if (sktUser.Roles.Any(x => x.Permissions.Administrator) && !sktAuthorUser.Roles.Any(x => x.Permissions.Administrator))
+                    if (sktUser.Roles.Any(x => x.Permissions.Administrator) &&
+                        !sktAuthorUser.Roles.Any(x => x.Permissions.Administrator))
                     {
                         await sktMessage.Channel.SendMessageAsync(
                             $"Unable to move {sktUser.Username}, You cannot move Administrators");
