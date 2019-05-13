@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connection.cs" />
-    <Compile Include="DataHandler.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Handler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
