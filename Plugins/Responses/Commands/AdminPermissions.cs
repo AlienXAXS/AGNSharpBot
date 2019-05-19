@@ -13,7 +13,6 @@ namespace Responses.Commands
     class AdminPermissions
     {
         [Command("perm", "Manages the permission system (try !perm help)")]
-        [Permissions(Permissions.PermissionTypes.Guest)]
         public async void AdminPermission(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
