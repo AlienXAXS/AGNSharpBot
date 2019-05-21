@@ -43,7 +43,7 @@ namespace Responses.Commands
             _menuHandler.OnMenuOptionSelected += MenuHandlerOnOnMenuOptionSelected;
             _menuHandler.Render(SocketMessage.Channel);
 
-            Task _myTask = new Task(async () =>
+            var _myTask = new Task(async () =>
             {
                 var timeout = 30;
                 while (timeout > 0)
@@ -119,7 +119,7 @@ namespace Responses.Commands
                         return;
                     }
 
-                    Task _myTask = new Task(async () =>
+                    var _myTask = new Task(async () =>
                     {
                         var sessionExpired = false;
 

@@ -82,19 +82,19 @@ namespace HomeLabReporting.SNMP
             try
             {
                 // SNMP community name
-                OctetString community = new OctetString(CommunityString);
+                var community = new OctetString(CommunityString);
 
                 // Define agent parameters class
-                AgentParameters param = new AgentParameters(community) {Version = SnmpVersion.Ver1};
-                IpAddress agent = new IpAddress(IpAddress);
-                UdpTarget target = new UdpTarget((IPAddress) agent, Port, ConnectionTimeout, 1);
+                var param = new AgentParameters(community) {Version = SnmpVersion.Ver1};
+                var agent = new IpAddress(IpAddress);
+                var target = new UdpTarget((IPAddress) agent, Port, ConnectionTimeout, 1);
 
                 var pdu = new Pdu(PduType.Get);
 
                 foreach (var oidEntry in OidList.Where(x => !x.Oid.Equals(""))) //do not read empty OID's here
                     pdu.VbList.Add(oidEntry.Oid);
 
-                SnmpV1Packet result = (SnmpV1Packet) target.Request(pdu, param);
+                var result = (SnmpV1Packet) target.Request(pdu, param);
                 if (result == null) return;
 
                 if (result.Pdu.ErrorStatus != 0)

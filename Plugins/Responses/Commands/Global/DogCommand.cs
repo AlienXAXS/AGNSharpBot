@@ -16,7 +16,7 @@ namespace Responses.Commands.Global
         {
             try
             {
-                HttpClient http = new HttpClient();
+                var http = new HttpClient();
                 var url = gif
                     ? "http://www.agngaming.com/private/agnsharpbot/catdog.gif"
                     : $"http://www.agngaming.com/private/agnsharpbot/catdog.jpg";

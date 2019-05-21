@@ -16,7 +16,7 @@ namespace Responses.Commands.Global
         {
             try
             {
-                HttpClient http = new HttpClient();
+                var http = new HttpClient();
                 var url = gif ? "https://cataas.com/cat/gif/says/" + text : $"https://cataas.com/cat/says/" + text;
                 var resp = await http.GetAsync(url);
                 return await resp.Content.ReadAsStreamAsync();

@@ -34,7 +34,7 @@ namespace Responses.Commands
                         return;
                     }
 
-                    EmbedBuilder embedBuilder = new EmbedBuilder();
+                    var embedBuilder = new EmbedBuilder();
                     embedBuilder.Title = $"User information for {user.Username}";
                     embedBuilder.AddField("Created", $"{user.CreatedAt.Date:dd/mm/yyyy hh:mm:ss} ({(DateTime.Now - user.CreatedAt.Date).Days} days ago)");
 
@@ -98,7 +98,7 @@ namespace Responses.Commands
                                 return;
                             }
 
-                            int deletedMessageCount = 0;
+                            var deletedMessageCount = 0;
                             List<IMessage> sortedList = sortedList = await sktMessage.Channel.GetMessagesAsync()?.Flatten().Where(x => x.Author.Id == userId).ToList();
 
                             // Delete from a message

@@ -43,7 +43,7 @@ namespace HomeLabReporting.SNMP
 
             if (snmpHost == null)
             {
-                string oidStrings = "";
+                var oidStrings = "";
                 foreach (var x in snmpVbCollection)
                     oidStrings += $"{x.Oid} = {x.Value}\r\n";
 
@@ -72,7 +72,7 @@ namespace HomeLabReporting.SNMP
 
             if (!foundTrap)
             {
-                string oidStrings = "";
+                var oidStrings = "";
                 foreach (var x in snmpVbCollection)
                     oidStrings += $"{x.Oid} = {x.Value}\r\n";
 
@@ -90,7 +90,7 @@ namespace HomeLabReporting.SNMP
         {
             // A crappy timer!
 
-            int _tickDelay = 1000;
+            var _tickDelay = 1000;
 
             while (!_stopCapture)
             {

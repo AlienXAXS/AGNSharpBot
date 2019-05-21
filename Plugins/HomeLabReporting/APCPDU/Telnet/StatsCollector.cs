@@ -18,14 +18,14 @@ namespace HomeLabReporting.APCPDU.Telnet
     {
         public void GetStats()
         {
-            SimpleTcpClient tcpClient = new SimpleTcpClient();
+            var tcpClient = new SimpleTcpClient();
             tcpClient.Connect("172.16.0.12", 23);
 
-            string apcUptime = "";
-            string apcOutputCurrent = "";
-            string apcTotalPower = "";
+            var apcUptime = "";
+            var apcOutputCurrent = "";
+            var apcTotalPower = "";
 
-            int cmds = 0;
+            var cmds = 0;
 
             tcpClient.Delimiter = 10;
             tcpClient.DelimiterDataReceived += (sender, tcpClientResponse) =>
@@ -37,8 +37,8 @@ namespace HomeLabReporting.APCPDU.Telnet
                     // UPTIME
                     if (tcpClientResponse.MessageString.Contains("Up Time"))
                     {
-                        Regex regex = new Regex("Up Time   :[ \t]*([^\n\r]*)Stat");
-                        Match match = regex.Match(tcpClientResponse.MessageString);
+                        var regex = new Regex("Up Time   :[ \t]*([^\n\r]*)Stat");
+                        var match = regex.Match(tcpClientResponse.MessageString);
                         if (match.Success && match.Groups.Count == 1)
                         {
                             apcUptime = match.Groups[1].Value.Trim();
@@ -48,8 +48,8 @@ namespace HomeLabReporting.APCPDU.Telnet
                     // Total Output Current
                     if (tcpClientResponse.MessageString.Contains("Total Output Current"))
                     {
-                        Regex regex = new Regex("\\bTotal Output Current\\s+:\\s+(.*)");
-                        Match match = regex.Match(tcpClientResponse.MessageString);
+                        var regex = new Regex("\\bTotal Output Current\\s+:\\s+(.*)");
+                        var match = regex.Match(tcpClientResponse.MessageString);
                         if (match.Success && match.Groups.Count == 1)
                         {
                             apcOutputCurrent = match.Groups[1].Value.Trim();
@@ -59,8 +59,8 @@ namespace HomeLabReporting.APCPDU.Telnet
                     // Total watts
                     if (tcpClientResponse.MessageString.Contains("Total Power"))
                     {
-                        Regex regex = new Regex("\\bTotal Power\\s +:\\s + (.*)");
-                        Match match = regex.Match(tcpClientResponse.MessageString);
+                        var regex = new Regex("\\bTotal Power\\s +:\\s + (.*)");
+                        var match = regex.Match(tcpClientResponse.MessageString);
                         if (match.Success && match.Groups.Count == 1)
                         {
                             apcTotalPower = match.Groups[1].Value.Trim();

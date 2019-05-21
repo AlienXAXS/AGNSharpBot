@@ -82,7 +82,7 @@ namespace DiscordMenu
             var thisEmbed = new EmbedBuilder {};
             thisEmbed.Color = new Color(rnd.Next(256), rnd.Next(256), rnd.Next(256));
 
-            string queryMessage = $"{MenuTitle}{Environment.NewLine}{Environment.NewLine}";
+            var queryMessage = $"{MenuTitle}{Environment.NewLine}{Environment.NewLine}";
 
             foreach (var item in MenuOptions.Where(x => x.Id != -1))
                 queryMessage += $"{IdToEmote(item.Id)} `{item.Caption}`{Environment.NewLine}";

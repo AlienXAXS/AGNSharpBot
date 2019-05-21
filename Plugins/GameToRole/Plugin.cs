@@ -13,25 +13,13 @@ namespace GameToRole
     public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "Game 2 Roles";
-        List<string> IPlugin.Commands => new List<string>() { "game2role" };
-        List<PluginRequestTypes.PluginRequestType> IPlugin.RequestTypes =>
-            new List<PluginRequestTypes.PluginRequestType> { PluginRequestTypes.PluginRequestType.COMMAND };
 
         public DiscordSocketClient DiscordClient { get; set; }
 
         void IPlugin.ExecutePlugin()
         {
-            GlobalLogger.Logger.Instance.WriteConsole($"GameToRole.dll v0.3.1 Plugin Loading...");
-            Games.GameManager.Instance.StartGameManager(DiscordClient);
-        }
-
-        async Task IPlugin.CommandAsync(string command, string message, SocketMessage sktMessage)
-        {
-            var splitCommandString = SplitArguments(message);
-            var commandHandler = new Admin.Handler
-                {DiscordSocket = sktMessage};
-
-            commandHandler.Parse(splitCommandString, DiscordClient);
+            GlobalLogger.Logger.Instance.WriteConsole($"GameToRole.dll v0.3.1 Plugin Loading... (This plugin is obsolete and no longer loads)");
+            //Games.GameManager.Instance.StartGameManager(DiscordClient);
         }
 
         public static string[] SplitArguments(string commandLine)
@@ -55,11 +43,6 @@ namespace GameToRole
                     parmChars[index] = '\n';
             }
             return (new string(parmChars)).Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        }
-
-        Task IPlugin.Message(string message, SocketMessage sktMessage)
-        {
-            return Task.CompletedTask;
         }
 
         void IPlugin.Dispose()

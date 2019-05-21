@@ -113,7 +113,7 @@ namespace Responses.Commands
             var mention = parameters[3];
 
             // Check if the last param was a true/false for explicit deny
-            bool explicitDeny = parameters[parameters.Length-1].Equals("true", StringComparison.OrdinalIgnoreCase);
+            var explicitDeny = parameters[parameters.Length-1].Equals("true", StringComparison.OrdinalIgnoreCase);
 
             // Will catch any raised exception from the Permissions system here.
             try

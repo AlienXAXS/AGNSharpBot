@@ -12,10 +12,6 @@ namespace Responses
     {
         string IPlugin.Name => "Discord Responses";
         DiscordSocketClient IPlugin.DiscordClient { get; set; }
-        List<string> IPlugin.Commands => new List<string> { "test_plugin" };
-
-        List<PluginRequestTypes.PluginRequestType> IPlugin.RequestTypes =>
-            new List<PluginRequestTypes.PluginRequestType> {PluginRequestTypes.PluginRequestType.COMMAND, PluginRequestTypes.PluginRequestType.MESSAGE};
 
         void IPlugin.ExecutePlugin()
         {
@@ -28,21 +24,6 @@ namespace Responses
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminPermissions>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.CatCommand>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.DogCommand>();
-        }
-
-        Task IPlugin.CommandAsync(string command, string message, SocketMessage sktMessage)
-        {
-            sktMessage.Channel.SendMessageAsync("Plugin Response Message!");
-            return Task.CompletedTask;
-        }
-
-        Task IPlugin.Message(string message, SocketMessage sktMessage)
-        {
-            var socketUser = (SocketGuildUser)sktMessage.Author;
-
-            GlobalLogger.Logger.Instance.LogDiscordUserMessageToFile(socketUser, sktMessage);
-
-            return Task.CompletedTask;
         }
 
         void IPlugin.Dispose()

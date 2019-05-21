@@ -75,7 +75,7 @@ namespace SpotifyStats.Commands
 
             foreach (var unknownUser in unknownUsers)
             {
-                long uid = (long) unknownUser;
+                var uid = (long) unknownUser;
                 listenersTable.Delete(x => x.DiscordId == uid);
             }
 
@@ -85,7 +85,7 @@ namespace SpotifyStats.Commands
         private async Task HandleTop(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
-            int topLength = 3;
+            var topLength = 3;
 
             // Check for a custom top
             if (parameters.Length == 3)

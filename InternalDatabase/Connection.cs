@@ -12,7 +12,6 @@ using SQLitePCL;
 
 namespace InternalDatabase
 {
-
     public class Connection
     {
         public SQLiteConnection DbConnection;
@@ -23,15 +22,15 @@ namespace InternalDatabase
         {
             DatabaseName = name;
 
-            string dbFileName = new string($"{DatabaseName}.db".Where(ch => !_invalidFileNameChars.Contains(ch)).ToArray());
-            string databasePath = $"Data\\{dbFileName}";
+            var dbFileName = new string($"{DatabaseName}.db".Where(ch => !_invalidFileNameChars.Contains(ch)).ToArray());
+            var databasePath = $"Data\\{dbFileName}";
 
             try
             {
-                if (!System.IO.Directory.Exists("Data"))
-                    System.IO.Directory.CreateDirectory("Data");
+                if (!Directory.Exists("Data"))
+                    Directory.CreateDirectory("Data");
 
-                if (!System.IO.File.Exists(databasePath))
+                if (!File.Exists(databasePath))
                     System.Data.SQLite.SQLiteConnection.CreateFile(databasePath);
 
                 DbConnection = new SQLiteConnection(databasePath);

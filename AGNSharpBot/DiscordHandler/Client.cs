@@ -21,7 +21,7 @@ namespace AGNSharpBot.DiscordHandler
         {
             _services = services;
 
-            DiscordSocketConfig _config = new DiscordSocketConfig { MessageCacheSize = 100 };
+            var _config = new DiscordSocketConfig { MessageCacheSize = 100 };
             //_discordSocket = services.GetRequiredService<DiscordSocketClient>();
             _discordSocket = new DiscordSocketClient(_config);
 
@@ -30,18 +30,8 @@ namespace AGNSharpBot.DiscordHandler
                 GlobalLogger.Logger.Instance.WriteConsole(message.Message);
                 return Task.CompletedTask;
             };
-
-            _discordSocket.MessageReceived += DiscordSocketOnMessageReceived;
         }
-
-        private async Task DiscordSocketOnMessageReceived(SocketMessage socketMessage)
-        {
-            if (!(socketMessage is SocketUserMessage message)) return; // BREAKPOINT IS HERE, ONLY GETS TRIGGERED WHEN THE BOT SPEAKS, NOT WHEN SOMEONE ELSE DOES
-            if (message.Source != MessageSource.User) return;
-
-            await PluginHandler.PluginManager.Instance.DispatchMessage(socketMessage);
-        }
-
+        
         internal async Task Connect()
         {
             await _discordSocket.LoginAsync(TokenType.Bot, Configuration.Discord.Instance.Token);

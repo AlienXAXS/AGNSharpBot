@@ -13,8 +13,6 @@ namespace JoinQuitLogger
     {
         string IPlugin.Name => "JoinQuitLogger";
         public DiscordSocketClient DiscordClient { get; set; }
-        List<string> IPlugin.Commands => new List<string>();
-        List<PluginRequestTypes.PluginRequestType> IPlugin.RequestTypes => null;
 
         void IPlugin.ExecutePlugin()
         {
@@ -52,15 +50,6 @@ namespace JoinQuitLogger
                     Config.ConfigurationHandler.Instance.ConfigurationRoot.JoinLeaveMessageOutput.ChannelId));
         }
 
-        Task IPlugin.CommandAsync(string command, string message, SocketMessage sktMessage)
-        {
-            return Task.CompletedTask;
-        }
-
-        Task IPlugin.Message(string message, SocketMessage sktMessage)
-        {
-            return Task.CompletedTask;
-        }
 
         void IPlugin.Dispose()
         {

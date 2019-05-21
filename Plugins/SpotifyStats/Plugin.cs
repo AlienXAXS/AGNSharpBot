@@ -12,8 +12,6 @@ namespace SpotifyStats
     {
         string IPlugin.Name => "Spotify Stats";
         public DiscordSocketClient DiscordClient { get; set; }
-        List<string> IPlugin.Commands => null;
-        List<PluginRequestTypes.PluginRequestType> IPlugin.RequestTypes => null;
 
         public async void ExecutePlugin()
         {

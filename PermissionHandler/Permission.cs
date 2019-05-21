@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Discord.Commands;
 using Discord.WebSocket;
 using GlobalLogger;
@@ -88,7 +89,7 @@ namespace PermissionHandler
                 return false;
 
             var canPermit = false;
-            bool foundExplicitRoleDeny = false;
+            var foundExplicitRoleDeny = false;
 
             // Check users roles
             foreach (var role in sktUser.Roles)

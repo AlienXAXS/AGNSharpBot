@@ -33,7 +33,7 @@ namespace SpotifyStats.Spotify
         {
             try
             {
-                long lId = (long) socketGuildUser.Id;
+                var lId = (long) socketGuildUser.Id;
                 dbConnection.DbConnection.Table<SQLite.Tables.Listener>()
                     .Delete(x => x.DiscordId == lId);
             }

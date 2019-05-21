@@ -18,7 +18,7 @@ namespace AGNSharpBot.PluginHandler
         private static PluginManager _instance;
         public static PluginManager Instance = _instance ?? (_instance = new PluginManager());
 
-        private bool HasExecutedPlugins = false;
+        private bool _hasExecutedPlugins = false;
 
         public void LoadPlugins()
         {
@@ -48,8 +48,8 @@ namespace AGNSharpBot.PluginHandler
 
             DiscordHandler.Client.Instance.GetDiscordSocket().Ready += async () =>
             {
-                if (HasExecutedPlugins) return;
-                HasExecutedPlugins = true;
+                if (_hasExecutedPlugins) return;
+                _hasExecutedPlugins = true;
 
 #if DEBUG
                 await Logger.Instance.Log("AGNSharpBot Loading (DEBUG MODE - DEBUGGER ATTACHED TO PROCESS)...", Logger.LoggerType.ConsoleAndDiscord);
@@ -57,7 +57,7 @@ namespace AGNSharpBot.PluginHandler
                 await Logger.Instance.Log("AGNSharpBot Loading...", Logger.LoggerType.ConsoleAndDiscord);
 #endif
 
-                string pluginNameList = "";
+                var pluginNameList = "";
                 Logger.Instance.WriteConsole("Discord Is Ready - Executing Plugins");
                 await Logger.Instance.Log($"{Plugins.Count()} plugins are loaded, executing them now.", Logger.LoggerType.DiscordOnly);
 
@@ -80,41 +80,6 @@ namespace AGNSharpBot.PluginHandler
             Logger.Instance.WriteConsole("Plugins loaded");
         }
         
-        public async Task DispatchMessage(SocketMessage sktMessage)
-        {
-            if (Plugins == null || Plugins.Count().Equals(0)) return;
-
-            // Fire each of our plugins message method
-            foreach (var plugin in Plugins)
-            {
-                try
-                {
-                    if (plugin.RequestTypes == null) continue;
-
-                    if (plugin.RequestTypes.Contains(PluginRequestTypes.PluginRequestType.MESSAGE))
-                        await plugin.Message(sktMessage.Content, sktMessage);
-
-                    if (plugin.RequestTypes.Contains(PluginRequestTypes.PluginRequestType.COMMAND) && sktMessage.Content != "")
-                    {
-                        if (sktMessage.Content.First() != Configuration.Discord.Instance.CommandPrefix) continue;
-
-                        var cmdWord = sktMessage.Content.Split(' ').First()
-                            .TrimStart(Configuration.Discord.Instance.CommandPrefix);
-
-                        // Sometimes our plugins have no commands registered, but they are listening for commands wrongly, handle that here.
-                        if ( plugin.Commands == null ) continue;
-                        if (plugin.Commands.Any(x => x.Equals(cmdWord, StringComparison.CurrentCultureIgnoreCase)))
-                            await plugin.CommandAsync(cmdWord, sktMessage.Content, sktMessage);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Caught exception while trying to dispatch a discord message to plugin {plugin.Name}\r\n\r\n{ex.Message}\r\n\r\n\r\n{ex.StackTrace}");
-                }
-            }
-        }
-        
-
         public IEnumerable<IPlugin> GetPlugins()
         {
             return Plugins;

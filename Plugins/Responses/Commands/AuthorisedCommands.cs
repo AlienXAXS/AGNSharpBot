@@ -25,7 +25,7 @@ namespace Responses.Commands
                 return;
             }
 
-            List<SocketGuildUser> CollectedUsers = new List<SocketGuildUser>();
+            var CollectedUsers = new List<SocketGuildUser>();
             var sktAuthorUser = (SocketGuildUser) sktMessage.Author;
 
             if (sktAuthorUser.VoiceChannel == null)
