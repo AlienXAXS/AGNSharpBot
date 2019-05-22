@@ -877,6 +877,9 @@
         <member name="F:Discord.ChannelType.Category">
             <summary> The channel is a category channel. </summary>
         </member>
+        <member name="F:Discord.ChannelType.News">
+            <summary> The channel is a news channel. </summary>
+        </member>
         <member name="T:Discord.Direction">
             <summary>
                 Specifies the direction of where message(s) should be retrieved from.
@@ -1136,71 +1139,43 @@
             </returns>
         </member>
         <member name="M:Discord.IGuildChannel.AddPermissionOverwriteAsync(Discord.IRole,Discord.OverwritePermissions,Discord.RequestOptions)">
-             <summary>
-                 Adds or updates the permission overwrite for the given role.
-             </summary>
-             <example>
-                 The following example fetches a role via <see cref="M:Discord.IGuild.GetRole(System.UInt64)"/> and a channel via 
-                 <see cref="M:Discord.IGuild.GetChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>. Next, it checks if an overwrite had already been set via 
-                 <see cref="M:Discord.IGuildChannel.GetPermissionOverwrite(Discord.IRole)"/>; if not, it denies the role from sending any
-                 messages to the channel.
-                 <code lang="cs">
-                 // Fetches the role and channels
-                 var role = guild.GetRole(339805618376540160);
-                 var channel = await guild.GetChannelAsync(233937283911385098);
-             
-                 // If either the of the object does not exist, bail
-                 if (role == null || channel == null) return;
-            
-                 // Fetches the previous overwrite and bail if one is found
-                 var previousOverwrite = channel.GetPermissionOverwrite(role);
-                 if (previousOverwrite.HasValue) return;
-             
-                 // Creates a new OverwritePermissions with send message set to deny and pass it into the method
-                 await channel.AddPermissionOverwriteAsync(role,
-                     new OverwritePermissions(sendMessage: PermValue.Deny));
-                 </code>
-             </example>
-             <param name="role">The role to add the overwrite to.</param>
-             <param name="permissions">The overwrite to add to the role.</param>
-             <param name="options">The options to be used when sending the request.</param>
-             <returns>
-                 A task representing the asynchronous permission operation for adding the specified permissions to the
-                 channel.
-             </returns>
+            <summary>
+                Adds or updates the permission overwrite for the given role.
+            </summary>
+            <example>
+                <para>The following example fetches a role via <see cref="M:Discord.IGuild.GetRole(System.UInt64)"/> and a channel via 
+                <see cref="M:Discord.IGuild.GetChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>. Next, it checks if an overwrite had already been set via 
+                <see cref="M:Discord.IGuildChannel.GetPermissionOverwrite(Discord.IRole)"/>; if not, it denies the role from sending any
+                messages to the channel.</para>
+                <code language="cs" region="AddPermissionOverwriteAsyncRole"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IGuildChannel.Examples.cs"/>
+            </example>
+            <param name="role">The role to add the overwrite to.</param>
+            <param name="permissions">The overwrite to add to the role.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task representing the asynchronous permission operation for adding the specified permissions to the
+                channel.
+            </returns>
         </member>
         <member name="M:Discord.IGuildChannel.AddPermissionOverwriteAsync(Discord.IUser,Discord.OverwritePermissions,Discord.RequestOptions)">
-             <summary>
-                 Adds or updates the permission overwrite for the given user.
-             </summary>
-             <example>
-                 The following example fetches a user via <see cref="M:Discord.IGuild.GetUserAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/> and a channel via 
-                 <see cref="M:Discord.IGuild.GetChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>. Next, it checks if an overwrite had already been set via 
-                 <see cref="M:Discord.IGuildChannel.GetPermissionOverwrite(Discord.IUser)"/>; if not, it denies the user from sending any
-                 messages to the channel.
-                 <code lang="cs">
-                 // Fetches the role and channels
-                 var user = await guild.GetUserAsync(168693960628371456);
-                 var channel = await guild.GetChannelAsync(233937283911385098);
-             
-                 // If either the of the object does not exist, bail
-                 if (user == null || channel == null) return;
-            
-                 // Fetches the previous overwrite and bail if one is found
-                 var previousOverwrite = channel.GetPermissionOverwrite(user);
-                 if (previousOverwrite.HasValue) return;
-             
-                 // Creates a new OverwritePermissions with send message set to deny and pass it into the method
-                 await channel.AddPermissionOverwriteAsync(role,
-                     new OverwritePermissions(sendMessage: PermValue.Deny));
-                 </code>
-             </example>
-             <param name="user">The user to add the overwrite to.</param>
-             <param name="permissions">The overwrite to add to the user.</param>
-             <param name="options">The options to be used when sending the request.</param>
-             <returns>
-                 A task representing the asynchronous permission operation for adding the specified permissions to the channel.
-             </returns>
+            <summary>
+                Adds or updates the permission overwrite for the given user.
+            </summary>
+            <example>
+                <para>The following example fetches a user via <see cref="M:Discord.IGuild.GetUserAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/> and a channel via 
+                <see cref="M:Discord.IGuild.GetChannelAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)"/>. Next, it checks if an overwrite had already been set via 
+                <see cref="M:Discord.IGuildChannel.GetPermissionOverwrite(Discord.IUser)"/>; if not, it denies the user from sending any
+                messages to the channel.</para>
+                <code language="cs" region="AddPermissionOverwriteAsyncUser"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IGuildChannel.Examples.cs"/>
+            </example>
+            <param name="user">The user to add the overwrite to.</param>
+            <param name="permissions">The overwrite to add to the user.</param>
+            <param name="options">The options to be used when sending the request.</param>
+            <returns>
+                A task representing the asynchronous permission operation for adding the specified permissions to the channel.
+            </returns>
         </member>
         <member name="M:Discord.IGuildChannel.GetUsersAsync(Discord.CacheMode,Discord.RequestOptions)">
             <summary>
@@ -1236,13 +1211,10 @@
                 Sends a message to this message channel.
             </summary>
             <example>
-                The following example sends a message with the current system time in RFC 1123 format to the channel and
-                deletes itself after 5 seconds.
-                <code language="cs">
-                var message = await channel.SendMessageAsync(DateTimeOffset.UtcNow.ToString("R"));
-                await Task.Delay(TimeSpan.FromSeconds(5))
-                    .ContinueWith(x => message.DeleteAsync());
-                </code>
+                <para>The following example sends a message with the current system time in RFC 1123 format to the channel and
+                deletes itself after 5 seconds.</para>
+                <code language="cs" region="SendMessageAsync"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
             </example>
             <param name="text">The message to be sent.</param>
             <param name="isTTS">Determines whether the message should be read aloud by Discord or not.</param>
@@ -1253,23 +1225,19 @@
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
             <example>
-                The following example uploads a local file called <c>wumpus.txt</c> along with the text 
-                <c>good discord boi</c> to the channel.
-                <code language="cs">
-                await channel.SendFileAsync("wumpus.txt", "good discord boi");
-                </code>
-            
-                The following example uploads a local image called <c>b1nzy.jpg</c> embedded inside a rich embed to the
-                channel.
-                <code language="cs">
-                await channel.SendFileAsync("b1nzy.jpg",
-                    embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
-                </code>
+                <para>The following example uploads a local file called <c>wumpus.txt</c> along with the text 
+                <c>good discord boi</c> to the channel.</para>
+                <code language="cs" region="SendFileAsync.FilePath"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+                <para>The following example uploads a local image called <c>b1nzy.jpg</c> embedded inside a rich embed to the
+                channel.</para>
+                <code language="cs" region="SendFileAsync.FilePath.EmbeddedImage"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
             </example>
             <remarks>
                 This method sends a file as if you are uploading an attachment directly from your Discord client.
@@ -1284,22 +1252,21 @@
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich" /> <see cref="T:Discord.Embed" /> to be sent.</param>
             <param name="options">The options to be used when sending the request.</param>
+            <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
             <example>
-                The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
-                rich embed to the channel.
-                <code language="cs">
-                await channel.SendFileAsync(b1nzyStream, "b1nzy.jpg",
-                    embed: new EmbedBuilder {ImageUrl = "attachment://b1nzy.jpg"}.Build());
-                </code>
+                <para>The following example uploads a streamed image that will be called <c>b1nzy.jpg</c> embedded inside a
+                rich embed to the channel.</para>
+                <code language="cs" region="SendFileAsync.FileStream.EmbeddedImage"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
             </example>
             <remarks>
                 This method sends a file as if you are uploading an attachment directly from your Discord client.
@@ -1315,6 +1282,7 @@
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
             <param name="options">The options to be used when sending the request.</param>
+            <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -1354,12 +1322,10 @@
                 of flattening.
             </remarks>
             <example>
-                The following example downloads 300 messages and gets messages that belong to the user 
-                <c>53905483156684800</c>.
-                <code lang="cs">
-                var messages = await messageChannel.GetMessagesAsync(300).FlattenAsync();
-                var userMessages = messages.Where(x =&gt; x.Author.Id == 53905483156684800);
-                </code>
+                <para>The following example downloads 300 messages and gets messages that belong to the user 
+                <c>53905483156684800</c>.</para>
+                <code language="cs" region="GetMessagesAsync.FromLimit.Standard"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
             </example>
             <param name="limit">The numbers of message to be gotten from.</param>
             <param name="mode">The <see cref="T:Discord.CacheMode" /> that determines whether the object should be fetched from
@@ -1392,10 +1358,13 @@
                 of flattening.
             </remarks>
             <example>
-                The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(442012544660537354, Direction.Before, 5).FlattenAsync();
-                </code>
+                <para>The following example gets 5 message prior to the message identifier <c>442012544660537354</c>.</para>
+                <code language="cs" region="GetMessagesAsync.FromId.FromMessage"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
+                <para>The following example attempts to retrieve <c>messageCount</c> number of messages from the 
+                beginning of the channel and prints them to the console.</para>
+                <code language="cs" region="GetMessagesAsync.FromId.BeginningMessages"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
             </example>
             <param name="fromMessageId">The ID of the starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
@@ -1430,10 +1399,9 @@
                 of flattening.
             </remarks>
             <example>
-                The following example gets 5 message prior to a specific message, <c>oldMessage</c>.
-                <code lang="cs">
-                var messages = await channel.GetMessagesAsync(oldMessage, Direction.Before, 5).FlattenAsync();
-                </code>
+                <para>The following example gets 5 message prior to a specific message, <c>oldMessage</c>.</para>
+                <code language="cs" region="GetMessagesAsync.FromMessage"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
             </example>
             <param name="fromMessage">The starting message to get the messages from.</param>
             <param name="dir">The direction of the messages to be gotten from.</param>
@@ -1488,13 +1456,9 @@
                 object is disposed.
             </summary>
             <example>
-                The following example keeps the client in the typing state until <c>LongRunningAsync</c> has finished.
-                <code lang="cs">
-                using (messageChannel.EnterTypingState())
-                {
-                    await LongRunningAsync();
-                }
-                </code>
+                <para>The following example keeps the client in the typing state until <c>LongRunningAsync</c> has finished.</para>
+                <code language="cs" region="EnterTypingState"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Channels\IMessageChannel.Examples.cs" />
             </example>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -1621,7 +1585,7 @@
             </summary>
             <example>
                 The following example gets 250 messages from the channel and deletes them.
-                <code lang="cs">
+                <code language="cs">
                 var messages = await textChannel.GetMessagesAsync(250).FlattenAsync();
                 await textChannel.DeleteMessagesAsync(messages);
                 </code>
@@ -2625,16 +2589,8 @@
             </summary>
             <example>
                 The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
-                <code lang="cs">
-                var categories = await guild.GetCategoriesAsync();
-                var targetCategory = categories.FirstOrDefault(x => x.Name == "wumpus");
-                if (targetCategory == null) return;
-                await Context.Guild.CreateTextChannelAsync(name, x =>
-                {
-                    x.CategoryId = targetCategory.Id;
-                    x.Topic = $"This channel was created at {DateTimeOffset.UtcNow} by {user}.";
-                });
-                </code>
+                <code language="cs" region="CreateTextChannelAsync"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Guilds\IGuild.Examples.cs"/>
             </example>
             <param name="name">The new name for the text channel.</param>
             <param name="func">The delegate containing the properties to be applied to the channel upon its creation.</param>
@@ -4876,6 +4832,11 @@
                 The message when another message is pinned.
             </summary>
         </member>
+        <member name="F:Discord.MessageType.GuildMemberJoin">
+            <summary>
+                The message when a new member joined.
+            </summary>
+        </member>
         <member name="T:Discord.ReactionMetadata">
             <summary>
                 A metadata containing reaction information.
@@ -6202,7 +6163,7 @@
             </summary>
             <example>
                 The following example checks if the current user has the ability to send a message with attachment in
-                this channel; if so, uploads a file via <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                this channel; if so, uploads a file via <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)"/>.
                 <code language="cs">
                 if (currentUser?.GetPermissions(targetChannel)?.AttachFiles)
                     await targetChannel.SendFileAsync("fortnite.png");
@@ -6347,10 +6308,8 @@
             <example>
                 The following example attempts to retrieve the user's current avatar and send it to a channel; if one is
                 not set, a default avatar for this user will be returned instead.
-                <code language="cs">
-                var userAvatarUrl = user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl();
-                await textChannel.SendMessageAsync(userAvatarUrl);
-                </code>
+                <code language="cs" region="GetAvatarUrl"
+                      source="..\..\..\Discord.Net.Examples\Core\Entities\Users\IUser.Examples.cs"/>
             </example>
             <param name="format">The format to return.</param>
             <param name="size">The size of the image to return in. This can be any power of two between 16 and 2048.
@@ -6414,27 +6373,18 @@
             <remarks>
                 This method is used to obtain or create a channel used to send a direct message.
                 <note type="warning">
-                In event that the current user cannot send a message to the target user, a channel can and will still be
-                created by Discord. However, attempting to send a message will yield a 
-                <see cref="T:Discord.Net.HttpException"/> with a 403 as its 
-                <see cref="P:Discord.Net.HttpException.HttpCode"/>. There are currently no official workarounds by
-                Discord.
+                     In event that the current user cannot send a message to the target user, a channel can and will
+                     still be created by Discord. However, attempting to send a message will yield a 
+                     <see cref="T:Discord.Net.HttpException"/> with a 403 as its 
+                     <see cref="P:Discord.Net.HttpException.HttpCode"/>. There are currently no official workarounds by
+                     Discord.
                 </note>
             </remarks>
             <example>
                 The following example attempts to send a direct message to the target user and logs the incident should
                 it fail.
-                <code language="cs">
-                var channel = await user.GetOrCreateDMChannelAsync();
-                try
-                {
-                    await channel.SendMessageAsync("Awesome stuff!");
-                }
-                catch (Discord.Net.HttpException ex) when (ex.HttpCode == 403)
-                {
-                    Console.WriteLine($"Boo, I cannot message {user}");
-                }
-                </code>
+                <code region="GetOrCreateDMChannelAsync" language="cs"
+                      source="../../../Discord.Net.Examples/Core/Entities/Users/IUser.Examples.cs"/>
             </example>
             <param name="options">The options to be used when sending the request.</param>
             <returns>
@@ -6668,6 +6618,16 @@
         <member name="M:Discord.AsyncEnumerableExtensions.Flatten``1(System.Collections.Generic.IAsyncEnumerable{System.Collections.Generic.IEnumerable{``0}})">
             <summary> Flattens the specified pages into one <see cref="T:System.Collections.Generic.IAsyncEnumerable`1"/>. </summary>
         </member>
+        <member name="F:Discord.AttachmentExtensions.SpoilerPrefix">
+            <summary>
+                The prefix applied to files to indicate that it is a spoiler.
+            </summary>
+        </member>
+        <member name="M:Discord.AttachmentExtensions.IsSpoiler(Discord.IAttachment)">
+            <summary>
+                Gets whether the message's attachments are spoilers or not.
+            </summary>
+        </member>
         <member name="T:Discord.DiscordClientExtensions">
             <summary> An extension class for the Discord client. </summary>
         </member>
@@ -6708,9 +6668,6 @@
         </member>
         <member name="M:Discord.EmbedBuilderExtensions.WithAuthor(Discord.EmbedBuilder,Discord.IUser)">
             <summary> Fills the embed author field with the provided user's full username and avatar URL. </summary>
-        </member>
-        <member name="M:Discord.EmbedBuilderExtensions.WithAuthor(Discord.EmbedBuilder,Discord.IGuildUser)">
-            <summary> Fills the embed author field with the provided user's nickname and avatar URL; username is used if nickname is not set. </summary>
         </member>
         <member name="M:Discord.EmbedBuilderExtensions.ToEmbedBuilder(Discord.IEmbed)">
             <summary> Converts a <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.IEmbed"/> object to a <see cref="T:Discord.EmbedBuilder"/>. </summary>
@@ -6932,6 +6889,9 @@
         <member name="M:Discord.Format.Strikethrough(System.String)">
             <summary> Returns a markdown-formatted string with strikethrough formatting. </summary>
         </member>
+        <member name="M:Discord.Format.Spoiler(System.String)">
+            <summary> Returns a string with spoiler formatting. </summary>
+        </member>
         <member name="M:Discord.Format.Url(System.String,System.String)">
             <summary> Returns a markdown-formatted URL. Only works in <see cref="T:Discord.EmbedBuilder"/> descriptions and fields. </summary>
         </member>
@@ -7006,7 +6966,7 @@
                 Gets a generic channel.
             </summary>
             <example>
-                <code lang="cs" title="Example method">
+                <code language="cs" title="Example method">
                 var channel = await _client.GetChannelAsync(381889909113225237);
                 if (channel != null &amp;&amp; channel is IMessageChannel msgChannel)
                 {
@@ -7142,7 +7102,7 @@
                 Gets a user.
             </summary>
             <example>
-                <code lang="cs" title="Example method">
+                <code language="cs" title="Example method">
                 var user = await _client.GetUserAsync(168693960628371456);
                 if (user != null)
                     Console.WriteLine($"{user} is created at {user.CreatedAt}.";
@@ -7161,7 +7121,7 @@
                 Gets a user.
             </summary>
             <example>
-                <code lang="cs" title="Example method">
+                <code language="cs" title="Example method">
                var user = await _client.GetUserAsync("Still", "2876");
                if (user != null)
                    Console.WriteLine($"{user} is created at {user.CreatedAt}.";
@@ -7181,7 +7141,7 @@
             </summary>
             <example>
                 The following example gets the most optimal voice region from the collection.
-                <code lang="cs">
+                <code language="cs">
                     var regions = await client.GetVoiceRegionsAsync();
                     var optimalRegion = regions.FirstOrDefault(x =&gt; x.IsOptimal);
                 </code>
@@ -8058,6 +8018,27 @@
                 documentation, and pre-existing tokens.
             </remarks>
         </member>
+        <member name="M:Discord.TokenUtils.PadBase64String(System.String)">
+            <summary>
+                Pads a base64-encoded string with 0, 1, or 2 '=' characters,
+                if the string is not a valid multiple of 4.
+                Does not ensure that the provided string contains only valid base64 characters.
+                Strings that already contain padding will not have any more padding applied.
+            </summary>
+            <remarks>
+                A string that would require 3 padding characters is considered to be already corrupt.
+                Some older bot tokens may require padding, as the format provided by Discord
+                does not include this padding in the token.
+            </remarks>
+            <param name="encodedBase64">The base64 encoded string to pad with characters.</param>
+            <returns>A string containing the base64 padding.</returns>
+            <exception cref="T:System.FormatException">
+                Thrown if <paramref name="encodedBase64"/> would require an invalid number of padding characters.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">
+                Thrown if <paramref name="encodedBase64"/> is null, empty, or whitespace.
+            </exception>
+        </member>
         <member name="M:Discord.TokenUtils.DecodeBase64UserId(System.String)">
             <summary>
                 Decodes a base 64 encoded string into a ulong value.
@@ -8075,6 +8056,21 @@
             </param>
             <returns>
                 True if the bot token was valid, false if it was not.
+            </returns>
+        </member>
+        <member name="F:Discord.TokenUtils.IllegalTokenCharacters">
+            <summary>
+                The set of all characters that are not allowed inside of a token.
+            </summary>
+        </member>
+        <member name="M:Discord.TokenUtils.CheckContainsIllegalCharacters(System.String)">
+            <summary>
+                Checks if the given token contains a whitespace or newline character
+                that would fail to log in.
+            </summary>
+            <param name="token"> The token to validate. </param>
+            <returns>
+                True if the token contains a whitespace or newline character.
             </returns>
         </member>
         <member name="M:Discord.TokenUtils.ValidateToken(Discord.TokenType,System.String)">

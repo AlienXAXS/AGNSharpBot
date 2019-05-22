@@ -227,13 +227,15 @@
             <remarks>
                 This method gets the user present in the WebSocket cache with the given condition.
                 <note type="warning">
-                    Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
-                    guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
-                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysDownloadUsers"/>.
+                    Sometimes a user may return <c>null</c> due to Discord not sending offline users in large guilds
+                    (i.e. guild with 100+ members) actively. To download users on startup and to see more information
+                    about this subject, see <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysDownloadUsers" />.
                 </note>
                 <note>
                     This method does not attempt to fetch users that the logged-in user does not have access to (i.e.
-                    users who don't share mutual guild(s) with the current user).
+                    users who don't share mutual guild(s) with the current user). If you wish to get a user that you do
+                    not have access to, consider using the REST implementation of
+                    <see cref="M:Discord.Rest.DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)" />.
                 </note>
             </remarks>
             <returns>
@@ -244,20 +246,22 @@
             <summary>
                 Gets a user.
             </summary>
-            <param name="username">The name of the user.</param>
-            <param name="discriminator">The discriminator value of the user.</param>
             <remarks>
                 This method gets the user present in the WebSocket cache with the given condition.
                 <note type="warning">
-                    Sometimes a user may return <c>null</c> due to Discord not sending offline users in large
-                    guilds (i.e. guild with 100+ members) actively. To download users on startup, consider enabling 
-                    <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysDownloadUsers"/>.
+                    Sometimes a user may return <c>null</c> due to Discord not sending offline users in large guilds
+                    (i.e. guild with 100+ members) actively. To download users on startup and to see more information
+                    about this subject, see <see cref="P:Discord.WebSocket.DiscordSocketConfig.AlwaysDownloadUsers" />.
                 </note>
                 <note>
                     This method does not attempt to fetch users that the logged-in user does not have access to (i.e.
-                    users who don't share mutual guild(s) with the current user).
+                    users who don't share mutual guild(s) with the current user). If you wish to get a user that you do
+                    not have access to, consider using the REST implementation of
+                    <see cref="M:Discord.Rest.DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)" />.
                 </note>
             </remarks>
+            <param name="username">The name of the user.</param>
+            <param name="discriminator">The discriminator value of the user.</param>
             <returns>
                 A generic WebSocket-based user; <c>null</c> when the user cannot be found.
             </returns>
@@ -432,6 +436,10 @@
                     see the derived classes of <see cref="T:Discord.WebSocket.SocketChannel"/> for more details.
                 </para>
             </remarks>
+            <example>
+                <code language="cs" region="ChannelCreated"
+                      source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+            </example>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ChannelDestroyed">
             <summary> Fired when a channel is destroyed. </summary>
@@ -446,6 +454,10 @@
                     see the derived classes of <see cref="T:Discord.WebSocket.SocketChannel"/> for more details.
                 </para>
             </remarks>
+            <example>
+                <code language="cs" region="ChannelDestroyed"
+                      source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+            </example>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ChannelUpdated">
             <summary> Fired when a channel is updated. </summary>
@@ -461,6 +473,10 @@
                     <see cref="T:Discord.WebSocket.SocketChannel"/> for more details.
                 </para>
             </remarks>
+            <example>
+                <code language="cs" region="ChannelUpdated"
+                      source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+            </example>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.MessageReceived">
             <summary> Fired when a message is received. </summary>
@@ -476,6 +492,11 @@
                     derived classes of <see cref="T:Discord.WebSocket.SocketMessage"/> for more details.
                 </para>
             </remarks>
+            <example>
+                <para>The example below checks if the newly received message contains the target user.</para>
+                <code language="cs" region="MessageReceived"
+                      source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+            </example>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.MessageDeleted">
             <summary> Fired when a message is deleted. </summary>
@@ -483,6 +504,38 @@
                 <para>
                     This event is fired when a message is deleted. The event handler must return a
                     <see cref="T:System.Threading.Tasks.Task"/> and accept a <see cref="T:Discord.Cacheable`2"/> and 
+                    <see cref="T:Discord.WebSocket.ISocketMessageChannel"/> as its parameters.
+                </para>
+                <para>
+                    <note type="important">
+                        It is not possible to retrieve the message via
+                        <see cref="M:Discord.Cacheable`2.DownloadAsync"/>; the message cannot be retrieved by Discord
+                        after the message has been deleted.
+                    </note>
+                    If caching is enabled via <see cref="T:Discord.WebSocket.DiscordSocketConfig"/>, the
+                    <see cref="T:Discord.Cacheable`2"/> entity will contain the deleted message; otherwise, in event
+                    that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+                    <see cref="T:System.UInt64"/>.
+                </para>
+                <para>
+                    The source channel of the removed message will be passed into the 
+                    <see cref="T:Discord.WebSocket.ISocketMessageChannel"/> parameter.
+                </para>
+            </remarks>
+            <example>
+                <code language="cs" region="MessageDeleted"
+                      source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs" />
+            </example>
+        </member>
+        <member name="E:Discord.WebSocket.BaseSocketClient.MessagesBulkDeleted">
+            <summary> Fired when multiple messages are bulk deleted. </summary>
+            <remarks>
+                <note>
+                    The <see cref="E:Discord.WebSocket.BaseSocketClient.MessageDeleted"/> event will not be fired for individual messages contained in this event.
+                </note>
+                <para>
+                    This event is fired when multiple messages are bulk deleted. The event handler must return a
+                    <see cref="T:System.Threading.Tasks.Task"/> and accept an <see cref="!:IReadOnlyCollection&lt;Cacheable&lt;TEntity,TId&gt;&gt;"/> and 
                     <see cref="T:Discord.WebSocket.ISocketMessageChannel"/> as its parameters.
                 </para>
                 <para>
@@ -527,6 +580,35 @@
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ReactionAdded">
             <summary> Fired when a reaction is added to a message. </summary>
+            <remarks>
+                <para>
+                    This event is fired when a reaction is added to a user message. The event handler must return a
+                    <see cref="T:System.Threading.Tasks.Task"/> and accept a <see cref="T:Discord.Cacheable`2"/>, an 
+                    <see cref="T:Discord.WebSocket.ISocketMessageChannel"/>, and a <see cref="T:Discord.WebSocket.SocketReaction"/> as its parameter.
+                </para>
+                <para>
+                    If caching is enabled via <see cref="T:Discord.WebSocket.DiscordSocketConfig"/>, the
+                    <see cref="T:Discord.Cacheable`2"/> entity will contain the original message; otherwise, in event
+                    that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+                    <see cref="T:System.UInt64"/>.
+                </para>
+                <para>
+                    The source channel of the reaction addition will be passed into the 
+                    <see cref="T:Discord.WebSocket.ISocketMessageChannel"/> parameter.
+                </para>
+                <para>
+                    The reaction that was added will be passed into the <see cref="T:Discord.WebSocket.SocketReaction"/> parameter.
+                </para>
+                <note>
+                    When fetching the reaction from this event, a user may not be provided under 
+                    <see cref="P:Discord.WebSocket.SocketReaction.User"/>. Please see the documentation of the property for more
+                    information.
+                </note>
+            </remarks>
+            <example>
+                <code language="cs" region="ReactionAdded"
+                      source="..\Discord.Net.Examples\WebSocket\BaseSocketClient.Events.Examples.cs"/>
+            </example>
         </member>
         <member name="E:Discord.WebSocket.BaseSocketClient.ReactionRemoved">
             <summary> Fired when a reaction is removed from a message. </summary>
@@ -753,7 +835,7 @@
                 </note>
             </remarks>
             <returns>
-                An collection of DM channels that have been opened in this session.
+                A collection of DM channels that have been opened in this session.
             </returns>
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketClient.GroupChannels">
@@ -768,7 +850,7 @@
                 </note>
             </remarks>
             <returns>
-                An collection of group channels that have been opened in this session.
+                A collection of group channels that have been opened in this session.
             </returns>
         </member>
         <member name="P:Discord.WebSocket.DiscordSocketClient.VoiceRegions">
@@ -1007,7 +1089,9 @@
                     Please note that it can be difficult to fill the cache completely on large guilds depending on the
                     traffic. If you are using the command system, the default user TypeReader may fail to find the user
                     due to this issue. This may be resolved at v3 of the library. Until then, you may want to consider
-                    overriding the TypeReader and use <see cref="M:Discord.Rest.DiscordRestClient.GetGuildUserAsync(System.UInt64,System.UInt64,Discord.RequestOptions)"/> as a backup.
+                    overriding the TypeReader and use
+                    <see cref="M:Discord.Rest.DiscordRestClient.GetUserAsync(System.UInt64,Discord.RequestOptions)"/> 
+                    or <see cref="!:DiscordSocketRestClient.GetGuildUserAsync(ulong, ulong, RequestOptions)"/> as a backup.
                 </note>
             </remarks>
         </member>
@@ -1016,6 +1100,18 @@
                 Gets or sets the timeout for event handlers, in milliseconds, after which a warning will be logged. Null
                 disables this check.
             </summary>
+        </member>
+        <member name="P:Discord.WebSocket.DiscordSocketConfig.ExclusiveBulkDelete">
+             <summary>
+                 Gets or sets the behavior for <see cref="E:Discord.WebSocket.BaseSocketClient.MessageDeleted"/> on bulk deletes.
+            
+                 If true, the <see cref="E:Discord.WebSocket.BaseSocketClient.MessageDeleted"/> event will not be raised for bulk deletes, and
+                 only the <see cref="E:Discord.WebSocket.BaseSocketClient.MessagesBulkDeleted"/> will be raised.
+            
+                 If false, both events will be raised.
+            
+                 If unset, both events will be raised, but a warning will be raised the first time a bulk delete event is received.
+             </summary>
         </member>
         <member name="M:Discord.WebSocket.DiscordSocketConfig.#ctor">
             <summary>
@@ -1057,12 +1153,12 @@
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.WebSocket.ISocketMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.ISocketMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)"/>.
                 Please visit its documentation for more details on this method.
             </remarks>
             <param name="filePath">The file path of the file.</param>
@@ -1070,17 +1166,18 @@
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich" /> <see cref="T:Discord.Embed" /> to be sent.</param>
             <param name="options">The options to be used when sending the request.</param>
+            <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
             </returns>
         </member>
-        <member name="M:Discord.WebSocket.ISocketMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.ISocketMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <summary>
                 Sends a file to this message channel with an optional caption.
             </summary>
             <remarks>
-                This method follows the same behavior as described in <see cref="M:Discord.IMessageChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)"/>.
+                This method follows the same behavior as described in <see cref="!:IMessageChannel.SendFileAsync(Stream, string, string, bool, Embed, RequestOptions)"/>.
                 Please visit its documentation for more details on this method.
             </remarks>
             <param name="stream">The <see cref="T:System.IO.Stream" /> of the file to be sent.</param>
@@ -1089,6 +1186,7 @@
             <param name="isTTS">Whether the message should be read aloud by Discord or not.</param>
             <param name="embed">The <see cref="F:Discord.EmbedType.Rich"/> <see cref="T:Discord.Embed"/> to be sent.</param>
             <param name="options">The options to be used when sending the request.</param>
+            <param name="isSpoiler">Whether the message attachment should be hidden as a spoiler.</param>
             <returns>
                 A task that represents an asynchronous send operation for delivering the message. The task result
                 contains the sent message.
@@ -1375,10 +1473,10 @@
             <inheritdoc />
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
-        <member name="M:Discord.WebSocket.SocketDMChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketDMChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketDMChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketDMChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
@@ -1438,10 +1536,10 @@
         <member name="M:Discord.WebSocket.SocketDMChannel.Discord#IMessageChannel#GetPinnedMessagesAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketDMChannel.Discord#IMessageChannel#SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketDMChannel.Discord#IMessageChannel#SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketDMChannel.Discord#IMessageChannel#SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketDMChannel.Discord#IMessageChannel#SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketDMChannel.Discord#IMessageChannel#SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
@@ -1553,10 +1651,10 @@
             <inheritdoc />
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
-        <member name="M:Discord.WebSocket.SocketGroupChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketGroupChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketGroupChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketGroupChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGroupChannel.DeleteMessageAsync(System.UInt64,Discord.RequestOptions)">
@@ -1612,10 +1710,10 @@
         <member name="M:Discord.WebSocket.SocketGroupChannel.Discord#IMessageChannel#GetPinnedMessagesAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketGroupChannel.Discord#IMessageChannel#SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketGroupChannel.Discord#IMessageChannel#SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketGroupChannel.Discord#IMessageChannel#SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketGroupChannel.Discord#IMessageChannel#SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketGroupChannel.Discord#IMessageChannel#SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
@@ -1780,6 +1878,11 @@
         <member name="M:Discord.WebSocket.SocketGuildChannel.Discord#IChannel#GetUserAsync(System.UInt64,Discord.CacheMode,Discord.RequestOptions)">
             <inheritdoc />
         </member>
+        <member name="T:Discord.WebSocket.SocketNewsChannel">
+            <summary>
+                Represents a WebSocket-based news channel in a guild that has the same properties as a <see cref="!:RestTextChannel"/>.
+            </summary>
+        </member>
         <member name="T:Discord.WebSocket.SocketTextChannel">
             <summary>
                 Represents a WebSocket-based channel in a guild that can send and receive messages.
@@ -1900,10 +2003,10 @@
             <inheritdoc />
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
-        <member name="M:Discord.WebSocket.SocketTextChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketTextChannel.SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketTextChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketTextChannel.SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
             <exception cref="T:System.ArgumentOutOfRangeException">Message content is too long, length must be less or equal to <see cref="F:Discord.DiscordConfig.MaxMessageSize"/>.</exception>
         </member>
@@ -1997,10 +2100,10 @@
         <member name="M:Discord.WebSocket.SocketTextChannel.Discord#IMessageChannel#GetPinnedMessagesAsync(Discord.RequestOptions)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketTextChannel.Discord#IMessageChannel#SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketTextChannel.Discord#IMessageChannel#SendFileAsync(System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Discord.WebSocket.SocketTextChannel.Discord#IMessageChannel#SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
+        <member name="M:Discord.WebSocket.SocketTextChannel.Discord#IMessageChannel#SendFileAsync(System.IO.Stream,System.String,System.String,System.Boolean,Discord.Embed,Discord.RequestOptions,System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Discord.WebSocket.SocketTextChannel.Discord#IMessageChannel#SendMessageAsync(System.String,System.Boolean,Discord.Embed,Discord.RequestOptions)">
@@ -2370,13 +2473,22 @@
                 A voice channel associated with the specified <paramref name="id" />; <c>null</c> if none is found.
             </returns>
         </member>
+        <member name="M:Discord.WebSocket.SocketGuild.GetCategoryChannel(System.UInt64)">
+            <summary>
+                Gets a category channel in this guild.
+            </summary>
+            <param name="id">The snowflake identifier for the category channel.</param>
+            <returns>
+                A category channel associated with the specified <paramref name="id" />; <c>null</c> if none is found.
+            </returns>
+        </member>
         <member name="M:Discord.WebSocket.SocketGuild.CreateTextChannelAsync(System.String,System.Action{Discord.TextChannelProperties},Discord.RequestOptions)">
             <summary>
                 Creates a new text channel in this guild.
             </summary>
             <example>
                 The following example creates a new text channel under an existing category named <c>Wumpus</c> with a set topic.
-                <code lang="cs">
+                <code language="cs">
                 var categories = await guild.GetCategoriesAsync();
                 var targetCategory = categories.FirstOrDefault(x => x.Name == "wumpus");
                 if (targetCategory == null) return;
@@ -2811,6 +2923,11 @@
             <summary>
                 Gets the ID of the user who added the reaction.
             </summary>
+            <remarks>
+                This property retrieves the snowflake identifier of the user responsible for this reaction. This
+                property will always contain the user identifier in event that
+                <see cref="P:Discord.WebSocket.SocketReaction.User" /> cannot be retrieved.
+            </remarks>
             <returns>
                 A user snowflake identifier associated with the user.
             </returns>
@@ -2819,6 +2936,18 @@
             <summary>
                 Gets the user who added the reaction if possible.
             </summary>
+            <remarks>
+                <para>
+                    This property attempts to retrieve a WebSocket-cached user that is responsible for this reaction from
+                    the client. In other words, when the user is not in the WebSocket cache, this property may not
+                    contain a value, leaving the only identifiable information to be
+                    <see cref="P:Discord.WebSocket.SocketReaction.UserId" />.
+                </para>
+                <para>
+                    If you wish to obtain an identifiable user object, consider utilizing
+                    <see cref="T:Discord.Rest.DiscordRestClient" /> which will attempt to retrieve the user from REST.
+                </para>
+            </remarks>
             <returns>
                 A user object where possible; a value is not always returned.
             </returns>

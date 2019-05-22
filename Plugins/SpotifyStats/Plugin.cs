@@ -13,7 +13,7 @@ namespace SpotifyStats
         string IPlugin.Name => "Spotify Stats";
         public DiscordSocketClient DiscordClient { get; set; }
 
-        public async void ExecutePlugin()
+        public void ExecutePlugin()
         {
             GlobalLogger.Logger.Instance.WriteConsole($"SpotifyStats.dll Plugin Loading...");
             

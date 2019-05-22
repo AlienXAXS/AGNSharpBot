@@ -232,6 +232,15 @@
                 Gets the specified <see cref="T:Discord.ChannelPermission" /> of the precondition.
             </summary>
         </member>
+        <member name="P:Discord.Commands.RequireBotPermissionAttribute.ErrorMessage">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Commands.RequireBotPermissionAttribute.NotAGuildErrorMessage">
+            <summary>
+                Gets or sets the error message if the precondition
+                fails due to being run outside of a Guild channel.
+            </summary>
+        </member>
         <member name="M:Discord.Commands.RequireBotPermissionAttribute.#ctor(Discord.GuildPermission)">
             <summary>
                 Requires the bot account to have a specific <see cref="T:Discord.GuildPermission"/>.
@@ -286,6 +295,9 @@
                 Gets the context required to execute the command.
             </summary>
         </member>
+        <member name="P:Discord.Commands.RequireContextAttribute.ErrorMessage">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Commands.RequireContextAttribute.#ctor(Discord.Commands.ContextType)">
             <summary> Requires the command to be invoked in the specified context. </summary>
             <param name="contexts">The type of context the command can be invoked in. Multiple contexts can be specified by ORing the contexts together.</param>
@@ -329,6 +341,9 @@
                  </code>
              </example>
         </member>
+        <member name="P:Discord.Commands.RequireNsfwAttribute.ErrorMessage">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Commands.RequireNsfwAttribute.CheckPermissionsAsync(Discord.Commands.ICommandContext,Discord.Commands.CommandInfo,System.IServiceProvider)">
             <inheritdoc />
         </member>
@@ -362,6 +377,9 @@
                 </code>
             </example>
         </member>
+        <member name="P:Discord.Commands.RequireOwnerAttribute.ErrorMessage">
+            <inheritdoc />
+        </member>
         <member name="M:Discord.Commands.RequireOwnerAttribute.CheckPermissionsAsync(Discord.Commands.ICommandContext,Discord.Commands.CommandInfo,System.IServiceProvider)">
             <inheritdoc />
         </member>
@@ -378,6 +396,15 @@
         <member name="P:Discord.Commands.RequireUserPermissionAttribute.ChannelPermission">
             <summary>
                 Gets the specified <see cref="T:Discord.ChannelPermission" /> of the precondition.
+            </summary>
+        </member>
+        <member name="P:Discord.Commands.RequireUserPermissionAttribute.ErrorMessage">
+            <inheritdoc />
+        </member>
+        <member name="P:Discord.Commands.RequireUserPermissionAttribute.NotAGuildErrorMessage">
+            <summary>
+                Gets or sets the error message if the precondition
+                fails due to being run outside of a Guild channel.
             </summary>
         </member>
         <member name="M:Discord.Commands.RequireUserPermissionAttribute.#ctor(Discord.GuildPermission)">
@@ -563,15 +590,8 @@
                 Occurs when a command is successfully executed without any error.
             </summary>
             <remarks>
-                <para>
-                    This event is fired when a command has been successfully executed without any of the following errors:
-                </para>
-                    <para>* Parsing error</para>
-                    <para>* Precondition error</para>
-                    <para>* Runtime exception</para>
-                <para>
-                    Should the command encounter any of the aforementioned error, this event will not be raised.
-                </para>
+                This event is fired when a command has been executed, successfully or not. When a command fails to
+                execute during parsing or precondition stage, the CommandInfo may not be returned.
             </remarks>
         </member>
         <member name="P:Discord.Commands.CommandService.Modules">

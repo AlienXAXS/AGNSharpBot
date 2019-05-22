@@ -33,6 +33,10 @@ namespace InternalDatabase
 
         public Connection NewConnection(string connectionName)
         {
+            var foundConnection = _connections?.DefaultIfEmpty(null).FirstOrDefault(x => x?.DatabaseName == connectionName);
+
+            if (foundConnection != null) return foundConnection;
+
             _connections.Add(new Connection(connectionName));
             return _connections[_connections.Count - 1];
         }

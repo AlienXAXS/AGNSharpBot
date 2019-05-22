@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using GlobalLogger;
@@ -66,7 +67,14 @@ namespace AGNSharpBot.PluginHandler
                     pluginNameList += $"{plugin.Name}, ";
                     try
                     {
-                        plugin.ExecutePlugin();
+                        Logger.Instance.WriteConsole($"Pre-Execute Plugin {plugin.Name}");
+
+                        var newThread = new System.Threading.Thread(new ThreadStart(() =>
+                        {
+                            plugin.ExecutePlugin();
+                        }));
+                        newThread.IsBackground = true;
+                        newThread.Start();
                     }
                     catch (Exception ex)
                     {

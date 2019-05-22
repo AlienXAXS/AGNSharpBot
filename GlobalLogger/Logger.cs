@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using Discord;
@@ -87,7 +88,7 @@ namespace GlobalLogger
 
         private void OutToConsole(string msg, string memberName, string memberFilePath, int memberLineNumber)
         {
-            Console.WriteLine($"{DateTime.Now:g} [{memberName}|{System.IO.Path.GetFileName(memberFilePath)}|{memberLineNumber}] - {msg}");
+            Console.WriteLine($"{DateTime.Now:g} [{memberName}[Thread:{System.Threading.Thread.CurrentThread.ManagedThreadId}/{Process.GetCurrentProcess().Threads.Count}]|{System.IO.Path.GetFileName(memberFilePath)}|{memberLineNumber}] - {msg}");
         }
 
         public void LogDiscordUserMessageToFile(SocketGuildUser user, SocketMessage message)

@@ -19,6 +19,9 @@ echo Copying Plugins...
 echo   - GameToRole
 copy /Y .\Plugins\GameToRole\bin\Release\GameToRole.dll .\Release_Builder\Plugins
 
+echo   - GameWatcher
+copy /Y .\Plugins\GameWatcher\bin\Release\GameWatcher.dll .\Release_Builder\Plugins
+
 echo   - HomeLabReporting
 copy /Y .\Plugins\HomeLabReporting\bin\Release\HomeLabReporting.dll .\Release_Builder\Plugins
 copy /Y .\Plugins\HomeLabReporting\bin\Release\SnmpSharpNet.dll .\Release_Builder\Plugins
