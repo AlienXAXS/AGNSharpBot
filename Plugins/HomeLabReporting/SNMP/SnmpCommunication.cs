@@ -122,8 +122,18 @@ namespace HomeLabReporting.SNMP
             return list;
         }
 
-        public async Task CommandExecute(string command, string message, SocketMessage sktMessage)
+        public async Task CommandExecute(string[] parameters, SocketMessage sktMessage)
         {
+            var message = sktMessage.Content;
+
+            if (parameters.Length != 2)
+            {
+                await sktMessage.Channel.SendMessageAsync($"Error: Parameters are wrong");
+                return;
+            }
+
+            var command = parameters[1];
+
             foreach (var entry in _snmpHosts)
             {
                 if (entry.Command.ToLower().Equals(command.ToLower()))
@@ -145,8 +155,7 @@ namespace HomeLabReporting.SNMP
                                 }
                                 else
                                 {
-                                    builder.AddField($"{oidEntry.ReadableName} | Expression: {oidEntry.Expression} |",
-                                        oidEntry.GetFormattedValue());
+                                    builder.AddField($"{oidEntry.ReadableName} | Expression: {oidEntry.Expression} |", oidEntry.GetFormattedValue());
                                 }
                             }
                             else
@@ -163,7 +172,6 @@ namespace HomeLabReporting.SNMP
                             timespanString += $"{timespan.Seconds:D} seconds ago";
                         if (timespan.Minutes == 0 && timespan.Seconds == 0)
                             timespanString = "just now";
-
 
                         builder.AddField("Data Timestamp",
                             $"{entry.LastContacted} ({timespanString})");

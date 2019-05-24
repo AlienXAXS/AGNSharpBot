@@ -1,4 +1,6 @@
-﻿namespace HomeLabReporting
+﻿using CommandHandler;
+
+namespace HomeLabReporting
 {
     using System;
     using System.Collections.Generic;
@@ -20,18 +22,8 @@
 
             // Start our trap receiver too
             SNMP.TrapReceiver.Instance.SetDiscordSocketClient(DiscordClient);
-            DiscordClient.MessageReceived += DiscordClientOnMessageReceived;
-        }
 
-        private Task DiscordClientOnMessageReceived(SocketMessage arg)
-        {
-            return Task.CompletedTask;
-        }
-
-        public async Task CommandAsync(string command, string message, SocketMessage sktMessage)
-        {
-            // Check if it's an SNMP command
-            await SNMP.SnmpCommunication.Instance.CommandExecute(command, message, sktMessage);
+            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands>();
         }
 
         void IPlugin.Dispose()

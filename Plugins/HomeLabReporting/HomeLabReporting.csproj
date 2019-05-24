@@ -32,6 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands.cs" />
     <Compile Include="SNMP\SnmpHost.cs" />
     <Compile Include="SNMP\SnmpCommunication.cs" />
     <Compile Include="SNMP\TrapReceiver.cs" />
@@ -40,6 +41,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\CommandHandler\CommandHandler.csproj">
+      <Project>{a945612b-37ac-4e68-86bb-2797d2cc3dd7}</Project>
+      <Name>CommandHandler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\GlobalLogger\GlobalLogger.csproj">
       <Project>{fc26bc37-d892-4531-abe2-c3f65ccdc4fb}</Project>
       <Name>GlobalLogger</Name>
