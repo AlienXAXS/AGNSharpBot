@@ -34,17 +34,9 @@ namespace GameWatcher
                     // Check to see if the activity is now nothing (aka, the user quit their app)
                     if (newGuildUser.Activity?.Type != ActivityType.Playing && !firstRun)
                     {
-                        await Logger.Instance.Log(
-                            $"[GAMEWATCHER] User {newGuildUser.Username} has stopped activity",
-                            Logger.LoggerType.ConsoleOnly);
-
                         var foundMemory = _roleMemory?.FirstOrDefault(x => x.Key == newGuildUser.Id);
                         if (foundMemory != null && foundMemory.Value.Key == 0)
                             return;
-
-                        await Logger.Instance.Log(
-                            $"[GAMEWATCHER] Found key {foundMemory.Value.Key} for user {newGuildUser.Username} in memory, attempting to delete them from the role",
-                            Logger.LoggerType.ConsoleOnly);
 
                         var foundRole = socketGuild.Roles.DefaultIfEmpty(null)
                             .FirstOrDefault(x => x.Id == foundMemory.Value.Value);
