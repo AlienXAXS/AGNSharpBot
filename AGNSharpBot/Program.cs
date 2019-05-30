@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AGNSharpBot.DiscordHandler;
 using AGNSharpBot.PluginHandler;
 using CommandHandler;
 using Discord;
-using GlobalLogger;
+using GlobalLogger.AdvancedLogger;
+using Logger = GlobalLogger.Logger;
 
 
 namespace AGNSharpBot
@@ -43,7 +45,7 @@ namespace AGNSharpBot
                 case CtrlType.CTRL_CLOSE_EVENT:
                     Client.Instance.Dispose();
                     PluginManager.Instance.Dispose();
-                    Logger.Instance.WriteConsole("Shutting down application...");
+                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log("Shutting down application...");
                     System.Threading.Thread.Sleep(1500);
                     _running = false;
                     return true;
@@ -54,9 +56,14 @@ namespace AGNSharpBot
 
         public async Task MainAsync()
         {
-            Logger.Instance.WriteConsole("AGN Discord Bot Loading...");
+            var logger = GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger()
+                .SetRetentionOptions(new RetentionOptions() { Compress = true, Days = 1 })
+                .OutputToConsole(true);
 
-            Logger.Instance.WriteConsole("Setting up exit handler capture");
+            logger.Log("AGNSharpBot is starting up");
+
+
+            logger.Log("Setting up exit handler capture");
             _handler += Handler;
             SetConsoleCtrlHandler(_handler, true);
 
@@ -66,15 +73,14 @@ namespace AGNSharpBot
             }
             catch (Configuration.Exceptions.MissingConfigurationFile)
             {
-                Logger.Instance.WriteConsole(
-                    "\r\n\r\nYou must provide a config.json file, rename the config.json.example to config.json before loading this application");
+                logger.Log("\r\n\r\nYou must provide a config.json file, rename the config.json.example to config.json before loading this application");
                 Console.WriteLine("Press <ENTER> to exit");
                 Console.ReadKey();
                 return;
             }
             catch (Configuration.Exceptions.InvalidConfigurationFile)
             {
-                Logger.Instance.WriteConsole(
+                logger.Log(
                     "\r\n\r\nThe provided config.json is invalid, unable to load.");
                 Console.WriteLine("Press <ENTER> to exit");
                 Console.ReadKey();
@@ -85,7 +91,7 @@ namespace AGNSharpBot
             var serviceHandler = new ServiceDefiner();
 
             // Start our discord client
-            Logger.Instance.WriteConsole("Loading Discord");
+            logger.Log("Loading Discord");
             _discordClient.InitDiscordClient(serviceHandler.GetServiceProvider());
             Logger.Instance.SetDiscordClient(Client.Instance.GetDiscordSocket());
             HandlerManager.Instance.RegisterDiscord(Client.Instance.GetDiscordSocket());
@@ -93,7 +99,7 @@ namespace AGNSharpBot
             // Load plugins
             PluginManager.Instance.LoadPlugins();
 
-            Logger.Instance.WriteConsole("Connecting to Discord");
+            logger.Log("Connecting to Discord");
             await _discordClient.Connect();         
             await GetUserInputAsync();
         }
@@ -103,6 +109,15 @@ namespace AGNSharpBot
             while (_running)
             {
                 await Task.Delay(1000);
+
+                var discordClient = _discordClient.GetDiscordSocket();
+
+                var totalUsers = 0;
+                foreach (var guild in discordClient.Guilds)
+                    totalUsers += guild.Users.Count;
+
+                Console.Title = $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.Instance.GetPlugins().Count().ToString()}";
+
                 /*var txt = Console.ReadLine();
                 switch (txt.ToLower())
                 {

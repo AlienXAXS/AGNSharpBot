@@ -1,4 +1,5 @@
 ﻿using CommandHandler;
+using GlobalLogger.AdvancedLogger;
 
 namespace HomeLabReporting
 {
@@ -17,7 +18,10 @@ namespace HomeLabReporting
 
         public void ExecutePlugin()
         {
-            GlobalLogger.Logger.Instance.WriteConsole($"HomeLabReporting.dll Plugin Loading...");
+            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
+                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+
+            AdvancedLoggerHandler.Instance.GetLogger().Log($"HomeLabReporting.dll Plugin Loading...");
             SNMP.SnmpCommunication.Instance.StartCapture();
 
             // Start our trap receiver too
@@ -29,7 +33,7 @@ namespace HomeLabReporting
         void IPlugin.Dispose()
         {
             //SNMP.SnmpCommunication.Instance.Dispose();
-            GlobalLogger.Logger.Instance.WriteConsole("HomeLabReporting Disposed");
+            AdvancedLoggerHandler.Instance.GetLogger().Log("HomeLabReporting Disposed");
         }
     }
 }

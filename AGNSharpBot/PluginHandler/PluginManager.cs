@@ -7,7 +7,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
-using GlobalLogger;
+using GlobalLogger.AdvancedLogger;
+using Logger = GlobalLogger.Logger;
 
 namespace AGNSharpBot.PluginHandler
 {
@@ -21,9 +22,15 @@ namespace AGNSharpBot.PluginHandler
 
         private bool _hasExecutedPlugins = false;
 
+        public PluginManager()
+        {
+            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
+                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+        }
+
         public void LoadPlugins()
         {
-            Logger.Instance.WriteConsole("Loading Plugins from Plugins directory");
+            AdvancedLoggerHandler.Instance.GetLogger().Log("Loading Plugins from Plugins directory");
 
             var catalog = new DirectoryCatalog("Plugins");
             using (var container = new CompositionContainer(catalog))
@@ -34,14 +41,14 @@ namespace AGNSharpBot.PluginHandler
                 }
                 catch (System.Reflection.ReflectionTypeLoadException ex)
                 {
-                    Logger.Instance.WriteConsole("Unable to load plugins...");
+                    AdvancedLoggerHandler.Instance.GetLogger().Log("Unable to load plugins...");
 
                     foreach (var x in ex.LoaderExceptions)
-                        Logger.Instance.WriteConsole(x.Message);
+                        AdvancedLoggerHandler.Instance.GetLogger().Log(x.Message);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.WriteConsole(ex.Message);
+                    AdvancedLoggerHandler.Instance.GetLogger().Log(ex.Message);
                 }
             }
 
@@ -53,39 +60,41 @@ namespace AGNSharpBot.PluginHandler
                 _hasExecutedPlugins = true;
 
 #if DEBUG
-                await Logger.Instance.Log("AGNSharpBot Loading (DEBUG MODE - DEBUGGER ATTACHED TO PROCESS)...", Logger.LoggerType.ConsoleAndDiscord);
+                AdvancedLoggerHandler.Instance.GetLogger().Log("AGNSharpBot Loading (DEBUG MODE - DEBUGGER ATTACHED TO PROCESS)...");
 #else
-                await Logger.Instance.Log("AGNSharpBot Loading...", Logger.LoggerType.ConsoleAndDiscord);
+                AdvancedLoggerHandler.Instance.GetLogger().Log("AGNSharpBot Loading...");
 #endif
 
                 var pluginNameList = "";
-                Logger.Instance.WriteConsole("Discord Is Ready - Executing Plugins");
+                AdvancedLoggerHandler.Instance.GetLogger().Log("Discord Is Ready - Executing Plugins");
                 await Logger.Instance.Log($"{Plugins.Count()} plugins are loaded, executing them now.", Logger.LoggerType.DiscordOnly);
 
                 foreach (var plugin in Plugins)
                 {
                     pluginNameList += $"{plugin.Name}, ";
-                    try
-                    {
-                        Logger.Instance.WriteConsole($"Pre-Execute Plugin {plugin.Name}");
+                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Pre-Execute Plugin {plugin.Name}");
 
-                        var newThread = new System.Threading.Thread(new ThreadStart(() =>
+                    var newThread = new System.Threading.Thread(() =>
+                    {
+                        try
                         {
                             plugin.ExecutePlugin();
-                        }));
-                        newThread.IsBackground = true;
-                        newThread.Start();
-                    }
-                    catch (Exception ex)
+                        }
+                        catch (Exception ex)
+                        {
+                            AdvancedLoggerHandler.Instance.GetLogger().Log($"Caught exception on Execute Plugin for {plugin.Name}\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                        }
+                    })
                     {
-                        Logger.Instance.WriteConsole($"Caught exception on Execute Plugin for {plugin.Name}\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
-                    }
+                        IsBackground = true
+                    };
+                    newThread.Start();
                 }
 
                 await Logger.Instance.Log($"{Plugins.Count()} plugins have been executed -> {pluginNameList}", Logger.LoggerType.DiscordOnly);
             };
 
-            Logger.Instance.WriteConsole("Plugins loaded");
+            AdvancedLoggerHandler.Instance.GetLogger().Log("Plugins loaded");
         }
         
         public IEnumerable<IPlugin> GetPlugins()
@@ -99,7 +108,7 @@ namespace AGNSharpBot.PluginHandler
 
             foreach (var plugin in Plugins)
             {
-                Logger.Instance.WriteConsole($"Plugin '{plugin.Name}' Detected - Init Plugin");
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"Plugin '{plugin.Name}' Detected - Init Plugin");
                 plugin.DiscordClient = DiscordHandler.Client.Instance.GetDiscordSocket();
             }
         }

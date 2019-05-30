@@ -1,4 +1,5 @@
 ﻿using System;
+using GlobalLogger;
 using Newtonsoft.Json;
 
 namespace GlobalLogger.Configuration
@@ -28,7 +29,7 @@ namespace GlobalLogger.Configuration
 
         public Discord()
         {
-
+            AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new AdvancedLogger.RetentionOptions(){Days = 1, Compress = true});
         }
 
         public ulong GetDiscordLoggerChannelId()
@@ -53,11 +54,11 @@ namespace GlobalLogger.Configuration
                 }
                 catch (JsonException jsonException)
                 {
-                    Logger.Instance.WriteConsole($"Unable to deserialize default configuration for logger discord config\r\n{jsonException.Message}");
+                    AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to deserialize default configuration for logger discord config\r\n{jsonException.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.WriteConsole($"Unable to read default configuration for logger discord config to file ({ConfigurationPath})\r\n{ex.Message}");
+                    AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to read default configuration for logger discord config to file ({ConfigurationPath})\r\n{ex.Message}");
                 }
             }
             else
@@ -69,11 +70,11 @@ namespace GlobalLogger.Configuration
                 }
                 catch (JsonException jsonException)
                 {
-                    Logger.Instance.WriteConsole($"Unable to serialize default configuration for logger discord config\r\n{jsonException.Message}");
+                    AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to serialize default configuration for logger discord config\r\n{jsonException.Message}");
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.WriteConsole($"Unable to write default configuration for logger discord config to file\r\n{ex.Message}");
+                    AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to write default configuration for logger discord config to file\r\n{ex.Message}");
                 }
             }
         }

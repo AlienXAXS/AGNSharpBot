@@ -5,6 +5,8 @@ using System.ComponentModel.Composition;
 using PluginInterface;
 using Discord.WebSocket;
 using GlobalLogger;
+using GlobalLogger.AdvancedLogger;
+using Logger = GlobalLogger.Logger;
 
 namespace JoinQuitLogger
 {
@@ -16,7 +18,9 @@ namespace JoinQuitLogger
 
         void IPlugin.ExecutePlugin()
         {
-            GlobalLogger.Logger.Instance.WriteConsole($"JoinQuitLogger.dll Plugin Loading...");
+            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
+                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+            AdvancedLoggerHandler.Instance.GetLogger().Log($"JoinQuitLogger.dll Plugin Loading...");
             Config.ConfigurationHandler.Instance.Init();
             DiscordClient.UserJoined += OnUserJoinedGuild;
             DiscordClient.UserLeft += OnUserLeftGuild;
@@ -50,10 +54,9 @@ namespace JoinQuitLogger
                     Config.ConfigurationHandler.Instance.ConfigurationRoot.JoinLeaveMessageOutput.ChannelId));
         }
 
-
         void IPlugin.Dispose()
         {
-            GlobalLogger.Logger.Instance.WriteConsole("JoinQuitLogger Disposed");
+            AdvancedLoggerHandler.Instance.GetLogger().Log("JoinQuitLogger Disposed");
         }
     }
 }

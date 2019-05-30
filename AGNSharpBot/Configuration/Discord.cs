@@ -1,4 +1,5 @@
 ﻿using System;
+using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
 
 namespace AGNSharpBot.Configuration
@@ -13,7 +14,7 @@ namespace AGNSharpBot.Configuration
 
         public void LoadConfiguration()
         {
-            GlobalLogger.Logger.Instance.WriteConsole("Attempting to load config.json");
+            AdvancedLoggerHandler.Instance.GetLogger().Log("Attempting to load config.json");
             if (System.IO.File.Exists("config.json"))
             {
                 var config = JsonConvert.DeserializeObject<Discord>(System.IO.File.ReadAllText("config.json"));
@@ -30,11 +31,11 @@ namespace AGNSharpBot.Configuration
                     throw new Exceptions.InvalidConfigurationFile(ex.Message);
                 }
 
-                GlobalLogger.Logger.Instance.WriteConsole("Config parsed and loaded!");
+                AdvancedLoggerHandler.Instance.GetLogger().Log("Config parsed and loaded!");
             }
             else
             {
-                GlobalLogger.Logger.Instance.WriteConsole("config.json missing, oops!");
+                AdvancedLoggerHandler.Instance.GetLogger().Log("config.json missing, oops!");
                 throw new Exceptions.MissingConfigurationFile();
             }
         }

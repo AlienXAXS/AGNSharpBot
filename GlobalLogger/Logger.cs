@@ -55,7 +55,7 @@ namespace GlobalLogger
             Configuration.Discord.Instance.LoadConfiguration();
         }
 
-        public void WriteConsole(string msg, [System.Runtime.CompilerServices.CallerMemberName]
+        public void WriteConsoleX(string msg, [System.Runtime.CompilerServices.CallerMemberName]
             string memberName = "", [System.Runtime.CompilerServices.CallerFilePath]
             string memberFilePath = "", [System.Runtime.CompilerServices.CallerLineNumber]
             int memberLineNumber = 0)
@@ -88,7 +88,7 @@ namespace GlobalLogger
 
         private void OutToConsole(string msg, string memberName, string memberFilePath, int memberLineNumber)
         {
-            Console.WriteLine($"{DateTime.Now:g} [{memberName}[Thread:{System.Threading.Thread.CurrentThread.ManagedThreadId}/{Process.GetCurrentProcess().Threads.Count}]|{System.IO.Path.GetFileName(memberFilePath)}|{memberLineNumber}] - {msg}");
+            Console.WriteLine($"REPLACE ME ##### {DateTime.Now:g} [{memberName}[Thread:{System.Threading.Thread.CurrentThread.ManagedThreadId}/{Process.GetCurrentProcess().Threads.Count}]|{System.IO.Path.GetFileName(memberFilePath)}|{memberLineNumber}] - {msg}");
         }
 
         public void LogDiscordUserMessageToFile(SocketGuildUser user, SocketMessage message)

@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using PluginInterface;
 using Discord.WebSocket;
+using GlobalLogger.AdvancedLogger;
 
 namespace SpotifyStats
 {
@@ -15,7 +16,10 @@ namespace SpotifyStats
 
         public void ExecutePlugin()
         {
-            GlobalLogger.Logger.Instance.WriteConsole($"SpotifyStats.dll Plugin Loading...");
+            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
+                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+
+            AdvancedLoggerHandler.Instance.GetLogger().Log($"SpotifyStats.dll Plugin Loading...");
             
             // Register our tables with the SQLHandler
             var dbConn = InternalDatabase.Handler.Instance.NewConnection();
@@ -32,14 +36,5 @@ namespace SpotifyStats
             
         }
 
-        public Task Message(string message, SocketMessage sktMessage)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task CommandAsync(string command, string message, SocketMessage sktMessage)
-        {
-            return Task.CompletedTask;
-        }
     }
 }

@@ -21,13 +21,12 @@ namespace AGNSharpBot.DiscordHandler
         {
             _services = services;
 
-            var _config = new DiscordSocketConfig { MessageCacheSize = 100 };
-            //_discordSocket = services.GetRequiredService<DiscordSocketClient>();
+            var _config = new DiscordSocketConfig { MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true, LogLevel = LogSeverity.Info};
             _discordSocket = new DiscordSocketClient(_config);
 
             _discordSocket.Log += message =>
             {
-                GlobalLogger.Logger.Instance.WriteConsole(message.Message);
+                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(message.Message);
                 return Task.CompletedTask;
             };
         }

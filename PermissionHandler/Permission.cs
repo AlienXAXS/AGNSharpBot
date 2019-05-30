@@ -5,8 +5,9 @@ using System.Reflection;
 using System.Threading;
 using Discord.Commands;
 using Discord.WebSocket;
-using GlobalLogger;
+using GlobalLogger.AdvancedLogger;
 using PermissionHandler.DB;
+using Logger = GlobalLogger.Logger;
 
 namespace PermissionHandler
 {
@@ -18,7 +19,7 @@ namespace PermissionHandler
 
         private readonly Database _database = new Database();
 
-        // Permission Type Handler Stuff
+        // Permission Type AdvancedLoggerHandler Stuff
         private readonly List<string> _registeredPermissionPaths = new List<string>();
 
         public void RegisterPermission<T>(Assembly assembly)
@@ -39,7 +40,7 @@ namespace PermissionHandler
                     _database.AddPermission(pathName);
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    Logger.Instance.Log($"Dynamically registered a new permission path node: {pathName}", Logger.LoggerType.ConsoleOnly);
+                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Dynamically registered a new permission path node: {pathName}");
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 }
             }

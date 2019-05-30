@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using PluginInterface;
 using Discord.WebSocket;
+using GlobalLogger.AdvancedLogger;
 
 namespace Responses
 {
@@ -15,7 +16,9 @@ namespace Responses
 
         void IPlugin.ExecutePlugin()
         {
-            GlobalLogger.Logger.Instance.WriteConsole($"Responses.dll Plugin Loading...");
+            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
+                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+            AdvancedLoggerHandler.Instance.GetLogger().Log($"Responses.dll Plugin Loading...");
 
             // Register our commands with the handler
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminCommands>();
@@ -28,7 +31,7 @@ namespace Responses
 
         void IPlugin.Dispose()
         {
-            GlobalLogger.Logger.Instance.WriteConsole("Responses Disposed");
+            AdvancedLoggerHandler.Instance.GetLogger().Log("Responses Disposed");
         }
     }
 }

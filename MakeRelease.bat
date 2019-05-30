@@ -16,8 +16,6 @@ echo Creating plugins directory
 mkdir .\Release_Builder\Plugins > NUL
 
 echo Copying Plugins...
-echo   - GameToRole
-copy /Y .\Plugins\GameToRole\bin\Release\GameToRole.dll .\Release_Builder\Plugins
 
 echo   - GameWatcher
 copy /Y .\Plugins\GameWatcher\bin\Release\GameWatcher.dll .\Release_Builder\Plugins

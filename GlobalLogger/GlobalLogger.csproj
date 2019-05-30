@@ -148,6 +148,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdvancedLogger\AdvancedLoggerHandler.cs" />
+    <Compile Include="AdvancedLogger\LogCompressor.cs" />
+    <Compile Include="AdvancedLogger\Logger.cs" />
+    <Compile Include="AdvancedLogger\RetentionOptions.cs" />
     <Compile Include="Configuration\Discord.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -10,8 +10,9 @@ using System.Xml.Serialization;
 using Discord;
 using Discord.WebSocket;
 using GameWatcher.DB;
-using GlobalLogger;
+using GlobalLogger.AdvancedLogger;
 using PluginInterface;
+using Logger = GlobalLogger.Logger;
 
 namespace GameWatcher
 {
@@ -25,9 +26,12 @@ namespace GameWatcher
         {
             try
             {
-                Logger.Instance.Log($"[GAMEWATCHER] Checking Discord...", Logger.LoggerType.ConsoleOnly).Wait();
+                AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
+                    .SetRetentionOptions(new RetentionOptions() {Compress = true});
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER] Checking Discord...");
                 CheckDiscord().GetAwaiter().GetResult();
-                Logger.Instance.Log($"[GAMEWATCHER]  >  Complete", Logger.LoggerType.ConsoleOnly).Wait();
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]  >  Complete");
+
                 CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Control>();
                 DiscordClient.GuildMemberUpdated += DiscordClientOnGuildMemberUpdatedEvent;
             }
@@ -49,21 +53,21 @@ namespace GameWatcher
             foreach (var guild in DiscordClient.Guilds)
             {
 
-                Logger.Instance.Log($"[GAMEWATCHER]   > Checking guild {guild.Name}...", Logger.LoggerType.ConsoleOnly).Wait();
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]   > Checking guild {guild.Name}...");
 
                 // Clean all roles
                 var foundRoles = guild.Roles.Where(y => y.Name.StartsWith("Playing:"));
                 foreach (var role in foundRoles)
                 {
-                    Logger.Instance.Log($"[GAMEWATCHER]   > Pre-Delete Role {role.Name}...", Logger.LoggerType.ConsoleOnly).Wait();
+                    AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]   > Pre-Delete Role {role.Name}...");
                     await role.DeleteAsync();
-                    Logger.Instance.Log($"Found old role of {role.Name}. I have deleted the role", Logger.LoggerType.ConsoleOnly).Wait();
+                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Found old role of {role.Name}. I have deleted the role");
                 }
 
                 // Rescan all users
                 foreach (var user in guild.Users)
                 {
-                    Logger.Instance.Log($"Scanning user {user.Username}", Logger.LoggerType.ConsoleOnly).Wait();
+                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Scanning user {user.Username}");
                     DiscordClientOnGuildMemberUpdated(user, user, true).Wait();
                 }
             }

@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
 using SnmpSharpNet;
 
@@ -126,7 +127,7 @@ namespace HomeLabReporting.SNMP
             }
             catch (Exception ex)
             {
-                GlobalLogger.Logger.Instance.WriteConsole($"Exception while attempting to compute SMTP Data:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"Exception while attempting to compute SMTP Data:\r\n{ex.Message}\r\n{ex.StackTrace}");
             }
         }
 
