@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commands\AuthorisedCommands.cs" />
+    <Compile Include="Commands\Global\ASCIIArt.cs" />
     <Compile Include="Commands\Global\DogCommand.cs" />
     <Compile Include="Commands\Global\CatCommand.cs" />
     <Compile Include="Commands\Handlers\AuthorisedCommandsPermission.cs" />
@@ -78,6 +79,9 @@
     </Reference>
     <Reference Include="Discord.Net.WebSocket, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Discord.Net.WebSocket.2.1.0\lib\net46\Discord.Net.WebSocket.dll</HintPath>
+    </Reference>
+    <Reference Include="Figgle, Version=0.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Figgle.0.3.0\lib\net45\Figgle.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.DependencyInjection.2.2.0\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>

@@ -27,6 +27,7 @@ namespace Responses
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminPermissions>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.CatCommand>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.DogCommand>();
+            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.ASCIIArt>();
         }
 
         void IPlugin.Dispose()
