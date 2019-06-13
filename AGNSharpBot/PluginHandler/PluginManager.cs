@@ -74,7 +74,7 @@ namespace AGNSharpBot.PluginHandler
                     pluginNameList += $"{plugin.Name}, ";
                     AdvancedLoggerHandler.Instance.GetLogger().Log($"Pre-Execute Plugin {plugin.Name}");
 
-                    var newThread = new System.Threading.Thread(() =>
+                    var newThread = new Thread(() =>
                     {
                         try
                         {

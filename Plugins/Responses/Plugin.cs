@@ -5,6 +5,8 @@ using System.ComponentModel.Composition;
 using PluginInterface;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
+using Responses.Informational;
+using Responses.SQLTables;
 
 namespace Responses
 {
@@ -12,13 +14,19 @@ namespace Responses
     public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "Discord Responses";
-        DiscordSocketClient IPlugin.DiscordClient { get; set; }
+        public DiscordSocketClient DiscordClient { get; set; }
+
 
         void IPlugin.ExecutePlugin()
         {
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
                 .SetRetentionOptions(new RetentionOptions() {Compress = true});
             AdvancedLoggerHandler.Instance.GetLogger().Log($"Responses.dll Plugin Loading...");
+
+            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<LastOnlineTable>();
+
+            var lastOnlineHandler = new LastOnlineDbHandler();
+            lastOnlineHandler.StartOnlineScanner(DiscordClient);
 
             // Register our commands with the handler
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminCommands>();
