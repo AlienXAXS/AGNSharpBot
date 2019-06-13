@@ -16,7 +16,7 @@ namespace GlobalLogger.AdvancedLogger
 
         public Logger GetLogger()
         {
-            var logName = Assembly.GetCallingAssembly().GetName().Name;
+            var logName = Assembly.GetCallingAssembly().GetName().Name ?? "UNKNOWN";
 
             Logger foundLogger = null;
             if (_loggers.Count != 0)
