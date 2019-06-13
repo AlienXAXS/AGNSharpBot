@@ -11,6 +11,49 @@ namespace Responses.Commands
 {
     class AdminCommands
     {
+
+        [Command("svr", "Switches the voice server to a random one, and back to the original one again to reconnect everyone in voice channels")]
+        [Alias("switchvoiceregion")]
+        public async void SwitchVoiceServer(string[] parameters, SocketMessage sktMessage,
+            DiscordSocketClient discordSocketClient)
+        {
+            if (sktMessage.Channel is SocketGuildChannel _socketGuildChannel)
+            {
+                try
+                {
+                    var voiceRegions = await _socketGuildChannel.Guild.GetVoiceRegionsAsync();
+                    var currentVoiceRegionId = _socketGuildChannel.Guild.VoiceRegionId;
+
+                    var currentVoiceRegion = voiceRegions.First(x => x.Id.Equals(currentVoiceRegionId));
+
+                    var voiceRegionsWithoutCurrent = voiceRegions.Where(x => x.Id != currentVoiceRegionId);
+
+                    await sktMessage.Channel.SendMessageAsync(
+                        $"Switch Voice Server Initiated, Current voice region: {currentVoiceRegion.Name} [{currentVoiceRegionId}]");
+                    await sktMessage.Channel.SendMessageAsync("Switching to a random Voice Region, please wait...");
+
+                    var rand = new Random(DateTime.Now.Millisecond);
+                    var newVoiceRegion = voiceRegionsWithoutCurrent.ElementAt(rand.Next(voiceRegionsWithoutCurrent.Count()));
+
+                    await _socketGuildChannel.Guild.ModifyAsync(properties =>
+                        properties.Region = newVoiceRegion);
+
+                    await sktMessage.Channel.SendMessageAsync(
+                        $"Voice region is now {newVoiceRegion.Name}, switching back to previous");
+
+                    await _socketGuildChannel.Guild.ModifyAsync(properties =>
+                        properties.Region = currentVoiceRegion);
+
+                    await sktMessage.Channel.SendMessageAsync("Voice Region switch complete!");
+                }
+                catch (Exception ex)
+                {
+                    await sktMessage.Channel.SendMessageAsync(
+                        $"Unable to switch the voice region, the error is as follows:\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                }
+            }
+        }
+
         [Command("userinfo", "Get's otherwise invisible information about a user that the discord client cannot retrieve. USAGE: userinfo <userid>")]
         public async void GetUserInfo(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
