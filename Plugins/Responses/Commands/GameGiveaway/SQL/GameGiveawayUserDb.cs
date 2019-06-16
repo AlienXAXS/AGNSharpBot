@@ -14,5 +14,7 @@ namespace Responses.Commands.GameGiveaway.SQL
         public int Id { get; set; }
         public long DiscordId { get; set; }
         public DateTime DateTime { get; set; }
+
+        public bool isHumbleRegistered { get; set; }
     }
 }

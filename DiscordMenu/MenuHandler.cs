@@ -126,6 +126,7 @@ namespace DiscordMenu
             }
 
             DiscordSocketClient.ReactionAdded -= DiscordSocketClientOnReactionAdded;
+            await Message.DeleteAsync();
             Message = null;
         }
 
