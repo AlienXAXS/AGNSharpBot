@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using CommandHandler;
@@ -162,12 +163,24 @@ namespace Responses.Commands.GameGiveaway
     {
         [Command("gamegiveaway", "Game Giveaway - Get free Steam Keys")]
         [Alias("gg", "ggz")]
-        [Permissions(Permissions.PermissionTypes.Guest)]
         public async void GameGiveawayCmd(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
-            var giveaway = new GameGiveawayHumbleMenu();
-            giveaway.SktMessage = sktMessage;
-            giveaway.DiscordSocketClient = discordSocketClient;
+
+            var author = sktMessage.Author;
+            if (author is SocketGuildUser guildUser)
+            {
+                var joinedRecently = (DateTime.Now - guildUser.JoinedAt);
+                if (joinedRecently.Value.TotalDays < 30)
+                {
+                    await sktMessage.Channel.SendMessageAsync($"Sorry {author.Username}, but you have to be active within the community in order to use this feature.");
+                    return;
+                }
+            }
+
+            var giveaway = new GameGiveawayHumbleMenu
+            {
+                SktMessage = sktMessage, DiscordSocketClient = discordSocketClient
+            };
             giveaway.StartMenu();
         }
     }
