@@ -17,7 +17,17 @@ namespace AGNSharpBot
         [DllImport("Kernel32")]
         private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
 
-        static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
+        static void Main(string[] args)
+        {
+            try
+            {
+                new Program().MainAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fatal Error: {ex.Message}\r\n\r\n{ex.StackTrace}");
+            }
+        }
         private readonly Client _discordClient = Client.Instance;
 
         private delegate bool EventHandler(CtrlType sig);
@@ -110,32 +120,25 @@ namespace AGNSharpBot
             {
                 await Task.Delay(1000);
 
-                var discordClient = _discordClient.GetDiscordSocket();
-
-                var totalUsers = 0;
-                foreach (var guild in discordClient.Guilds)
-                    totalUsers += guild.Users.Count;
-
-                Console.Title = $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.Instance.GetPlugins().Count().ToString()}";
-
-                /*var txt = Console.ReadLine();
-                switch (txt.ToLower())
+                try
                 {
-                    case "quit":
-                    case "exit":
-                        if (_discordClient.GetDiscordSocket().ConnectionState == ConnectionState.Connected)
-                        {
-                            await _discordClient.GetDiscordSocket().LogoutAsync();
-                            _discordClient.GetDiscordSocket().Dispose();
-                        }
+                    var discordClient = _discordClient.GetDiscordSocket();
 
-                        return;
+                    if ( discordClient == null) continue;
 
-                    default:
-                        Console.WriteLine("Unknown command, type 'exit' or 'quit' to stop the bot");
-                        break;
+                    var totalUsers = 0;
+                    foreach (var guild in discordClient.Guilds)
+                        totalUsers += guild.Users.Count;
+
+
+                    Console.Title =
+                        $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.Instance.GetPlugins().Count()}";
+
                 }
-            }*/
+                catch (Exception)
+                {
+
+                }
             }
         }
     }

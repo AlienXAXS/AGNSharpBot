@@ -40,6 +40,7 @@ namespace Responses
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.CatCommand>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.DogCommand>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.ASCIIArt>();
+            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.ModerateUser>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.GameGiveaway.GameGiveawayAdmin>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.GameGiveaway.GameGiveawayPublic>();
         }

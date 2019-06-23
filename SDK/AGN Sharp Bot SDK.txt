@@ -1,0 +1,3 @@
+This is the Software Development Kit for the AGN Sharp bot.
+
+Not much of a Kit... but fuck you.

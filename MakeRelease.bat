@@ -20,6 +20,9 @@ echo Copying Plugins...
 echo   - GameWatcher
 copy /Y .\Plugins\GameWatcher\bin\Release\GameWatcher.dll .\Release_Builder\Plugins
 
+echo   - Auditor
+copy /Y .\Plugins\Auditer\bin\Release\Auditor.dll .\Release_Builder\Plugins
+
 echo   - HomeLabReporting
 copy /Y .\Plugins\HomeLabReporting\bin\Release\HomeLabReporting.dll .\Release_Builder\Plugins
 copy /Y .\Plugins\HomeLabReporting\bin\Release\SnmpSharpNet.dll .\Release_Builder\Plugins

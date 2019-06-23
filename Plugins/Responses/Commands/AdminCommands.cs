@@ -79,11 +79,14 @@ namespace Responses.Commands
 
                     var embedBuilder = new EmbedBuilder();
                     embedBuilder.Title = $"User information for {user.Username}";
-                    embedBuilder.AddField("Created", $"{user.CreatedAt.Date:dd/mm/yyyy hh:mm:ss} ({(DateTime.Now - user.CreatedAt.Date).Days} days ago)");
+                    embedBuilder.AddField("Created", $"{user.CreatedAt.Date} ({(DateTime.Now - user.CreatedAt.Date).Days} days ago)");
 
                     if (user.JoinedAt != null)
+                    {
                         embedBuilder.AddField("Joined This Guild",
-                            $"{user.JoinedAt:dd/mm/yyyy hh:mm:ss} ({(DateTime.Now - user.JoinedAt.Value).Days} days ago)");
+                            $"{user.JoinedAt.Value.Date} ({(DateTime.Now - user.JoinedAt.Value.Date).Days} days ago)");
+                    }
+
 
                     embedBuilder.AddField("Current Nickname", user.Nickname ?? "None");
                     embedBuilder.AddField("Avatar Identifier", user.AvatarId);

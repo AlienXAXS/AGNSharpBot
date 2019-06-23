@@ -21,9 +21,8 @@ namespace AGNSharpBot.DiscordHandler
         {
             _services = services;
 
-            var _config = new DiscordSocketConfig { MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true, LogLevel = LogSeverity.Info};
+            var _config = new DiscordSocketConfig {MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true, LogLevel = LogSeverity.Info};
             _discordSocket = new DiscordSocketClient(_config);
-
             _discordSocket.Log += message =>
             {
                 if (message.Message == null)
