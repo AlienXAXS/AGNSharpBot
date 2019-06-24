@@ -100,7 +100,15 @@ namespace HomeLabReporting.SNMP
             var ipep = new IPEndPoint(IPAddress.Any, 162);
             EndPoint ep = ipep;
 
-            socket.Bind(ep);
+            try
+            {
+                socket.Bind(ep);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return;
+            }
 
             // Disable timeout processing. Just block until packet is received 
             socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 0);

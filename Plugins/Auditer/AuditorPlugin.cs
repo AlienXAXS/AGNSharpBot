@@ -21,7 +21,10 @@ namespace Auditor
         {
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions(){Compress = true, Days = 1});
 
-            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<AuditorSQL>();
+            // register our SQL Tables
+            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<AuditorSql.AuditEntry>().RegisterTable<AuditorSql.WebServerSettings>();
+
+            CommandHandler.HandlerManager.Instance.RegisterHandler<WebServer.ControllerCommands>();
 
             DiscordClient.MessageDeleted += DiscordClientOnMessageDeleted;
             DiscordClient.MessageUpdated += DiscordClientOnMessageUpdated;
@@ -31,11 +34,11 @@ namespace Auditor
             DiscordClient.UserLeft += DiscordClientOnUserLeft;
         }
 
-        private void WriteToDatabase(AuditorSQL.AuditType type, ulong channelId = 0, ulong userId = 0, string contents = null,
+        private void WriteToDatabase(AuditorSql.AuditEntry.AuditType type, ulong channelId = 0, ulong userId = 0, string contents = null,
             string prevContents = null, ulong messageId = 0, ulong guildId = 0, string notes = null, string imgUrls = null)
         {
-            var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSQL>();
-            db.Connection.Insert(new AuditorSQL()
+            var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql>();
+            db.Connection.Insert(new AuditorSql.AuditEntry()
             {
                 ChannelId = (long)channelId,
                 Contents = contents,
@@ -54,7 +57,7 @@ namespace Auditor
         {
             if (sktGuildUser.IsBot || sktGuildUser.IsWebhook) return Task.CompletedTask;
 
-            WriteToDatabase(AuditorSQL.AuditType.QUIT_GUILD, userId: sktGuildUser.Id, notes: $"User {sktGuildUser.Username} Left Guild", guildId: sktGuildUser.Guild.Id);
+            WriteToDatabase(AuditorSql.AuditEntry.AuditType.QUIT_GUILD, userId: sktGuildUser.Id, notes: $"User {sktGuildUser.Username} Left Guild", guildId: sktGuildUser.Guild.Id);
 
             return Task.CompletedTask;
         }
@@ -63,7 +66,7 @@ namespace Auditor
         {
             if (sktGuildUser.IsBot || sktGuildUser.IsWebhook) return Task.CompletedTask;
 
-            WriteToDatabase(AuditorSQL.AuditType.JOIN_GUILD, userId: sktGuildUser.Id, notes: $"User {sktGuildUser.Username} Joined Guild", guildId: sktGuildUser.Guild.Id);
+            WriteToDatabase(AuditorSql.AuditEntry.AuditType.JOIN_GUILD, userId: sktGuildUser.Id, notes: $"User {sktGuildUser.Username} Joined Guild", guildId: sktGuildUser.Guild.Id);
 
             return Task.CompletedTask;
         }
@@ -77,12 +80,12 @@ namespace Auditor
             if (newGuildUser.Status == UserStatus.Offline)
             {
                 // Is offline now
-                WriteToDatabase(AuditorSQL.AuditType.USER_OFFLINE, userId: newGuildUser.Id, notes: $"User {newGuildUser.Username} is now offline", guildId: newGuildUser.Guild.Id);
+                WriteToDatabase(AuditorSql.AuditEntry.AuditType.USER_OFFLINE, userId: newGuildUser.Id, notes: $"User {newGuildUser.Username} is now offline", guildId: newGuildUser.Guild.Id);
             }
             else if (oldGuildUser.Status != UserStatus.Online)
             {
                 // Must be online
-                WriteToDatabase(AuditorSQL.AuditType.USER_ONLINE, userId: newGuildUser.Id, notes: $"User {newGuildUser.Username} is now online", guildId: newGuildUser.Guild.Id);
+                WriteToDatabase(AuditorSql.AuditEntry.AuditType.USER_ONLINE, userId: newGuildUser.Id, notes: $"User {newGuildUser.Username} is now online", guildId: newGuildUser.Guild.Id);
             }
 
             if (newGuildUser.Nickname != null)
@@ -90,12 +93,12 @@ namespace Auditor
                 // Nickname set
                 if (oldGuildUser.Nickname == null)
                     // ReSharper disable once HeuristicUnreachableCode - code is reachable
-                    WriteToDatabase(AuditorSQL.AuditType.NICKNAME_NEW, userId: newGuildUser.Id,
+                    WriteToDatabase(AuditorSql.AuditEntry.AuditType.NICKNAME_NEW, userId: newGuildUser.Id,
                         notes: $"User {newGuildUser.Username} set a nickname of: {newGuildUser.Nickname}", guildId: newGuildUser.Guild.Id);
 
                 // Nickname updated
                 if (oldGuildUser.Nickname != null && !newGuildUser.Nickname.Equals(oldGuildUser.Nickname))
-                    WriteToDatabase(AuditorSQL.AuditType.NICKNAME_MODIFIED, userId: newGuildUser.Id,
+                    WriteToDatabase(AuditorSql.AuditEntry.AuditType.NICKNAME_MODIFIED, userId: newGuildUser.Id,
                         notes:
                         $"User {newGuildUser.Username} updated their nickname from {oldGuildUser.Nickname} to {newGuildUser.Nickname}", guildId: newGuildUser.Guild.Id);
             }
@@ -103,7 +106,7 @@ namespace Auditor
             {
                 // Nickname removed
                 if (oldGuildUser.Nickname != null)
-                    WriteToDatabase(AuditorSQL.AuditType.NICKNAME_DELETED, userId: newGuildUser.Id, notes:$"User {newGuildUser.Username} removed their nickname which was {oldGuildUser.Nickname}", guildId: newGuildUser.Guild.Id);
+                    WriteToDatabase(AuditorSql.AuditEntry.AuditType.NICKNAME_DELETED, userId: newGuildUser.Id, notes:$"User {newGuildUser.Username} removed their nickname which was {oldGuildUser.Nickname}", guildId: newGuildUser.Guild.Id);
             }
 
             return Task.CompletedTask;
@@ -119,7 +122,7 @@ namespace Auditor
 
             var imgUrls = sktMessage.Attachments.Aggregate("", (current, attachment) => current + $"{attachment.Url}|");
 
-            WriteToDatabase(AuditorSQL.AuditType.MESSAGE_NEW, sktMessage.Channel.Id, sktMessage.Author.Id, sktMessage.Content, notes: $"Message Received by {sktMessage.Author.Username} in channel {sktMessage.Channel.Name}", guildId: guildId, messageId: sktMessage.Id, imgUrls: imgUrls);
+            WriteToDatabase(AuditorSql.AuditEntry.AuditType.MESSAGE_NEW, sktMessage.Channel.Id, sktMessage.Author.Id, sktMessage.Content, notes: $"Message Received by {sktMessage.Author.Username} in channel {sktMessage.Channel.Name}", guildId: guildId, messageId: sktMessage.Id, imgUrls: imgUrls);
             return Task.CompletedTask;
         }
 
@@ -132,7 +135,7 @@ namespace Auditor
             if (sktChannel is SocketGuildChannel socketGuildChannel)
                 guildId = socketGuildChannel.Guild.Id;
 
-            WriteToDatabase(AuditorSQL.AuditType.MESSAGE_MODIFIED, sktChannel.Id, message.Author.Id, message.Content, prevMessage.HasValue ? prevMessage.Value.Content : "Unable to get contents", message.Id, notes: $"Message Updated by {message.Author.Username} in channel {sktChannel.Name}", guildId: guildId);
+            WriteToDatabase(AuditorSql.AuditEntry.AuditType.MESSAGE_MODIFIED, sktChannel.Id, message.Author.Id, message.Content, prevMessage.HasValue ? prevMessage.Value.Content : "Unable to get contents", message.Id, notes: $"Message Updated by {message.Author.Username} in channel {sktChannel.Name}", guildId: guildId);
 
             return Task.CompletedTask;
         }
@@ -146,7 +149,7 @@ namespace Auditor
             if (sktChannel is SocketGuildChannel socketGuildChannel)
                 guildId = socketGuildChannel.Guild.Id;
 
-            WriteToDatabase(AuditorSQL.AuditType.MESSAGE_DELETED, sktChannel.Id, message.Value.Id, message.Value.Content, messageId: message.Value.Id, notes: $"Message Deleted by {message.Value.Author.Username} in channel {message.Value.Channel.Name}", guildId: guildId);
+            WriteToDatabase(AuditorSql.AuditEntry.AuditType.MESSAGE_DELETED, sktChannel.Id, message.Value.Id, message.Value.Content, messageId: message.Value.Id, notes: $"Message Deleted by {message.Value.Author.Username} in channel {message.Value.Channel.Name}", guildId: guildId);
 
             return Task.CompletedTask;
         }
