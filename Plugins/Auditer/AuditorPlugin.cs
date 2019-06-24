@@ -32,6 +32,9 @@ namespace Auditor
             DiscordClient.GuildMemberUpdated += DiscordClientOnGuildMemberUpdated;
             DiscordClient.UserJoined += DiscordClientOnUserJoined;
             DiscordClient.UserLeft += DiscordClientOnUserLeft;
+
+            var nancyServer = new WebServer.NancyServer();
+            nancyServer.Start();
         }
 
         private void WriteToDatabase(AuditorSql.AuditEntry.AuditType type, ulong channelId = 0, ulong userId = 0, string contents = null,
