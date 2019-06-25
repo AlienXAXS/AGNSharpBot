@@ -50,7 +50,6 @@ namespace Auditor.WebServer
 
         public NancyEndpoints()
         {
-
             Get("/", args =>
             {
                 if (IsSessionAuthOk())
@@ -73,11 +72,10 @@ namespace Auditor.WebServer
                         AuditedDataRowCount = auditDb.Count(),
                         DeletedMessagesSaved = auditDb.Count(entry =>
                             entry.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_DELETED),
-                        ImagesSaved = auditDb.Count(x => x.ImageUrls != ""),
+                        ImagesSaved = auditDb.Count(x => x.ImageUrls != "" && x.GuildId == (long)sktGuild.Id),
                         OnlineUsers = sktGuild.Users.Count(x => x.Status != UserStatus.Offline),
                         OfflineUsers = sktGuild.Users.Count(x => x.Status == UserStatus.Offline),
-                        RecordedMessages =
-                            auditDb.Count(entry => entry.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_NEW),
+                        RecordedMessages = auditDb.Count(entry => entry.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_NEW && entry.GuildId == (long)sktGuild.Id),
                         DatabaseFileSize = $"{new System.IO.FileInfo("Data\\Auditor.db").Length} Bytes"
                     };
 
