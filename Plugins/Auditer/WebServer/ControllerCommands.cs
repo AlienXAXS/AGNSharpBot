@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -6,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using CommandHandler;
+using Discord;
 using Discord.WebSocket;
 
 namespace Auditor.WebServer
@@ -21,6 +23,46 @@ namespace Auditor.WebServer
             {
                 Failure = failure;
                 Message = message;
+            }
+        }
+
+        [Command("auditor", "Controls the Auditor plugin.")]
+        public async void AuditorPublicCmd(string[] parameters, SocketMessage sktMessage,
+            DiscordSocketClient discordSocketClient)
+        {
+            if (parameters.Length != 2)
+            {
+                await sktMessage.Channel.SendMessageAsync(
+                    "Only command this has right now is !auditor `login` which requests a new login session to be used with Nancy");
+                return;
+            }
+
+            if (parameters[1].Equals("login"))
+            {
+                var random = new Random(DateTime.Now.Millisecond);
+                var authKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 16).Select(s => s[random.Next(s.Length)]).ToArray());
+                var wsConfig = Configuration.ConfigHandler.Instance.Configuration;
+                var authDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection
+                    .Table<AuditorSql.AuditorNancyLoginSession>();
+
+                if (sktMessage.Channel is SocketGuildChannel socketGuildChannel)
+                {
+                    // Remove all old known keys that this user once had
+                    foreach (var result in authDb.ToArray())
+                    {
+                        if ( result.UserId == (long)sktMessage.Author.Id )
+                            authDb.Connection.Delete(result);
+                    }
+
+                    authDb.Connection.Insert(new AuditorSql.AuditorNancyLoginSession()
+                    {
+                        AuthKey = authKey,
+                        GuildId = (long)socketGuildChannel.Guild.Id,
+                        UserId = (long)sktMessage.Author.Id
+                    });
+
+                    await sktMessage.Author.SendMessageAsync($"AGNSharpBot Web Login Token: {wsConfig.URI}/login?key={authKey}");
+                }
             }
         }
 
@@ -74,38 +116,31 @@ namespace Auditor.WebServer
             {
                 case "help":
                     return new ReturnValue(true, "`Auditor WebServer Help`\r\n" +
-                                                          "`!auditoradmin webserver help` - This help\r\n" +
-                                                          "`!auditoradmin webserver start` - Starts the web server\r\n" +
-                                                          "`!auditoradmin webserver stop` - Stops the web server\r\n" +
-                                                          "`!auditoradmin webserver configure` - Configures the web server.  Params: ip:port autostart uri");
+                                                 "`!auditoradmin webserver help` - This help\r\n" +
+                                                 "`!auditoradmin webserver start` - Starts the web server\r\n" +
+                                                 "`!auditoradmin webserver stop` - Stops the web server");
 
                 case "start":
-                    break;
+                    try
+                    {
+                        NancyServer.Instance.Start(true);
+                        return new ReturnValue(false, $"NancyServer started successfully, you can access it via {Configuration.ConfigHandler.Instance.Configuration.URI}");
+                    }
+                    catch (Exception ex)
+                    {
+                        return new ReturnValue(true, $"Unable to start NancyServer, message was: {ex.Message}");
+                    }
 
                 case "stop":
-                    break;
-
-                case "configure":
-                    var ipPortPair = paramArray.ElementAt(1);
-                    var autoStart = paramArray.ElementAt(2).Equals("true") ? true : false;
-                    var ipPortSplit = ipPortPair.Split(':');
-                    var uri = paramArray.ElementAt(3);
-
-                    if (!IPAddress.TryParse(ipPortSplit[0], out var ipAddress))
-                        return new ReturnValue(true,"Invalid IP Address given");
-
-                    if (!int.TryParse(ipPortSplit[1], out var port))
-                        return new ReturnValue(true, "Invalid port given");
-
-                    IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-                    TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
-
-                    if (tcpConnInfoArray.Any(tcpi => tcpi.LocalEndPoint.Port == port))
-                        return new ReturnValue(true, $"Sorry, port {port} is already in use, try another.");
-
-                    Configuration.Instance.UpdateConfiguration(ipAddress, port, autoStart, uri, guildId);
-
-                    return new ReturnValue(false, "Configuration saved, you can start the webserver now with !auditoradmin webserver start.");
+                    try
+                    {
+                        NancyServer.Instance.Stop();
+                        return new ReturnValue(false, $"NancyServer stopped successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        return new ReturnValue(true, $"Unable to stop NancyServer, message was: {ex.Message}");
+                    }
 
                 default:
                     return new ReturnValue(true, "Unknown command, use help");

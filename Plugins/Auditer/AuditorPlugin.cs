@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Auditor.WebServer;
 using Discord;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
@@ -19,13 +21,16 @@ namespace Auditor
 
         public void ExecutePlugin()
         {
+            // Setup logger
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions(){Compress = true, Days = 1});
 
-            // register our SQL Tables
-            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<AuditorSql.AuditEntry>().RegisterTable<AuditorSql.WebServerSettings>();
+            // Register our SQL Tables
+            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<AuditorSql.AuditEntry>().RegisterTable<AuditorSql.AuditorNancyLoginSession>();
 
+            // Register commands
             CommandHandler.HandlerManager.Instance.RegisterHandler<WebServer.ControllerCommands>();
 
+            // Setup discord hooks
             DiscordClient.MessageDeleted += DiscordClientOnMessageDeleted;
             DiscordClient.MessageUpdated += DiscordClientOnMessageUpdated;
             DiscordClient.MessageReceived += DiscordClientOnMessageReceived;
@@ -33,8 +38,9 @@ namespace Auditor
             DiscordClient.UserJoined += DiscordClientOnUserJoined;
             DiscordClient.UserLeft += DiscordClientOnUserLeft;
 
-            var nancyServer = new WebServer.NancyServer();
-            nancyServer.Start();
+            // Start nancy
+            NancyServer.Instance.DiscordSocketClient = DiscordClient;
+            NancyServer.Instance.Start();
         }
 
         private void WriteToDatabase(AuditorSql.AuditEntry.AuditType type, ulong channelId = 0, ulong userId = 0, string contents = null,

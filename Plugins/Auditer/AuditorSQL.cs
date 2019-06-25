@@ -6,7 +6,6 @@ namespace Auditor
 
     public class AuditorSql
     {
-
         public class AuditEntry
         {
             public enum AuditType
@@ -38,12 +37,12 @@ namespace Auditor
             public string ImageUrls { get; set; }
         }
 
-        public class WebServerSettings
+        public class AuditorNancyLoginSession
         {
-            public bool Enabled { get; set; }
-            public string IpAddress { get; set; }
-            public int Port { get; set; }
-            public string URI { get; set; }
+            [PrimaryKey, AutoIncrement]
+            public int Id { get; set; }
+            public long UserId { get; set; }
+            public string AuthKey { get; set; }
             public long GuildId { get; set; }
         }
     }
