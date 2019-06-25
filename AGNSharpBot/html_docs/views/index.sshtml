@@ -1,0 +1,129 @@
+﻿@Master['MasterPage']
+
+@Section['Content']
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <h1>
+        Home        <small>Dashboard</small>
+      </h1>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+                <!-- Notifications -->
+
+                <!-- Page Content Here -->
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="row">
+                            <div class="col-md-12 col-sm-6 col-xs-12">
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-aqua"><i class="fa fa-server"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Online Users</span>
+                                        <span class="info-box-number">@Model.OnlineUsers</span>
+                                        <span class="text-muted">Offline Users: @Model.OfflineUsers</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-green"><i class="fa fa-comment"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Recorded Messages</span>
+                                        <span class="info-box-number">@Model.RecordedMessages</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+
+                            </div>
+                            <!-- /.col -->
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-12 col-sm-6 col-xs-12">
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-blue"><i class="fa fa-comment-slash"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Deleted Messages Saved</span>
+                                        <span class="info-box-number">@Model.DeletedMessagesSaved</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-purple"><i class="fa fa-images"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Images Linked / Attached Saved</span>
+                                        <span class="info-box-number">@Model.ImagesSaved</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+
+                                <div class="info-box">
+                                    <span class="info-box-icon bg-black"><i class="fa fa-database"></i></span>
+                                    <div class="info-box-content">
+                                        <span class="info-box-text">Total Amount Of Audited Data</span>
+                                        <span class="info-box-number">@Model.AuditedDataRowCount records</span>
+                                    </div>
+                                    <!-- /.info-box-content -->
+                                </div>
+                                <!-- /.info-box -->
+
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="row">
+
+                            <!-- response times -->
+                            <div class="col-md-12 col-sm-6 col-xs-12">
+
+                                <div class="box box-info">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Audited Users</h3>
+                                    </div>
+                                    <div class="box-body">
+                                        @Model.AuditedUsers Users
+                                    </div>
+                                    <!-- /.box-body -->
+                                </div>
+                            </div>
+
+                            <!-- skills graphs -->
+                            <div class="col-md-12 col-sm-6 col-xs-12">
+
+                                <div class="box">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">
+              Database Size
+            </h3>
+                                    </div>
+                                    <div class="box-body">
+                                        @Model.DatabaseFileSize
+                                    </div>
+                                </div>
+
+                            </div>
+                            <!-- /.col -->
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+            <!-- /.content -->
+@EndSection

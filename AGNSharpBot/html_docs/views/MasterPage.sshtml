@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<!-- saved from url=(0035)/home -->
+<html lang="en" style="height: auto; min-height: 100%;">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" content="z6lY2D2UjqxZKLhBFl963XN95XlQwi3XVVdSWP7M">
+
+    <title>AGNSharpBot | Home</title>
+
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.5 -->
+    <link rel="stylesheet" href="./inc/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="./inc/css/all.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="./inc/css/select2.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="./inc/css/datatables.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="./inc/css/adminlte.min.css">
+    <!-- Skin -->
+    <link rel="stylesheet" href="./inc/css/skin-black.min.css">
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <!-- SeAT CSS -->
+    <link rel="stylesheet" href="./inc/css/seat.css">
+    <!-- Custom layout CSS -->
+
+    <!-- view specific head content -->
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body class="skin-black sidebar-mini sidebar-full" style="height: auto; min-height: 100%;">
+
+    <div class="wrapper" style="height: auto; min-height: 100%;">
+
+        <!-- Main Header -->
+        <header class="main-header">
+
+            <!-- Logo -->
+            <a href="." class="logo">
+                <span class="logo-mini">AGN<b>Sharp</b>Bot</span>
+                <span class="logo-lg">AGN<b>Sharp</b>Bot</span>
+            </a>
+
+            <!-- Header Navbar -->
+            <nav class="navbar navbar-static-top">
+
+                <!-- Navbar Right Menu -->
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+
+                        <!-- Impersonation information -->
+
+
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+
+                <!-- Sidebar Menu -->
+                <ul class="sidebar-menu tree" data-widget="tree">
+                    <li class="header">Main Menu</li>
+
+                    <li class="active">
+                        <a href="/">
+                            <i class="fa fa-home"></i> <span>Home</span>
+                        </a>
+                    </li>
+
+                    <li class="treeview ">
+                        <a href="/home#">
+                            <i class="fa fa-user"></i>
+                            <span> Message Search</span>
+                            <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+
+                        </a>
+                        <ul class="treeview-menu">
+                            <li class="">
+                                <a href="/character/list">
+                                    <i class="fa fa-inbox"></i> All Messages
+                                </a>
+                            </li>
+							<li class="">
+                                <a href="/character/list">
+                                    <i class="fa fa-comments"></i> Messages By Channel
+                                </a>
+                            </li>
+                            <li class="">
+                                <a href="/character/list">
+                                    <i class="fa fa-user"></i> Messages By User
+                                </a>
+                            </li>
+                            <li class="">
+                                <a href="/character/view/mail/timeline">
+                                    <i class="fa fa-trash-alt"></i> Deleted Messages
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="treeview ">
+                        <a href="/home#">
+                            <i class="fa fa-building"></i>
+                            <span>Image Search</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+
+                            <li class="">
+                                <a href="/corporation/list">
+                                    <i class="fa fa-images"></i> All Images
+                                </a>
+                            </li>
+
+							<li class="">
+                                <a href="/corporation/list">
+                                    <i class="fa fa-comments"></i> Images by Channel
+                                </a>
+                            </li>
+							
+							<li class="">
+                                <a href="/corporation/list">
+                                    <i class="fa fa-user"></i> Images by User
+                                </a>
+                            </li>
+                            
+                            <li class="">
+                                <a href="/corporation/list">
+                                    <i class="fa fa-trash-alt"></i> Deleted Images
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
+
+           
+
+                </ul>
+                <!-- /.sidebar-menu -->
+
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper" style="min-height: 843px;">
+            @Section['Content']
+        </div>
+        <!-- /.content-wrapper -->
+        
+        <footer class="main-footer">
+
+  <!-- To the right -->
+  <div class="pull-right hidden-xs">
+    <b>Created By</b> AlienX |
+                <b>API Version</b> AGNSharpBot v0.1.5 |
+                <b>Web Version</b> 0.0.1
+  </div>
+
+  <!-- Default to the left -->
+  <strong>Copyright © 2019 | <a href="http://www.agngaming.com">AGN Gaming</a></strong>
+</footer>
+
+        <!-- Right Sidebar Content -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- right sidebar -->
+            <section class="right-sidebar">
+            </section>
+            <!-- ./right sidebar -->
+        </aside>
+        <div class="control-sidebar-bg"></div>
+    </div>
+    <!-- ./wrapper -->
+
+    <!-- Le-JavaScript -->
+
+    <!-- jQuery -->
+    <script src="./inc/js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="./inc/js/bootstrap.min.js"></script>
+    <!-- Select2 -->
+    <script src="./inc/js/select2.full.min.js"></script>
+    <!-- Bootbox -->
+    <script src="./inc/js/bootbox.min.js"></script>
+    <!-- jQuery Unveil -->
+    <script src="./inc/js/jquery.unveil.js"></script>
+    <!-- DataTables -->
+    <script src="./inc/js/datatables.min.js"></script>
+    <!-- MomentJS -->
+    <script src="./inc/js/moment-with-locales.min.js"></script>
+    <!-- ChartJS -->
+    <script src="./inc/js/chart.min.js"></script>
+    <!-- Theme JS -->
+    <script src="./inc/js/app.min.js"></script>
+    <!-- SeAT JS -->
+    <script src="./inc/js/seat.js"></script>
+
+</body>
+
+</html>

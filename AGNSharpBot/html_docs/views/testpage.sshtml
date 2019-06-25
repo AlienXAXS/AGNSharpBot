@@ -1,0 +1,11 @@
+﻿@Master['MasterPage']
+
+@Section['Content']
+    <font size="12">Hello, I am a website content area! - wheeeeeee!</font><br /><br /><hr>
+    
+    
+    @Each
+    id: @Current.Id - userid: @Current.UserId - channelid: @Current.ChannelId - contents: @Current.Contents<br />
+    @EndEach
+    
+@EndSection
