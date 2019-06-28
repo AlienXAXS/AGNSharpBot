@@ -13,22 +13,20 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <!-- Bootstrap 3.3.5 -->
-    <link rel="stylesheet" href="./inc/css/bootstrap.min.css">
+    <link rel="stylesheet" href="@Context.Request.Url.SiteBase/inc/css/bootstrap.min.css">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="./inc/css/all.css">
-    <!-- Select2 -->
-    <link rel="stylesheet" href="./inc/css/select2.min.css">
-    <!-- DataTables -->
-    <link rel="stylesheet" href="./inc/css/datatables.min.css">
+    <link rel="stylesheet" href="@Context.Request.Url.SiteBase/inc/css/all.css">
     <!-- Theme style -->
-    <link rel="stylesheet" href="./inc/css/adminlte.min.css">
+    <link rel="stylesheet" href="@Context.Request.Url.SiteBase/inc/css/adminlte.min.css">
     <!-- Skin -->
-    <link rel="stylesheet" href="./inc/css/skin-black.min.css">
+    <link rel="stylesheet" href="@Context.Request.Url.SiteBase/inc/css/skin-black.min.css">
     <!-- Google Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     <!-- SeAT CSS -->
-    <link rel="stylesheet" href="./inc/css/seat.css">
+    <link rel="stylesheet" href="@Context.Request.Url.SiteBase/inc/css/seat.css">
     <!-- Custom layout CSS -->
+
+    @Section['CSS']
 
     <!-- view specific head content -->
 
@@ -41,7 +39,6 @@
 </head>
 
 <body class="skin-black sidebar-mini sidebar-full" style="height: auto; min-height: 100%;">
-
     <div class="wrapper" style="height: auto; min-height: 100%;">
 
         <!-- Main Header -->
@@ -105,7 +102,7 @@
                                 </a>
                             </li>
                             <li class="">
-                                <a href="/character/list">
+                                <a href="/search/messages/by-user">
                                     <i class="fa fa-user"></i> Messages By User
                                 </a>
                             </li>
@@ -196,25 +193,27 @@
     <!-- Le-JavaScript -->
 
     <!-- jQuery -->
-    <script src="./inc/js/jquery.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="./inc/js/bootstrap.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/bootstrap.min.js"></script>
     <!-- Select2 -->
-    <script src="./inc/js/select2.full.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/select2.full.min.js"></script>
     <!-- Bootbox -->
-    <script src="./inc/js/bootbox.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/bootbox.min.js"></script>
     <!-- jQuery Unveil -->
-    <script src="./inc/js/jquery.unveil.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/jquery.unveil.js"></script>
     <!-- DataTables -->
-    <script src="./inc/js/datatables.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/datatables.min.js"></script>
     <!-- MomentJS -->
-    <script src="./inc/js/moment-with-locales.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/moment-with-locales.min.js"></script>
     <!-- ChartJS -->
-    <script src="./inc/js/chart.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/chart.min.js"></script>
     <!-- Theme JS -->
-    <script src="./inc/js/app.min.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/app.min.js"></script>
     <!-- SeAT JS -->
-    <script src="./inc/js/seat.js"></script>
+    <script src="@Context.Request.Url.SiteBase/inc/js/seat.js"></script>
+
+    @Section['Javascript']
 
 </body>
 

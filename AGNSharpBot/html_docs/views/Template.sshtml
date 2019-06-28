@@ -1,0 +1,16 @@
+﻿@Master['MasterPage']
+
+@Section['Content']
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <h1>
+        Home        <small>Dashboard</small>
+      </h1>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+
+            </section>
+            <!-- /.content -->
+@EndSection
