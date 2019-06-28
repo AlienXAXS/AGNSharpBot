@@ -28,7 +28,10 @@ namespace Auditor
             public AuditType Type { get; set; }
             public DateTime Timestamp { get; set; }
             public long UserId { get; set; }
+            public string UserName { get; set; }
+            public string Nickname { get; set; }
             public long ChannelId { get; set; }
+            public string ChannelName { get; set; }
             public string Contents { get; set; }
             public string PreviousContents { get; set; }
             public long MessageId { get; set; }

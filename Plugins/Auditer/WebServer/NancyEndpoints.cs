@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.Remoting.Messaging;
+using System.Security.Cryptography.X509Certificates;
 using Auditor.WebServer.Models;
+using Auditor.WebServer.Models.Messages;
 using Discord;
 using Discord.WebSocket;
 using Nancy;
@@ -31,9 +31,6 @@ namespace Auditor.WebServer
             var strGuildId = Request.Session["DiscordGuildId"]?.ToString();
             if (strGuildId == null) return null;
 
-            if (strGuildId == null)
-                return null;
-
             if (ulong.TryParse(strGuildId, out var discordGuildId))
             {
                 return NancyServer.Instance.DiscordSocketClient.GetGuild(discordGuildId);
@@ -55,7 +52,6 @@ namespace Auditor.WebServer
                 if (IsSessionAuthOk())
                 {
                     // Create our model
-
                     var sktGuild = GetDiscordGuildFromSession();
                     if (sktGuild == null)
                     {
@@ -63,35 +59,41 @@ namespace Auditor.WebServer
                         return "Cannot find your discord guild id. You have been logged out!";
                     }
 
-                    var auditDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection
-                        .Table<AuditorSql.AuditEntry>();
+                    var sktGuildId = (long) sktGuild.Id;
+                    
+                    var auditDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql.AuditEntry>();
 
-                    var homepageModel = new Models.HomepageModel
-                    {
-                        AuditedUsers = sktGuild.Users.Count,
-                        AuditedDataRowCount = auditDb.Count(),
-                        DeletedMessagesSaved = auditDb.Count(entry =>
-                            entry.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_DELETED),
-                        ImagesSaved = auditDb.Count(x => x.ImageUrls != "" && x.GuildId == (long)sktGuild.Id),
-                        OnlineUsers = sktGuild.Users.Count(x => x.Status != UserStatus.Offline),
-                        OfflineUsers = sktGuild.Users.Count(x => x.Status == UserStatus.Offline),
-                        RecordedMessages = auditDb.Count(entry => entry.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_NEW && entry.GuildId == (long)sktGuild.Id),
-                        DatabaseFileSize = $"{new System.IO.FileInfo("Data\\Auditor.db").Length} Bytes"
-                    };
+                    var homepageModel = new Models.HomepageModel();
+                    homepageModel.AuditedUsers = sktGuild.Users.Count;
+
+                    homepageModel.AuditedDataRowCount = auditDb.Count();
+
+                    homepageModel.DeletedMessagesSaved = auditDb.Count(entry =>
+                        entry.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_DELETED);
+
+                    homepageModel.ImagesSaved = auditDb.Count(x => x.ImageUrls != "" && x.GuildId == sktGuildId);
+
+                    homepageModel.OnlineUsers = sktGuild.Users.Count(x => x.Status != UserStatus.Offline);
+
+                    homepageModel.OfflineUsers = sktGuild.Users.Count(x => x.Status == UserStatus.Offline);
+
+                    homepageModel.RecordedMessages = auditDb.Count(entry => entry.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_NEW && entry.GuildId == sktGuildId);
+
+                    homepageModel.DatabaseFileSize = $"{new System.IO.FileInfo("Data\\Auditor.db").Length} Bytes";
 
                     return View["Index", homepageModel];
                 }
                 else
-                    return View["NoAuth", this.Request.Url];
+                    return Response.AsRedirect("/NoAuth");
             });
+
+            Get("/NoAuth", args => View["NoAuth"]);
 
             Get("/login", args =>
             {
                 // If we're already authed, do not do it again
                 if (IsSessionAuthOk())
-                {
                     return Response.AsRedirect("/");
-                }
 
                 var request = this.Bind<RequestObjects.LoginRequest>();
 
@@ -109,37 +111,160 @@ namespace Auditor.WebServer
                 }
                 else
                 {
-                    return View["NoAuth", this.Request.Url];
+                    return Response.AsRedirect("/NoAuth");
                 }
             });
 
-            Get("/test", args =>
+            Get("/search/messages/by-user", args =>
             {
-                List<Models.TestList> users = new List<TestList>();
-
-                var dbEntries = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql.AuditEntry>()
-                    .ToList();
-
-                foreach (var dbEntry in dbEntries)
+                if (IsSessionAuthOk())
                 {
-                    users.Add(new TestList()
+                    var sktGuild = GetDiscordGuildFromSession();
+                    if (sktGuild == null)
                     {
-                        ChannelId = dbEntry.ChannelId,
-                        Contents = dbEntry.Contents != null ? HttpUtility.HtmlEncode(dbEntry.Contents).Replace("@", "&#64;") : "",
-                        GuildId = dbEntry.GuildId,
-                        Id = dbEntry.Id,
-                        ImageUrls = dbEntry.ImageUrls,
-                        Type = dbEntry.Type.ToString(),
-                        PreviousContents = HttpUtility.HtmlEncode(dbEntry.PreviousContents),
-                        Timestamp = HttpUtility.HtmlEncode(dbEntry.Timestamp.ToString()),
-                        UserId = dbEntry.UserId,
-                        Notes = dbEntry.Notes,
-                        MessageId = dbEntry.MessageId
-                    });
+                        DeauthSession();
+                        return "Cannot find your discord guild id. You have been logged out!";
+                    }
+
+                    Models.Messages.ByUser model;
+                    try
+                    {
+                        model = GenerateByUserModel(sktGuild);
+                    }
+                    catch (Exception ex)
+                    {
+                        model = new ByUser()
+                        {
+                            IsErrored = true,
+                            ErrorMessage = ex.Message
+                        };
+                    }
+
+                    return View["Messages_ByUser", model];
+                }
+                else
+                    return Response.AsRedirect("/NoAuth");
+            });
+
+            Post("/search/messages/by-user", args =>
+            {
+                var sktGuild = GetDiscordGuildFromSession();
+                if (sktGuild == null)
+                {
+                    DeauthSession();
+                    return "Cannot find your discord guild id. You have been logged out!";
                 }
 
-                return View["testpage", users];
+                Models.Messages.ByUser model;
+                try
+                {
+                    model = GenerateByUserModel(sktGuild);
+                }
+                catch (Exception ex)
+                {
+                    model = new ByUser()
+                    {
+                        IsErrored = true,
+                        ErrorMessage =  ex.Message
+                    };
+                }
+
+                return View["Messages_ByUser", model];
             });
+        }
+
+        private Models.Messages.ByUser GenerateByUserModel(SocketGuild sktGuild)
+        {
+            var model = new Models.Messages.ByUser();
+
+            // Generate the drop down list of users
+            var users = sktGuild.Users;
+            foreach (var user in users.OrderBy(x => x.Username))
+            {
+                model.Users.Add(new Models.Messages.UserMakeup(user.Username, user.Nickname, user.Id));
+            }
+
+            // See if we have results
+            if (Context.Request.Method.Equals("POST"))
+            {
+                var postData = this.Bind<Models.Messages.PostData>();
+
+                foreach (var user in model.Users )
+                {
+                    if (user.Id.ToString() == postData.User)
+                    {
+                        user.MakeSelected();
+                    }
+                }
+
+                DateTime.TryParse(postData.DatetimeRange_From, out var dtFrom);
+                DateTime.TryParse(postData.DatetimeRange_To, out var dtTo);
+
+                var auditDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql.AuditEntry>();
+
+                long gId = (long) sktGuild.Id;
+
+                if (!long.TryParse(postData.User, out var uId))
+                    throw new Exception("Cannot convert user to Long, oopsie!");
+
+                var foundAudits = auditDb.DefaultIfEmpty(null).Where(x => x != null && x.GuildId == gId && x.UserId == uId).ToList().OrderByDescending(x => x.Timestamp);
+
+                Dictionary<string, SocketGuildUser> userMemory = new Dictionary<string, SocketGuildUser>();
+                Dictionary<string, string> channelMemory = new Dictionary<string, string>();
+
+                foreach (var audit in foundAudits)
+                {
+                    if (audit.Type != AuditorSql.AuditEntry.AuditType.MESSAGE_NEW &&
+                        audit.Type != AuditorSql.AuditEntry.AuditType.MESSAGE_DELETED &&
+                        audit.Type != AuditorSql.AuditEntry.AuditType.MESSAGE_MODIFIED) continue;
+
+                    audit.Contents = HttpUtility.HtmlEncode(audit.Contents).Replace("@", "&#64;");
+                    audit.Notes = HttpUtility.HtmlEncode(audit.Contents).Replace("@", "&#64;");
+
+                    if ((postData.DatetimeRange_From != null && postData.DatetimeRange_To != null))
+                        if ( !(audit.Timestamp.Ticks > dtFrom.Ticks && audit.Timestamp.Ticks < dtTo.Ticks) ) continue;
+
+                    if (!channelMemory.ContainsKey(audit.ChannelId.ToString()))
+                    {
+                        var foundChannel = sktGuild.GetChannel((ulong) audit.ChannelId);
+                        if (foundChannel == null)
+                        {
+                            if (audit.ChannelName == null)
+                            {
+                                audit.ChannelName = foundChannel.Name;
+                                auditDb.Connection.Update(audit); //Update the record in the DB itself
+                                channelMemory.Add(audit.ChannelId.ToString(), foundChannel.Name);
+                            }
+                        }
+                        else
+                        {
+                            channelMemory.Add(audit.ChannelId.ToString(), audit.ChannelName ?? "Unknown Channel");
+                            audit.ChannelName = foundChannel.Name;
+
+                            if (audit.ChannelName == null )
+                                auditDb.Connection.Update(audit); //Update the record in the DB itself
+                        }
+                    }
+                    else
+                    {
+                        audit.ChannelName = channelMemory[audit.ChannelId.ToString()];
+                    }
+
+                    if (userMemory.ContainsKey(postData.User))
+                    {
+                        model.Results.Add(new SearchResults(audit, userMemory[postData.User]));
+                    }
+                    else
+                    {
+                        var sktUser = sktGuild.GetUser(Convert.ToUInt64(postData.User));
+                        userMemory.Add(postData.User, sktUser);
+
+                        model.Results.Add(new SearchResults(audit, sktUser));
+                    }
+                }
+            }
+
+            return model;
         }
     }
 }

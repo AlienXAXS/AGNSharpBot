@@ -89,6 +89,8 @@
     <Compile Include="WebServer\Configuration\StartupConfig.cs" />
     <Compile Include="WebServer\ControllerCommands.cs" />
     <Compile Include="WebServer\Models\HomepageModel.cs" />
+    <Compile Include="WebServer\Models\Messages\ByUser.cs" />
+    <Compile Include="WebServer\Models\Messages\PostData.cs" />
     <Compile Include="WebServer\Models\TestList.cs" />
     <Compile Include="WebServer\NancyServer.cs" />
     <Compile Include="WebServer\NancyEndpoints.cs" />
