@@ -188,6 +188,7 @@ namespace HomeLabReporting.SNMP
         public void Dispose()
         {
             _trapReceiverTask?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }
