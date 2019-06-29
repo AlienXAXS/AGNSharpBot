@@ -12,6 +12,8 @@ mkdir .\Release_Builder\x86 > NUL
 copy /Y .\AGNSharpBot\bin\Release\x64\* .\Release_Builder\x64\* > NUL
 copy /Y .\AGNSharpBot\bin\Release\x86\* .\Release_Builder\x86\* > NUL
 
+xcopy AGNSharpBot\html_docs Release_Builder\html_docs /E /I
+
 echo Creating plugins directory 
 mkdir .\Release_Builder\Plugins > NUL
 
