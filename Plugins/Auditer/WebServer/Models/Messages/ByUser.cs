@@ -51,7 +51,10 @@ namespace Auditor.WebServer.Models.Messages
                 sktGuildUser.Nickname == null ? sktGuildUser.Username :
                 $"{sktGuildUser.Username} ({sktGuildUser.Nickname})";
 
-            Message = audit.Contents;
+            if (audit.Type == AuditorSql.AuditEntry.AuditType.MESSAGE_MODIFIED)
+                Message = $"{audit.PreviousContents} -> {audit.Contents}";
+            else
+                Message = audit.Contents;
 
             switch (audit.Type)
             {

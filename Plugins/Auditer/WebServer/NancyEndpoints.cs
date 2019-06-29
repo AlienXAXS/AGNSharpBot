@@ -219,7 +219,7 @@ namespace Auditor.WebServer
                         audit.Type != AuditorSql.AuditEntry.AuditType.MESSAGE_MODIFIED) continue;
 
                     audit.Contents = HttpUtility.HtmlEncode(audit.Contents).Replace("@", "&#64;");
-                    audit.Notes = HttpUtility.HtmlEncode(audit.Contents).Replace("@", "&#64;");
+                    audit.Notes = HttpUtility.HtmlEncode(audit.Notes).Replace("@", "&#64;");
 
                     if ((postData.DatetimeRange_From != null && postData.DatetimeRange_To != null))
                         if ( !(audit.Timestamp.Ticks > dtFrom.Ticks && audit.Timestamp.Ticks < dtTo.Ticks) ) continue;
@@ -231,23 +231,33 @@ namespace Auditor.WebServer
                         {
                             if (audit.ChannelName == null)
                             {
-                                audit.ChannelName = foundChannel.Name;
+                                audit.ChannelName = "Unknown Channel";
                                 auditDb.Connection.Update(audit); //Update the record in the DB itself
-                                channelMemory.Add(audit.ChannelId.ToString(), foundChannel.Name);
+                                channelMemory.Add(audit.ChannelId.ToString(), "Unknown Channel");
                             }
                         }
                         else
                         {
-                            channelMemory.Add(audit.ChannelId.ToString(), audit.ChannelName ?? "Unknown Channel");
-                            audit.ChannelName = foundChannel.Name;
+                            channelMemory.Add(audit.ChannelId.ToString(), foundChannel.Name);
 
-                            if (audit.ChannelName == null )
+                            if (audit.ChannelName == null)
+                            {
+                                audit.ChannelName = foundChannel.Name;
                                 auditDb.Connection.Update(audit); //Update the record in the DB itself
+                            }
                         }
                     }
                     else
                     {
-                        audit.ChannelName = channelMemory[audit.ChannelId.ToString()];
+                        if (audit.ChannelName == null)
+                        {
+                            audit.ChannelName = channelMemory[audit.ChannelId.ToString()];
+                            auditDb.Connection.Update(audit); //Update the record in the DB itself
+                        }
+                        else
+                        {
+                            audit.ChannelName = channelMemory[audit.ChannelId.ToString()];
+                        }
                     }
 
                     if (userMemory.ContainsKey(postData.User))
