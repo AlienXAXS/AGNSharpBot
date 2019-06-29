@@ -161,7 +161,7 @@ namespace Auditor
             if (sktChannel is SocketGuildChannel socketGuildChannel)
                 guildId = socketGuildChannel.Guild.Id;
 
-            WriteToDatabase(AuditorSql.AuditEntry.AuditType.MESSAGE_DELETED, sktChannel.Id, message.Value.Id, message.Value.Content, messageId: message.Value.Id, notes: $"Message Deleted by {message.Value.Author.Username} in channel {message.Value.Channel.Name}", guildId: guildId, Username: message.Value.Author.Username, ChannelName: sktChannel.Name);
+            WriteToDatabase(AuditorSql.AuditEntry.AuditType.MESSAGE_DELETED, sktChannel.Id, message.Value.Author.Id, message.Value.Content, messageId: message.Value.Id, notes: $"Message Deleted by {message.Value.Author.Username} in channel {message.Value.Channel.Name}", guildId: guildId, Username: message.Value.Author.Username, ChannelName: sktChannel.Name);
 
             return Task.CompletedTask;
         }
