@@ -46,12 +46,16 @@
 
             <!-- Logo -->
             <a href="." class="logo">
-                <span class="logo-mini">AGN<b>Sharp</b>Bot</span>
+                <span class="logo-mini">A<b>S</b>B</span>
                 <span class="logo-lg">AGN<b>Sharp</b>Bot</span>
             </a>
 
             <!-- Header Navbar -->
             <nav class="navbar navbar-static-top">
+
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="fa fa-angle-left pull-right"> Toggle navigation</span>
+                </a>
 
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
