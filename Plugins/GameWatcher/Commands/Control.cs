@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,16 +64,38 @@ namespace GameWatcher.Commands
                     ScanUsers(discordSocketClient, sktMessage);
                     break;
 
-                case "debug":
+                case "rolepos":
                     var msg = "";
-                    foreach ( var x in discordSocketClient.Guilds )
+                    foreach (var x in discordSocketClient.Guilds)
                     foreach (var y in x.Roles)
                     {
-                        if ( !y.IsEveryone )
+                        if (!y.IsEveryone)
                             msg += $"{y.Name} = {y.Position}\r\n";
                     }
 
                     await sktMessage.Channel.SendMessageAsync(msg);
+                    break;
+
+                case "showmemory":
+                    var mem = GameHandler.Instance.GetMemory();
+
+                    var memOutput = "Memory Output:";
+                    if (sktMessage.Channel is SocketGuildChannel sktGuildChannel)
+                    {
+                        foreach (var m in mem)
+                        {
+                            var user = discordSocketClient.GetUser(m.Key);
+                            var role = sktGuildChannel.Guild.Roles.DefaultIfEmpty(null).First(x => x.Id == m.Value);
+
+                            var roleName = role != null ? role.Name : "Unknown Role Name";
+                            var userName = user != null ? user.Username : "Unknown User Name";
+
+                            memOutput += $"User {userName}({m.Key}) is in role {roleName}({m.Value})\r\n";
+                        }
+                    }
+
+                    await sktMessage.Channel.SendMessageAsync(memOutput);
+
                     break;
             }
         }
@@ -83,9 +106,23 @@ namespace GameWatcher.Commands
             await sktMessage.Channel.SendMessageAsync(
                 "Scanning every guild for users playing games that exist in the database");
 
-            foreach ( var guild in discordSocketClient.Guilds)
-                foreach ( var user in guild.Users )
-                    GameHandler.Instance.GameScan(user, user);
+            foreach (var guild in discordSocketClient.Guilds)
+            {
+
+                var uList = guild.Users.ToList();
+
+                foreach (var user in uList)
+                {
+                    try
+                    {
+                        await GameHandler.Instance.GameScan(user, user);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Print(ex.Message);
+                    }
+                }
+            }
 
             await sktMessage.Channel.SendMessageAsync("Scan completed");
         }

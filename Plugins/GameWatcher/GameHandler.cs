@@ -9,7 +9,8 @@ using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using GameWatcher.DB;
-using GlobalLogger;
+using GlobalLogger.AdvancedLogger;
+using Logger = GlobalLogger.Logger;
 
 namespace GameWatcher
 {
@@ -21,13 +22,20 @@ namespace GameWatcher
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly Dictionary<ulong, ulong> _roleMemory = new Dictionary<ulong, ulong>();
 
-        public async void GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool firstRun = false)
+        public Dictionary<ulong, ulong> GetMemory()
+        {
+            return _roleMemory;
+        }
+
+        public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool firstRun = false)
         {
             try
             {
+                await _semaphoreSlim.WaitAsync();
+
                 // As we're dealing with adding/deleting roles, we should make this thread-safe to ensure roles exist before adding people to a role.
                 // Reason for this, is if multiple people start a game at the same time, we must execute them one at a time.
-                await _semaphoreSlim.WaitAsync();
+                //await _semaphoreSlim.WaitAsync();
 
                 // Grab the guild
                 if (newGuildUser.Guild is SocketGuild socketGuild)
@@ -84,8 +92,7 @@ namespace GameWatcher
                                     // Create the new role, and add the user to it
                                     newRole =
                                         await socketGuild.CreateRoleAsync(gameName, isHoisted: true, color: Color.Red);
-                                    await newRole.ModifyAsync(properties =>
-                                        properties.Position = socketGuild.Roles.Count - 1);
+                                    await newRole.ModifyAsync(properties => properties.Position = socketGuild.Roles.Count - 2);
                                     
                                     await newGuildUser.AddRoleAsync(newRole);
                                     _roleMemory.Add(newGuildUser.Id, newRole.Id);
@@ -93,10 +100,7 @@ namespace GameWatcher
                                 catch (Exception ex)
                                 {
                                     // Something weird happened, delete the role that was made.
-                                    if (newRole != null)
-                                    {
-                                        await newRole.DeleteAsync();
-                                    }
+                                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Exception while creating role for {gameName}: {ex.Message}");
                                 }
                             }
                         }

@@ -24,11 +24,6 @@ namespace GameWatcher
         
         public void ExecutePlugin()
         {
-
-#if DEBUG
-            return;
-#endif
-
             try
             {
                 AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
