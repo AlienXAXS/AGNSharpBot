@@ -30,6 +30,14 @@ namespace Auditor.WebServer
         public async void AuditorPublicCmd(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
+
+            if (!NancyServer.Instance.GetServerRunning())
+            {
+                await sktMessage.Channel.SendMessageAsync(
+                    $"Sorry {sktMessage.Author.Username} but while the Auditor is logging for your discord server, the web server has been configured yet.");
+                return;
+            }
+
             if (parameters.Length != 2)
             {
                 await sktMessage.Channel.SendMessageAsync(

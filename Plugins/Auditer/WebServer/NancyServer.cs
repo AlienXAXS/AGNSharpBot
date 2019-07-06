@@ -30,6 +30,11 @@ namespace Auditor.WebServer
         private bool _stopRequested = false;
         private bool _serverRunning = false;
 
+        public bool GetServerRunning()
+        {
+            return _serverRunning;
+        }
+
         public void Stop()
         {
             if (!_serverRunning)
@@ -88,6 +93,11 @@ namespace Auditor.WebServer
             {
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"NancyServer Start Error: {ex.Message}");
             }
+        }
+
+        public void Dispose()
+        {
+            _stopRequested = true;
         }
     }
 
