@@ -168,7 +168,7 @@ namespace Auditor
 
         public void Dispose()
         {
-            
+            NancyServer.Instance.Dispose();
         }
     }
 }
