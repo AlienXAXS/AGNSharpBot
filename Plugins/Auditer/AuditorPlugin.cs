@@ -9,7 +9,8 @@ using Auditor.WebServer;
 using Discord;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
-using PluginInterface;
+using Interface;
+using PluginManager;
 
 namespace Auditor
 {
@@ -17,7 +18,7 @@ namespace Auditor
     public class Plugin : IPlugin
     {
         public string Name => "Auditor";
-        public DiscordSocketClient DiscordClient { get; set; }
+        public EventRouter EventRouter { get; set; }
 
         public void ExecutePlugin()
         {
@@ -31,15 +32,15 @@ namespace Auditor
             CommandHandler.HandlerManager.Instance.RegisterHandler<WebServer.ControllerCommands>();
 
             // Setup discord hooks
-            DiscordClient.MessageDeleted += DiscordClientOnMessageDeleted;
-            DiscordClient.MessageUpdated += DiscordClientOnMessageUpdated;
-            DiscordClient.MessageReceived += DiscordClientOnMessageReceived;
-            DiscordClient.GuildMemberUpdated += DiscordClientOnGuildMemberUpdated;
-            DiscordClient.UserJoined += DiscordClientOnUserJoined;
-            DiscordClient.UserLeft += DiscordClientOnUserLeft;
+            EventRouter.MessageDeleted += DiscordClientOnMessageDeleted;
+            EventRouter.MessageUpdated += DiscordClientOnMessageUpdated;
+            EventRouter.MessageReceived += DiscordClientOnMessageReceived;
+            EventRouter.GuildMemberUpdated += DiscordClientOnGuildMemberUpdated;
+            EventRouter.UserJoined += DiscordClientOnUserJoined;
+            EventRouter.UserLeft += DiscordClientOnUserLeft;
 
             // Start nancy
-            NancyServer.Instance.DiscordSocketClient = DiscordClient;
+            NancyServer.Instance.DiscordSocketClient = EventRouter.GetDiscordSocketClient();
             NancyServer.Instance.Start();
         }
 

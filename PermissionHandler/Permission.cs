@@ -7,7 +7,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
 using PermissionHandler.DB;
-using Logger = GlobalLogger.Logger;
 
 namespace PermissionHandler
 {

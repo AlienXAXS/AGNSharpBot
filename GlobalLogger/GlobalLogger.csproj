@@ -153,7 +153,6 @@
     <Compile Include="AdvancedLogger\Logger.cs" />
     <Compile Include="AdvancedLogger\RetentionOptions.cs" />
     <Compile Include="Configuration\Discord.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

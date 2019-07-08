@@ -6,13 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using HtmlAgilityPack;
-using PluginInterface;
+using Interface;
+using PluginManager;
 
 namespace GameUpdateNotifier
 {
     [Export(typeof(IPlugin))]
     public class Plugin : IPlugin
     {
+        public EventRouter EventRouter { get; set; }
         public string Name => "GameUpdateNotifier";
         public DiscordSocketClient DiscordClient { get; set; }
         public void ExecutePlugin()

@@ -24,7 +24,7 @@ namespace Auditor
             }
 
             [PrimaryKey, AutoIncrement]
-            public int Id { get; set; }
+            public long Id { get; set; }
             public AuditType Type { get; set; }
             public DateTime Timestamp { get; set; }
             public long UserId { get; set; }

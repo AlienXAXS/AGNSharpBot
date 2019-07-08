@@ -1,5 +1,6 @@
 ﻿using CommandHandler;
 using GlobalLogger.AdvancedLogger;
+using Interface;
 
 namespace HomeLabReporting
 {
@@ -8,13 +9,11 @@ namespace HomeLabReporting
     using System.ComponentModel.Composition;
     using System.Threading.Tasks;
     using Discord.WebSocket;
-    using PluginInterface;
 
     [Export(typeof(IPlugin))]
     public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "AlienX's HomeLab Reporting";
-        public DiscordSocketClient DiscordClient { get; set; }
 
         public void ExecutePlugin()
         {

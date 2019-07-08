@@ -106,9 +106,8 @@ namespace PermissionHandler
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.Log(
-                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to load permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}",
-                        Logger.LoggerType.ConsoleAndDiscord).Wait();
+                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(
+                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to load permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}");
                 }
             }
         }
@@ -124,9 +123,7 @@ namespace PermissionHandler
                 }
                 catch (Exception ex)
                 {
-                    Logger.Instance.Log(
-                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to save permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}",
-                        Logger.LoggerType.ConsoleAndDiscord).Wait();
+                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to save permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}");
                 }
             }
         }

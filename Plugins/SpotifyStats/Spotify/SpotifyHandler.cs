@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using GlobalLogger;
+using PluginManager;
 
 namespace SpotifyStats.Spotify
 {
@@ -19,12 +20,10 @@ namespace SpotifyStats.Spotify
 
         private InternalDatabase.Connection dbConnection;
 
-        public DiscordSocketClient _discordSocketClient;
-        public void SetupDiscordInstance(DiscordSocketClient discordSocket)
+        public void SetupDiscordInstance(EventRouter discordSocket)
         {
-            _discordSocketClient = discordSocket;
-            _discordSocketClient.GuildMemberUpdated += OnGuildMemberUpdated;
-            _discordSocketClient.UserLeft += DiscordSocketClientOnUserLeft;
+            discordSocket.GuildMemberUpdated += OnGuildMemberUpdated;
+            discordSocket.UserLeft += DiscordSocketClientOnUserLeft;
 
             dbConnection = InternalDatabase.Handler.Instance.GetConnection();
         }
@@ -69,8 +68,7 @@ namespace SpotifyStats.Spotify
                 if (newMember.Activity?.Type == ActivityType.Listening)
                 {
                     // It's spotify listing type
-                    await Logger.Instance.Log($"User {newMember.Username} is listening to spotify",
-                        Logger.LoggerType.ConsoleOnly);
+                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"User {newMember.Username} is listening to spotify");
 
                     if (newMember.Activity is SpotifyGame spotifyGame)
                     {
@@ -89,9 +87,7 @@ namespace SpotifyStats.Spotify
                         discordEmbedBuilder.AddField("Person Listening",
                             newMember?.Nickname ?? newMember.Username, true);
 
-                        await Logger.Instance.Log(
-                            $"User {newMember.Username} Listening to Spotify | SID:{spotifyGame.SessionId} | ID: {spotifyGame.TrackId} | A:{spotifyGame.Artists.First()} | T: {spotifyGame.TrackTitle}",
-                            Logger.LoggerType.ConsoleOnly);
+                        GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"User {newMember.Username} Listening to Spotify | SID:{spotifyGame.SessionId} | ID: {spotifyGame.TrackId} | A:{spotifyGame.Artists.First()} | T: {spotifyGame.TrackTitle}");
 
                         var outputString = "";
                         for (var i = 0; i <= topUsersList.Count - 1; i++)
@@ -102,15 +98,14 @@ namespace SpotifyStats.Spotify
 
                         discordEmbedBuilder.AddField("Top Users", outputString);
                         
-                        await Logger.Instance.Log(null, Logger.LoggerType.ConsoleAndDiscord,
-                            discordEmbed: discordEmbedBuilder.Build());
+                        //TODO: Fix this shit
+                        //GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(null, GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.LoggerType.ConsoleAndDiscord, discordEmbed: discordEmbedBuilder.Build());
                     }
                 }
             }
             catch(Exception ex)
             {
-                await Logger.Instance.Log($"FATAL EXCEPTION\r\n{ex.Message}\r\n\r\nSTACK:\r\n{ex.StackTrace}))",
-                    Logger.LoggerType.ConsoleAndDiscord);
+                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"FATAL EXCEPTION\r\n{ex.Message}\r\n\r\nSTACK:\r\n{ex.StackTrace}))");
             }
         }
     }

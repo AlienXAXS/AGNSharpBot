@@ -11,21 +11,26 @@ using Discord;
 using Discord.WebSocket;
 using GameWatcher.DB;
 using GlobalLogger.AdvancedLogger;
-using PluginInterface;
-using Logger = GlobalLogger.Logger;
+using Interface;
+using PluginManager;
 
 namespace GameWatcher
 {
     [Export(typeof(IPlugin))]
     public class GameWatcher : IPlugin
     {
-
+        public EventRouter EventRouter { get; set; }
         public string Name => "GameWatcher";
-        
+
+
+        private DiscordSocketClient _discordClient;
+
         public void ExecutePlugin()
         {
             try
             {
+                _discordClient = EventRouter.GetDiscordSocketClient();
+
                 AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
                     .SetRetentionOptions(new RetentionOptions() {Compress = true});
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER] Checking Discord...");
@@ -33,7 +38,7 @@ namespace GameWatcher
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]  >  Complete");
 
                 CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Control>();
-                DiscordClient.GuildMemberUpdated += DiscordClientOnGuildMemberUpdatedEvent;
+                EventRouter.GuildMemberUpdated += DiscordClientOnGuildMemberUpdatedEvent;
             }
             catch (Exception ex)
             {
@@ -50,7 +55,7 @@ namespace GameWatcher
         private async Task CheckDiscord()
         {
             // Scan for existing roles with the "Playing:" prefix, and delete them.
-            foreach (var guild in DiscordClient.Guilds)
+            foreach (var guild in _discordClient.Guilds)
             {
 
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]   > Checking guild {guild.Name}...");
@@ -73,13 +78,11 @@ namespace GameWatcher
             }
         }
 
-
         private async Task DiscordClientOnGuildMemberUpdated(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool firstRun = false)
         {
-            GameHandler.Instance.GameScan(oldGuildUser, newGuildUser, firstRun);
+            await GameHandler.Instance.GameScan(oldGuildUser, newGuildUser, firstRun);
         }
 
-        public DiscordSocketClient DiscordClient { get; set; }
         public void Dispose()
         {
             

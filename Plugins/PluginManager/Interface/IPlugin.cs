@@ -2,16 +2,14 @@
 using System.Threading.Tasks;
 using Discord.WebSocket;
 
-namespace PluginInterface
+namespace Interface
 {
     public interface IPlugin
     {
         string Name { get; }
         void ExecutePlugin();
-
-        DiscordSocketClient DiscordClient { get; set; }
-
         void Dispose();
+        PluginManager.EventRouter EventRouter { get; set; }
     }
 
     public class PluginRequestTypes

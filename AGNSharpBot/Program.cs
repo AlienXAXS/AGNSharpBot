@@ -3,12 +3,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AGNSharpBot.DiscordHandler;
-using AGNSharpBot.PluginHandler;
 using CommandHandler;
 using Discord;
 using GlobalLogger.AdvancedLogger;
-using Logger = GlobalLogger.Logger;
-
 
 namespace AGNSharpBot
 {
@@ -25,7 +22,10 @@ namespace AGNSharpBot
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fatal Error: {ex.Message}\r\n\r\n{ex.StackTrace}");
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"Fatal Error: {ex.Message}\r\n\r\n{ex.StackTrace}");
+
+                if ( ex.InnerException != null )
+                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Inner Exception Error: {ex.InnerException.Message}\r\n\r\n{ex.InnerException.StackTrace}");
             }
         }
         private readonly Client _discordClient = Client.Instance;
@@ -54,7 +54,7 @@ namespace AGNSharpBot
                 case CtrlType.CTRL_SHUTDOWN_EVENT:
                 case CtrlType.CTRL_CLOSE_EVENT:
                     Client.Instance.Dispose();
-                    PluginManager.Instance.Dispose();
+                    PluginManager.PluginHandler.Instance.Dispose();
                     GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log("Shutting down application...");
                     System.Threading.Thread.Sleep(1500);
                     _running = false;
@@ -80,6 +80,22 @@ namespace AGNSharpBot
             try
             {
                 Configuration.Discord.Instance.LoadConfiguration();
+
+                // Get our discord service definitions
+                var serviceHandler = new ServiceDefiner();
+
+                // Start our discord client
+                logger.Log("Loading Discord");
+                _discordClient.InitDiscordClient(serviceHandler.GetServiceProvider());
+                HandlerManager.Instance.RegisterDiscord(Client.Instance.GetDiscordSocket());
+
+                // Load plugins
+                PluginManager.PluginHandler.Instance.DiscordSocketClient = _discordClient.GetDiscordSocket();
+                PluginManager.PluginHandler.Instance.LoadPlugins();
+
+                logger.Log("Connecting to Discord");
+                await _discordClient.Connect();
+                await GetUserInputAsync();
             }
             catch (Configuration.Exceptions.MissingConfigurationFile)
             {
@@ -97,21 +113,7 @@ namespace AGNSharpBot
                 return;
             }
 
-            // Get our discord service definitions
-            var serviceHandler = new ServiceDefiner();
-
-            // Start our discord client
-            logger.Log("Loading Discord");
-            _discordClient.InitDiscordClient(serviceHandler.GetServiceProvider());
-            Logger.Instance.SetDiscordClient(Client.Instance.GetDiscordSocket());
-            HandlerManager.Instance.RegisterDiscord(Client.Instance.GetDiscordSocket());
-
-            // Load plugins
-            PluginManager.Instance.LoadPlugins();
-
-            logger.Log("Connecting to Discord");
-            await _discordClient.Connect();         
-            await GetUserInputAsync();
+            
         }
 
         private async Task GetUserInputAsync()
@@ -126,13 +128,10 @@ namespace AGNSharpBot
 
                     if ( discordClient == null) continue;
 
-                    var totalUsers = 0;
-                    foreach (var guild in discordClient.Guilds)
-                        totalUsers += guild.Users.Count;
-
+                    var totalUsers = discordClient.Guilds.Sum(guild => guild.MemberCount);
 
                     Console.Title =
-                        $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.Instance.GetPlugins().Count()}";
+                        $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.PluginHandler.Instance.GetPlugins().Count()}";
 
                 }
                 catch (Exception)

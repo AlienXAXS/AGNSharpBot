@@ -48,8 +48,8 @@ namespace Auditor.WebServer
             if (_serverRunning)
                 throw new Exception("NancyServer is already running");
 
-            if ( DiscordSocketClient == null )
-                throw new Exception("DiscordSocketClient not set - unable to start Nancy");
+            //if ( DiscordSocketClient == null )
+                //throw new Exception("DiscordSocketClient not set - unable to start Nancy");
 
             try
             {

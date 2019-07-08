@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
+using PluginManager;
 using Responses.SQLTables;
 
 namespace Responses.Informational
@@ -13,7 +14,7 @@ namespace Responses.Informational
     class LastOnlineDbHandler
     {
 
-        public Task StartOnlineScanner(DiscordSocketClient discordSocketClient)
+        public Task StartOnlineScanner(EventRouter discordSocketClient)
         {
             discordSocketClient.GuildMemberUpdated += delegate (SocketGuildUser oldUser, SocketGuildUser NewUser)
             {

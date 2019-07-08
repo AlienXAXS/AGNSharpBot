@@ -10,7 +10,6 @@ using Discord.Rest;
 using Discord.WebSocket;
 using GameWatcher.DB;
 using GlobalLogger.AdvancedLogger;
-using Logger = GlobalLogger.Logger;
 
 namespace GameWatcher
 {
@@ -109,7 +108,7 @@ namespace GameWatcher
             }
             catch (Exception ex)
             {
-                await Logger.Instance.Log($"{ex.Message}\r\n\r\n{ex.StackTrace}", Logger.LoggerType.ConsoleOnly);
+                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"{ex.Message}\r\n\r\n{ex.StackTrace}");
             }
             finally
             {

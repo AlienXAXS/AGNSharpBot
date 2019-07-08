@@ -63,7 +63,7 @@ namespace Responses.Commands.Handlers
                 }
                 catch (Exception ex)
                 {
-                    await Logger.Instance.Log($"Unable to parse SpotifySongs.json, error was:\r\n{ex.Message}", Logger.LoggerType.ConsoleOnly);
+                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to parse SpotifySongs.json, error was:\r\n{ex.Message}");
                 }
             }
             else
@@ -87,8 +87,7 @@ namespace Responses.Commands.Handlers
             }
             catch (Exception ex)
             {
-                Logger.Instance.Log($"Unable to init config for AuthorisedCommandsPermission\r\n{ex.Message}",
-                    Logger.LoggerType.ConsoleOnly).Wait();
+                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to init config for AuthorisedCommandsPermission\r\n{ex.Message}");
             }
         }
     }

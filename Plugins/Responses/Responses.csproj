@@ -72,9 +72,9 @@
       <Project>{79D98CA3-6292-476A-A7E2-47D25C272342}</Project>
       <Name>PermissionHandler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PluginInterface\PluginInterface.csproj">
-      <Project>{827b77a9-20f8-4c61-a76a-51198feab3d7}</Project>
-      <Name>PluginInterface</Name>
+    <ProjectReference Include="..\PluginManager\PluginManager.csproj">
+      <Project>{405F6757-6CC0-4E7E-9E11-28C7113BE03E}</Project>
+      <Name>PluginManager</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

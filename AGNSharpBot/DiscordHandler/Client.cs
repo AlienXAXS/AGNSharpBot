@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -31,6 +32,7 @@ namespace AGNSharpBot.DiscordHandler
                     GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(message.Message);
                 return Task.CompletedTask;
             };
+            
         }
         
         internal async Task Connect()

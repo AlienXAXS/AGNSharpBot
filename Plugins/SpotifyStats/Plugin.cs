@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
-using PluginInterface;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
+using Interface;
+using PluginManager;
 
 namespace SpotifyStats
 {
@@ -12,7 +13,6 @@ namespace SpotifyStats
     public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "Spotify Stats";
-        public DiscordSocketClient DiscordClient { get; set; }
 
         public void ExecutePlugin()
         {
@@ -27,7 +27,7 @@ namespace SpotifyStats
             dbConn.RegisterTable<SQLite.Tables.Song>();
 
             // Setup our discordclient link to spotifystats
-            Spotify.SpotifyHandler.Instance.SetupDiscordInstance(DiscordClient);
+            Spotify.SpotifyHandler.Instance.SetupDiscordInstance(EventRouter);
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.SpotifyCommandHandler>();
         }
 
@@ -36,5 +36,6 @@ namespace SpotifyStats
             
         }
 
+        public EventRouter EventRouter { get; set; }
     }
 }

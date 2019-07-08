@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.ComponentModel.Composition;
-using PluginInterface;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
+using Interface;
+using PluginManager;
 using Responses.Informational;
 using Responses.SQLTables;
 
@@ -14,8 +15,7 @@ namespace Responses
     public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "Discord Responses";
-        public DiscordSocketClient DiscordClient { get; set; }
-
+        public EventRouter EventRouter { get; set; }
 
         void IPlugin.ExecutePlugin()
         {
@@ -30,7 +30,7 @@ namespace Responses
             InternalDatabase.Handler.Instance.GetConnection().RegisterTable<Commands.GameGiveaway.SQL.GameGiveawayUserDb>();
 
             var lastOnlineHandler = new LastOnlineDbHandler();
-            lastOnlineHandler.StartOnlineScanner(DiscordClient);
+            lastOnlineHandler.StartOnlineScanner(EventRouter);
 
             // Register our commands with the handler
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminCommands>();
@@ -49,5 +49,6 @@ namespace Responses
         {
             AdvancedLoggerHandler.Instance.GetLogger().Log("Responses Disposed");
         }
+
     }
 }
