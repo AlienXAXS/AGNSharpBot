@@ -9,7 +9,7 @@ namespace PluginManager
 {
     public class EventRouter
     {
-        private readonly List<string> _socketClientAllowedBinaries = new List<string>() { "Auditor.dll" };
+        private readonly List<string> _socketClientAllowedBinaries = new List<string>() { "Auditor.dll", "GameWatcher.dll" };
 
 
         private DiscordSocketClient _discordSocketClient;
