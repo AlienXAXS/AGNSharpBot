@@ -14,6 +14,8 @@ namespace SpotifyStats
     {
         string IPlugin.Name => "Spotify Stats";
 
+        string IPlugin.Description => "Spotify based stats, such as top listeners.";
+
         public void ExecutePlugin()
         {
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)

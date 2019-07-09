@@ -9,7 +9,7 @@ namespace PluginManager.SQL
 {
     class PluginManager
     {
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
         public int id { get; set; }
         public string PluginName { get; set; }
         public bool Enabled { get; set; }

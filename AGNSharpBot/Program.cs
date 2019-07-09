@@ -112,8 +112,6 @@ namespace AGNSharpBot
                 Console.ReadKey();
                 return;
             }
-
-            
         }
 
         private async Task GetUserInputAsync()
@@ -130,13 +128,12 @@ namespace AGNSharpBot
 
                     var totalUsers = discordClient.Guilds.Sum(guild => guild.MemberCount);
 
-                    Console.Title =
-                        $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.PluginHandler.Instance.GetPlugins().Count()}";
+                    Console.Title = $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.PluginHandler.Instance.GetPlugins().Count()}";
 
+                    await discordClient.SetGameAsync($"Serving {totalUsers} users over {discordClient.Guilds.Count} servers.");
                 }
                 catch (Exception)
                 {
-
                 }
             }
         }

@@ -16,6 +16,7 @@ namespace GameUpdateNotifier
     {
         public EventRouter EventRouter { get; set; }
         public string Name => "GameUpdateNotifier";
+        public string Description => "Game Update Notifier - Does nothing, is a test plugin";
         public DiscordSocketClient DiscordClient { get; set; }
         public void ExecutePlugin()
         {

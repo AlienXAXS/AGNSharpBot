@@ -22,6 +22,8 @@ namespace GameWatcher
         public EventRouter EventRouter { get; set; }
         public string Name => "GameWatcher";
 
+        public string Description =>
+            "Watches the guild for game activity, and automatically assigns roles to people playing games.";
 
         private DiscordSocketClient _discordClient;
 

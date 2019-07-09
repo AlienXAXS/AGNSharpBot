@@ -4,7 +4,6 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
@@ -76,14 +75,25 @@ namespace PluginManager
             AdvancedLoggerHandler.Instance.GetLogger().Log("Plugins loaded");
         }
 
-        public bool ShouldExecutePlugin(ulong guildId)
+        public bool ShouldExecutePlugin(ulong guildId, Assembly assembly)
         {
-            var pluginName = Assembly.GetCallingAssembly().ManifestModule.ScopeName.Replace(".dll", "");
+            var pluginName = assembly.ManifestModule.ScopeName;
 
             var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
 
             var foundEntry = db.DefaultIfEmpty(null).FirstOrDefault(manager =>
                 manager != null && manager.PluginName == pluginName && manager.GuildId == Convert.ToInt64(guildId));
+
+            if (foundEntry == null) return false;
+
+            return foundEntry.Enabled;
+        }
+
+        public bool ShouldExecutePlugin(string pluginName, ulong guildId)
+        {
+            var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
+
+            var foundEntry = db.DefaultIfEmpty(null).FirstOrDefault(manager => manager != null && manager.PluginName.Equals(pluginName, StringComparison.OrdinalIgnoreCase) && manager.GuildId == Convert.ToInt64(guildId));
 
             if (foundEntry == null) return false;
 
@@ -141,6 +151,36 @@ namespace PluginManager
         {
             foreach (var plugin in Plugins)
                 plugin.Dispose();
+        }
+
+        public void SetPluginState(string pluginName, ulong guildId, bool status)
+        {
+            var foundPlugin = Plugins.DefaultIfEmpty(null).FirstOrDefault(x => x.Name.Equals(pluginName, StringComparison.OrdinalIgnoreCase));
+            if (foundPlugin != null)
+            {
+                var moduleName = foundPlugin.GetType().Assembly.ManifestModule.Name;
+
+                var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
+                var pluginEntry = db.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.PluginName.Equals(moduleName, StringComparison.OrdinalIgnoreCase) && x.GuildId.Equals(Convert.ToInt64(guildId)));
+
+                if (pluginEntry == null)
+                {
+                    pluginEntry = new SQL.PluginManager()
+                    {
+                        Enabled = status,
+                        GuildId = Convert.ToInt64(guildId),
+                        PluginName = moduleName
+                    };
+                    db.Connection.Insert(pluginEntry);
+                }
+                else
+                {
+                    pluginEntry.Enabled = status;
+                    db.Connection.Update(pluginEntry);
+                }
+            }
+            else
+                throw new Exception($"The plugin {pluginName} cannot be found, use !plugins list.");
         }
     }
 }

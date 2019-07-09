@@ -18,6 +18,9 @@ namespace Auditor
     public class Plugin : IPlugin
     {
         public string Name => "Auditor";
+
+        public string Description =>
+            "Audits all actions of users within your guild, accessable and searchable via a web interface.";
         public EventRouter EventRouter { get; set; }
 
         public void ExecutePlugin()

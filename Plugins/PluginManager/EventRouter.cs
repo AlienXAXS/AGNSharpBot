@@ -413,7 +413,9 @@ namespace PluginManager
 
                     foreach (var sub in UserJoinedEvent.Subscriptions)
                     {
-                        sub.Invoke(user);
+                        var moduleName = sub.Method.Module.Name;
+                        if (PluginManager.PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
+                            sub.Invoke(user);
                     }
                 }
 
@@ -423,8 +425,18 @@ namespace PluginManager
             dsc.MessageReceived += message =>
             {
                 if (MessageReceivedEvent.HasSubscribers)
-                    foreach (var sub in MessageReceivedEvent.Subscriptions)
-                        sub.Invoke(message);
+                {
+                    if (message.Channel is SocketGuildChannel socketChannel)
+                    {
+                        var guildId = socketChannel.Guild.Id;
+                        foreach (var sub in MessageReceivedEvent.Subscriptions)
+                        {
+                            var moduleName = sub.Method.Module.Name;
+                            if (PluginManager.PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
+                                sub.Invoke(message);
+                        }
+                    }
+                }
 
                 return Task.CompletedTask;
             };
@@ -435,7 +447,11 @@ namespace PluginManager
                 {
                     var guildId = newUser.Guild.Id;
                     foreach (var sub in GuildMemberUpdatedEvent.Subscriptions)
-                        sub.Invoke(oldUser, newUser);
+                    {
+                        var moduleName = sub.Method.Module.Name;
+                        if ( PluginManager.PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId) )
+                            sub.Invoke(oldUser, newUser);
+                    }
                 }
 
                 return Task.CompletedTask;

@@ -71,6 +71,10 @@
       <Project>{79D98CA3-6292-476A-A7E2-47D25C272342}</Project>
       <Name>PermissionHandler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Plugins\PluginManager\PluginManager.csproj">
+      <Project>{405f6757-6cc0-4e7e-9e11-28c7113be03e}</Project>
+      <Name>PluginManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

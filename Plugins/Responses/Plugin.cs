@@ -14,8 +14,10 @@ namespace Responses
     [Export(typeof(IPlugin))]
     public sealed class Plugin : IPlugin
     {
-        string IPlugin.Name => "Discord Responses";
+        string IPlugin.Name => "AdminUtilities";
         public EventRouter EventRouter { get; set; }
+
+        string IPlugin.Description => "Provides the guild with useful admin utilities, plus pictures of cats!";
 
         void IPlugin.ExecutePlugin()
         {
