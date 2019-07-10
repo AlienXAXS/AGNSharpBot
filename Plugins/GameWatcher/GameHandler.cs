@@ -26,80 +26,135 @@ namespace GameWatcher
             return _roleMemory;
         }
 
-        public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool firstRun = false)
+        public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser)
         {
+            var logger = AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
+            logger.Log($"[{newGuildUser.Id}] User {newGuildUser.Username} has fired the GameScan method");
+
             try
             {
                 await _semaphoreSlim.WaitAsync();
-
-                // As we're dealing with adding/deleting roles, we should make this thread-safe to ensure roles exist before adding people to a role.
-                // Reason for this, is if multiple people start a game at the same time, we must execute them one at a time.
-                //await _semaphoreSlim.WaitAsync();
-
+                
                 // Grab the guild
                 if (newGuildUser.Guild is SocketGuild socketGuild)
                 {
                     // Check to see if the activity is now nothing (aka, the user quit their app)
-                    if (newGuildUser.Activity?.Type != ActivityType.Playing && !firstRun)
+                    if (newGuildUser.Activity?.Type != ActivityType.Playing)
                     {
                         var foundMemory = _roleMemory?.FirstOrDefault(x => x.Key == newGuildUser.Id);
                         if (foundMemory != null && foundMemory.Value.Key == 0)
                             return;
 
-                        var foundRole = socketGuild.Roles.DefaultIfEmpty(null)
-                            .FirstOrDefault(x => x.Id == foundMemory.Value.Value);
-
-                        if (foundRole != null)
+                        try
                         {
-                            await newGuildUser.RemoveRoleAsync(foundRole);
-                            
-                            // Cleanup the role if there is no one left in it
-                            if (!foundRole.Members.Any())
-                            {
-                                await foundRole.DeleteAsync();
-                            }
-                        }
 
-                        _roleMemory.Remove(newGuildUser.Id);
+                            logger.Log($"[{newGuildUser.Id}] User {newGuildUser.Username} had an activity of {oldGuildUser.Activity.Name} but now doesnt - attempting to find role");
+
+                            var foundRole = socketGuild.Roles.DefaultIfEmpty(null).FirstOrDefault(x => x.Id == foundMemory.Value.Value);
+
+                            if (foundRole != null)
+                            {
+                                logger.Log($"[{newGuildUser.Id}] Role found, attempting to remove user from role");
+                                try
+                                {
+                                    await newGuildUser.RemoveRoleAsync(foundRole);
+                                    logger.Log($"[{newGuildUser.Id}] User successfully removed from role");
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.Log($"[{newGuildUser.Id}] Unable to remove user from role, message was: {ex.Message}\r\n{ex.StackTrace}");
+                                }
+
+                                // Cleanup the role if there is no one left in it
+                                if (!foundRole.Members.Any())
+                                {
+                                    logger.Log($"[{newGuildUser.Id}] Role has no users left inside it, attempting to remove the role");
+                                    try
+                                    {
+                                        await foundRole.DeleteAsync();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        logger.Log($"[{newGuildUser.Id}] Unable to remove the role, message was: {ex.Message}\r\n{ex.StackTrace}");
+                                    }
+                                }
+                            }
+
+                            logger.Log($"[{newGuildUser.Id}] Removing user from role dictionary");
+                            _roleMemory.Remove(newGuildUser.Id);
+                            logger.Log($"[{newGuildUser.Id}] Process complete");
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Log($"[{newGuildUser.Id}] Unhandled exception for this event, message follows: {ex.Message}\r\n{ex.StackTrace}");
+                        }
                     }
                     else if(newGuildUser.Activity?.Type == ActivityType.Playing)
                     {
                         if (newGuildUser.Activity is Game game && newGuildUser.Activity.Type == ActivityType.Playing)
                         {
+
+                            logger.Log($"[{newGuildUser.Id}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database");
+
                             if (!DatabaseHandler.Instance.Exists(game.Name)) return;
 
-                            var roles = socketGuild.Roles;
+                            logger.Log($"[{newGuildUser.Id}] Game is in db, processing...");
 
+                            var roles = socketGuild.Roles;
                             var gameName = $"Playing: {game.Name}";
+
+                            logger.Log($"[{newGuildUser.Id}] Checking to see if the user is already in a role named {gameName}");
 
                             // Check to see if this user is already part of the role, if they are ignore this.
                             if (newGuildUser.Roles.Any(x => x.Name.Equals(gameName))) return;
+
+                            logger.Log($"[{newGuildUser.Id}] Checking to see if the role with the name of {gameName} exists within the guild");
 
                             // Does this role exist?
                             if (roles.Any(x => x.Name == gameName))
                             {
                                 // Get the role, and add the user to it
                                 var foundRole = roles.First(x => x.Name.Equals(gameName));
-                                await newGuildUser.AddRoleAsync(foundRole);
-                                _roleMemory.Add(newGuildUser.Id, foundRole.Id); // Remember this
+
+                                logger.Log(
+                                    $"[{newGuildUser.Id}] Found an existing role, adding the user to the role now");
+                                try
+                                {
+                                    await newGuildUser.AddRoleAsync(foundRole);
+                                    _roleMemory.Add(newGuildUser.Id, foundRole.Id); // Remember this
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.Log(
+                                        $"[{newGuildUser.Id}] Exception while attempting to add the user to a role, message follows: {ex.Message}\r\n{ex.StackTrace}");
+                                }
                             }
                             else
                             {
-                                RestRole newRole = null;
+                                logger.Log($"[{newGuildUser.Id}] Role not found, will attempt to create it");
+
+                                // Create the new role, and add the user to it
                                 try
                                 {
-                                    // Create the new role, and add the user to it
-                                    newRole =
-                                        await socketGuild.CreateRoleAsync(gameName, isHoisted: true, color: Color.Red);
-                                    await newRole.ModifyAsync(properties => properties.Position = socketGuild.Roles.Count - 2);
-                                    
+                                    var newRole = await socketGuild.CreateRoleAsync(gameName, isHoisted: true,
+                                        color: Color.Red);
+
+                                    logger.Log(
+                                        $"[{newGuildUser.Id}] Role created, attempting to modify its position");
+
+                                    await newRole.ModifyAsync(properties =>
+                                        properties.Position = socketGuild.Roles.Count - 2);
+
+                                    logger.Log(
+                                        $"[{newGuildUser.Id}] Position modified successfully, adding user to the role and saving memory.");
+
                                     await newGuildUser.AddRoleAsync(newRole);
                                     _roleMemory.Add(newGuildUser.Id, newRole.Id);
                                 }
                                 catch (Exception ex)
                                 {
-                                    // Something weird happened, delete the role that was made.
-                                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Exception while creating role for {gameName}: {ex.Message}");
+                                    logger.Log(
+                                        $"[{newGuildUser.Id}] Unable to create or modify role, error is: {ex.Message}\r\n{ex.StackTrace}");
                                 }
                             }
                         }
