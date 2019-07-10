@@ -75,28 +75,6 @@ namespace GameWatcher.Commands
 
                     await sktMessage.Channel.SendMessageAsync(msg);
                     break;
-
-                case "showmemory":
-                    var mem = GameHandler.Instance.GetMemory();
-
-                    var memOutput = "Memory Output:";
-                    if (sktMessage.Channel is SocketGuildChannel sktGuildChannel)
-                    {
-                        foreach (var m in mem)
-                        {
-                            var user = discordSocketClient.GetUser(m.Key);
-                            var role = sktGuildChannel.Guild.Roles.DefaultIfEmpty(null).First(x => x.Id == m.Value);
-
-                            var roleName = role != null ? role.Name : "Unknown Role Name";
-                            var userName = user != null ? user.Username : "Unknown User Name";
-
-                            memOutput += $"User {userName}({m.Key}) is in role {roleName}({m.Value})\r\n";
-                        }
-                    }
-
-                    await sktMessage.Channel.SendMessageAsync(memOutput);
-
-                    break;
             }
         }
 

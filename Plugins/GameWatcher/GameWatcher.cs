@@ -35,6 +35,9 @@ namespace GameWatcher
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER] Checking Discord...");
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]  >  Complete");
 
+                _discordClient = EventRouter.GetDiscordSocketClient();
+                GameHandler.Instance.DiscordSocketClient = _discordClient;
+
                 CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Control>();
                 EventRouter.GuildMemberUpdated += DiscordClientOnGuildMemberUpdatedEvent;
             }
@@ -57,7 +60,7 @@ namespace GameWatcher
 
         public void Dispose()
         {
-            
+            GameHandler.Instance.Dispose();
         }
     }
 }
