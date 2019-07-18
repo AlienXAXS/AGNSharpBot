@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AGNSharpBot.DiscordHandler;
 using CommandHandler;
-using Discord;
 using GlobalLogger.AdvancedLogger;
 
 namespace AGNSharpBot

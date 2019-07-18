@@ -118,8 +118,8 @@ namespace Responses.Commands.GameGiveaway
                         return;
                     }
 
-                    var lastAccessTimespan = (dbUser.DateTime.AddDays(30) - DateTime.Now);
-                    if (lastAccessTimespan.TotalDays < GiveawayAccessDurationInDays)
+                    var lastAccessTimespan = (dbUser.DateTime.AddDays(GiveawayAccessDurationInDays) - DateTime.Now);
+                    if (lastAccessTimespan.TotalDays < 0)
                     {
                         await SktMessage.Channel.SendMessageAsync(
                             $"Sorry {SktMessage.Author.Username}, but you'll have to wait {Util.ReadableTimespan.GetReadableTimespan(lastAccessTimespan)} before you can claim another game.");
