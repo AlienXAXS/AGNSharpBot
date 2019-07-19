@@ -1,6 +1,7 @@
 ﻿using CommandHandler;
 using GlobalLogger.AdvancedLogger;
 using Interface;
+using PluginManager;
 
 namespace HomeLabReporting
 {
@@ -14,6 +15,8 @@ namespace HomeLabReporting
     public sealed class Plugin : IPlugin
     {
         string IPlugin.Name => "AlienX's HomeLab Reporting";
+        public string Description => "Homelab Reporting for AlienX's House";
+        public EventRouter EventRouter { get; set; }
 
         public void ExecutePlugin()
         {
@@ -22,10 +25,7 @@ namespace HomeLabReporting
 
             AdvancedLoggerHandler.Instance.GetLogger().Log($"HomeLabReporting.dll Plugin Loading...");
             SNMP.SnmpCommunication.Instance.StartCapture();
-
-            // Start our trap receiver too
-            SNMP.TrapReceiver.Instance.SetDiscordSocketClient(DiscordClient);
-
+            
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands>();
         }
 

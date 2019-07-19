@@ -76,7 +76,7 @@ namespace Responses.Commands.GameGiveaway
                 var gamesDbConnection = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.GameGiveawayGameDb>();
                 var gamesDb = gamesDbConnection.Where(x => x.Used == false);
                 var usersDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.GameGiveawayUserDb>();
-                var dbUser = usersDb.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.DiscordId.Equals((long)SktMessage.Author.Id));
+                var dbUser = usersDb.DefaultIfEmpty(null).LastOrDefault(x => x != null && x.DiscordId.Equals((long)SktMessage.Author.Id));
 
                 _menu.Dispose();
 
@@ -119,23 +119,24 @@ namespace Responses.Commands.GameGiveaway
                     }
 
                     var lastAccessTimespan = (dbUser.DateTime.AddDays(GiveawayAccessDurationInDays) - DateTime.Now);
-                    if (lastAccessTimespan.TotalDays < 0)
+                    if (lastAccessTimespan.TotalDays > 0)
                     {
                         await SktMessage.Channel.SendMessageAsync(
                             $"Sorry {SktMessage.Author.Username}, but you'll have to wait {Util.ReadableTimespan.GetReadableTimespan(lastAccessTimespan)} before you can claim another game.");
                         return;
-                    }
-                    else
-                    {
-                        // Remove the user from the table, they will be re-added shortly
-                        usersDb.Connection.Delete(dbUser);
                     }
                 }
 
                 // Code will only reach here if the user either isn't in the claims database, or if they didn't claim within the last GiveawayAccessDurationInDays value
 
                 // Insert our user into the database
-                usersDb.Connection.Insert(new SQL.GameGiveawayUserDb() { DiscordId = (long)SktMessage.Author.Id, DateTime = DateTime.Now });
+                if ( dbUser == null )
+                    usersDb.Connection.Insert(new SQL.GameGiveawayUserDb() { DiscordId = (long)SktMessage.Author.Id, DateTime = DateTime.Now });
+                else
+                {
+                    dbUser.DateTime = DateTime.Now;
+                    usersDb.Connection.Update(dbUser);
+                }
 
                 // Grab a random game from the database, modify it to be marked as used and send a PM to the user with the key.
                 var rand = new Random(DateTime.Now.Millisecond);

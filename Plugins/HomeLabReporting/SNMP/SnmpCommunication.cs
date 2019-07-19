@@ -7,7 +7,6 @@ using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
 using SnmpSharpNet;
 using Newtonsoft.Json;
-using Logger = GlobalLogger.Logger;
 
 namespace HomeLabReporting.SNMP
 {
@@ -65,8 +64,7 @@ namespace HomeLabReporting.SNMP
                     if (snmpVb.Oid.ToString().Equals(trapDefinition.Oid))
                     {
                         trapDefinition.LastValue = new SnmpHostValueDefinition(snmpVb.Value.ToString());
-                        await Logger.Instance.Log(
-                            $"[SNMP TRAP] From {snmpHost.Name} -['{trapDefinition.ReadableName}' has a value of '{trapDefinition.LastValue.Value}']-", Logger.LoggerType.ConsoleAndDiscord, Logger.Instance.NewDiscordMention(trapDefinition.MentionSettings.UserId, trapDefinition.MentionSettings.GuildId, trapDefinition.MentionSettings.ChannelId));
+                        //await Logger.Instance.Log($"[SNMP TRAP] From {snmpHost.Name} -['{trapDefinition.ReadableName}' has a value of '{trapDefinition.LastValue.Value}']-", Logger.LoggerType.ConsoleAndDiscord, Logger.Instance.NewDiscordMention(trapDefinition.MentionSettings.UserId, trapDefinition.MentionSettings.GuildId, trapDefinition.MentionSettings.ChannelId));
                         foundTrap = true;
                     }
                 }

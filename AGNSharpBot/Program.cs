@@ -27,12 +27,10 @@ namespace AGNSharpBot
                     AdvancedLoggerHandler.Instance.GetLogger().Log($"Inner Exception Error: {ex.InnerException.Message}\r\n\r\n{ex.InnerException.StackTrace}");
             }
         }
+
         private readonly Client _discordClient = Client.Instance;
-
         private delegate bool EventHandler(CtrlType sig);
-
         static EventHandler _handler;
-
         private static bool _running = true;
 
         enum CtrlType
@@ -54,7 +52,7 @@ namespace AGNSharpBot
                 case CtrlType.CTRL_CLOSE_EVENT:
                     Client.Instance.Dispose();
                     PluginManager.PluginHandler.Instance.Dispose();
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log("Shutting down application...");
+                    AdvancedLoggerHandler.Instance.GetLogger().Log("Shutting down application...");
                     System.Threading.Thread.Sleep(1500);
                     _running = false;
                     return true;
@@ -70,7 +68,6 @@ namespace AGNSharpBot
                 .OutputToConsole(true);
 
             logger.Log("AGNSharpBot is starting up");
-
 
             logger.Log("Setting up exit handler capture");
             _handler += Handler;

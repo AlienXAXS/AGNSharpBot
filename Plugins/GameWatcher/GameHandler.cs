@@ -32,12 +32,8 @@ namespace GameWatcher
         public static GameHandler Instance = _instance ?? (_instance = new GameHandler());
 
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
-
-        // Key = 
         private readonly List<GameRoleMemory> _roleMemory = new List<GameRoleMemory>();
-
         public DiscordSocketClient DiscordSocketClient { get; set; }
-
         private bool GameWatcherTimerRunning;
 
         public GameHandler()
@@ -52,27 +48,35 @@ namespace GameWatcher
             {
                 while (GameWatcherTimerRunning)
                 {
-                    Thread.Sleep(10000);
-                    await _semaphoreSlim.WaitAsync();
-
-                    foreach (var guild in DiscordSocketClient.Guilds)
+                    try
                     {
-                        foreach (var role in guild.Roles)
+                        Thread.Sleep(10000);
+                        await _semaphoreSlim.WaitAsync();
+
+                        foreach (var guild in DiscordSocketClient.Guilds)
                         {
-                            // Check for our roles
-                            if ( role.Name.StartsWith("Playing:") )
+                            foreach (var role in guild.Roles)
                             {
-                                // Check for any memory of this role
-                                if (_roleMemory.All(x => x.RoleId != role.Id))
+                                // Check for our roles
+                                if (role.Name.StartsWith("Playing:"))
                                 {
-                                    // We have none, the role should be empty, let's delete it
-                                    await role.DeleteAsync();
+                                    // Check for any memory of this role
+                                    if (_roleMemory.All(x => x.RoleId != role.Id))
+                                    {
+                                        // We have none, the role should be empty, let's delete it
+                                        await role.DeleteAsync();
+                                    }
                                 }
                             }
                         }
                     }
-
-                    _semaphoreSlim.Release();
+                    catch
+                    {
+                    }
+                    finally
+                    {
+                        _semaphoreSlim.Release();
+                    }
                 }
             });
             thread.Start();
@@ -88,13 +92,9 @@ namespace GameWatcher
             var random = new Random(DateTime.Now.Millisecond);
             var randomNumber = random.Next(1000, 10000);
             var logger = AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
-            logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has fired the GameScan method");
 
             try
             {
-                logger.Log(
-                    $"[{newGuildUser.Id} | {randomNumber}] There are currently {_semaphoreSlim.CurrentCount} queries in the queue behind this new one");
-
                 await _semaphoreSlim.WaitAsync();
                 
                 // Grab the guild
@@ -103,7 +103,7 @@ namespace GameWatcher
                     // Check to see if the activity is now nothing (aka, the user quit their app)
                     if (newGuildUser.Activity?.Type != ActivityType.Playing)
                     {
-                        var foundMemory = _roleMemory?.DefaultIfEmpty(null).FirstOrDefault(x => x.UserId == newGuildUser.Id && newGuildUser.Roles.Any(y => y.Id == x.RoleId));
+                        var foundMemory = _roleMemory?.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.UserId == newGuildUser.Id && newGuildUser.Roles.Any(y => y.Id == x.RoleId));
                         if (foundMemory == null)
                             return;
 
@@ -227,7 +227,7 @@ namespace GameWatcher
             }
             catch (Exception ex)
             {
-                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"{ex.Message}\r\n\r\n{ex.StackTrace}");
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"{ex.Message}\r\n\r\n{ex.StackTrace}");
             }
             finally
             {

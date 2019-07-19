@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using GlobalLogger;
+using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
 
 namespace HomeLabReporting.SNMP
@@ -34,7 +35,6 @@ namespace HomeLabReporting.SNMP
         private static TrapReceiver _instance;
         public static TrapReceiver Instance = _instance ?? (_instance = new TrapReceiver());
 
-        private DiscordSocketClient _discordSocketClient;
         private TrapReceiverConfiguration _trapReceiverConfiguration;
 
         public delegate void EventRaiser(object sender, IpAddress ipAddress, VbCollection snmpVbCollection);
@@ -47,6 +47,8 @@ namespace HomeLabReporting.SNMP
 
         public TrapReceiver()
         {
+            var logger = AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
+
             if (System.IO.File.Exists(ConfigurationPath))
             {
                 try
@@ -57,11 +59,7 @@ namespace HomeLabReporting.SNMP
                 }
                 catch (Exception ex)
                 {
-    #pragma warning disable 4014
-                    Logger.Instance.Log(
-                        $"Unable to deserialize snmp.json, error is as follows:\r\n{ex.Message}",
-                        Logger.LoggerType.ConsoleOnly);
-    #pragma warning restore 4014
+                    logger.Log($"Unable to deserialize snmp.json, error is as follows:\r\n{ex.Message}");
                 }
             }
             else
@@ -74,20 +72,11 @@ namespace HomeLabReporting.SNMP
                 }
                 catch (Exception ex)
                 {
-    #pragma warning disable 4014
-                    Logger.Instance.Log(
-                        $"Exception while attempting to write to snmp.json, error is as follows: {ex.Message}",
-                        Logger.LoggerType.ConsoleOnly);
-    #pragma warning restore 4014
+                    logger.Log($"Exception while attempting to write to snmp.json, error is as follows: {ex.Message}");
                 }
             }
 
             _trapReceiverTask = Task.Run(() => StartTrapReceiver());
-        }
-
-        public void SetDiscordSocketClient(DiscordSocketClient discordSocketClient)
-        {
-            _discordSocketClient = discordSocketClient;
         }
 
         /// <summary>
@@ -123,16 +112,9 @@ namespace HomeLabReporting.SNMP
                 try
                 {
                     inLength = socket.ReceiveFrom(inData, ref inEndPoint);
-
-                    // Do not process this SNMP trap if we're not connected to discord
-                    if (_discordSocketClient == null ||
-                        _discordSocketClient?.ConnectionState == ConnectionState.Disconnected ||
-                        _discordSocketClient?.ConnectionState == ConnectionState.Disconnecting)
-                        continue;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Exception {0}", ex.Message);
                     inLength = -1;
                 }
 
@@ -148,39 +130,6 @@ namespace HomeLabReporting.SNMP
 
                         OnTrapReceived?.Invoke(this, pkt.Pdu.AgentAddress, pkt.Pdu.VbList);
                     }
-                    else
-                    {
-                        // Parse SNMP Version 2 TRAP packet 
-                        var pkt = new SnmpV2Packet();
-                        pkt.decode(inData, inLength);
-                        Console.WriteLine("** SNMP Version 2 TRAP received from {0}:", inEndPoint);
-                        if (pkt.Pdu.Type != PduType.V2Trap)
-                        {
-                            Console.WriteLine("*** NOT an SNMPv2 trap ****");
-                        }
-                        else
-                        {
-
-                            Console.WriteLine("*** Community: {0}", pkt.Community);
-                            Console.WriteLine("*** VarBind count: {0}", pkt.Pdu.VbList.Count);
-                            Console.WriteLine("*** VarBind content:");
-                            foreach (var v in pkt.Pdu.VbList)
-                            {
-                                Console.WriteLine(
-                                    "**** {0} {1}: {2}",
-                                    v.Oid,
-                                    SnmpConstants.GetTypeName(v.Value.Type),
-                                    v.Value);
-                            }
-
-                            Console.WriteLine("** End of SNMP Version 2 TRAP data.");
-                        }
-                    }
-                }
-                else
-                {
-                    if (inLength == 0)
-                        Console.WriteLine("Zero length packet received.");
                 }
             }
         }
