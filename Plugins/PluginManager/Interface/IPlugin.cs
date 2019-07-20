@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord.WebSocket;
+using PluginManager;
 
 namespace Interface
 {
@@ -11,6 +12,11 @@ namespace Interface
         void ExecutePlugin();
         void Dispose();
         PluginManager.EventRouter EventRouter { get; set; }
+    }
+
+    public interface IPluginWithRouter : IPlugin
+    {
+        PluginRouter PluginRouter { get; set; }
     }
 
     public class PluginRequestTypes

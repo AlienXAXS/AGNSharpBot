@@ -17,13 +17,12 @@ using PluginManager;
 namespace GameWatcher
 {
     [Export(typeof(IPlugin))]
-    public class GameWatcher : IPlugin
+    public class GameWatcher : IPluginWithRouter
     {
         public EventRouter EventRouter { get; set; }
         public string Name => "GameWatcher";
-
-        public string Description =>
-            "Watches the guild for game activity, and automatically assigns roles to people playing games.";
+        public PluginRouter PluginRouter { get; set; }
+        public string Description => "Watches the guild for game activity, and automatically assigns roles to people playing games.";
 
         private DiscordSocketClient _discordClient;
 
@@ -37,6 +36,7 @@ namespace GameWatcher
 
                 _discordClient = EventRouter.GetDiscordSocketClient();
                 GameHandler.Instance.DiscordSocketClient = _discordClient;
+                GameHandler.Instance.PluginRouter = PluginRouter;
 
                 CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Control>();
                 EventRouter.GuildMemberUpdated += DiscordClientOnGuildMemberUpdatedEvent;
@@ -50,12 +50,7 @@ namespace GameWatcher
 
         private async Task DiscordClientOnGuildMemberUpdatedEvent(SocketGuildUser arg1, SocketGuildUser arg2)
         {
-            await DiscordClientOnGuildMemberUpdated(arg1, arg2);
-        }
-
-        private async Task DiscordClientOnGuildMemberUpdated(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool firstRun = false)
-        {
-            await GameHandler.Instance.GameScan(oldGuildUser, newGuildUser);
+            await GameHandler.Instance.GameScan(arg1, arg2);
         }
 
         public void Dispose()

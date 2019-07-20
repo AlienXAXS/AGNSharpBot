@@ -21,6 +21,8 @@ namespace PluginManager
         public static PluginHandler Instance = _instance ?? (_instance = new PluginHandler());
 
         public EventRouter EventRouter = new EventRouter();
+        
+        public PluginRouter PluginRouter = new PluginRouter();
 
         private DiscordSocketClient _discordSocketClient;
         public DiscordSocketClient DiscordSocketClient
@@ -33,7 +35,7 @@ namespace PluginManager
                 EventRouter.SetupEventRouter(value);
             }
         }
-
+        
         private Task DiscordSocketClientOnReady()
         {
             InitPluginsReady();
@@ -122,6 +124,11 @@ namespace PluginManager
                 // Set the event router
                 plugin.EventRouter = EventRouter;
 
+                if (plugin is IPluginWithRouter pluginWithRouter)
+                {
+                    pluginWithRouter.PluginRouter = PluginRouter;
+                }
+
                 var newThread = new Thread(() =>
                 {
                     try
@@ -150,7 +157,10 @@ namespace PluginManager
         public void Dispose()
         {
             foreach (var plugin in Plugins)
+            {
+                AdvancedLoggerHandler.Instance.GetLogger().Log($"Shutting down plugin {plugin.Name}.");
                 plugin.Dispose();
+            }
         }
 
         public void SetPluginState(string pluginName, ulong guildId, bool status)

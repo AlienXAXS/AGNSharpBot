@@ -82,10 +82,13 @@ namespace GameWatcher.Commands
         {
 
             await sktMessage.Channel.SendMessageAsync(
-                "Scanning every guild for users playing games that exist in the database");
+                "Scanning this guild for users playing games that exist in the database");
 
-            foreach (var guild in discordSocketClient.Guilds)
+            if (sktMessage.Author is SocketGuildUser socketGuildUser)
             {
+                var guild = socketGuildUser.Guild;
+                if (!PluginManager.PluginHandler.Instance.PluginRouter.IsPluginExecutableOnGuild(guild.Id))
+                    return;
 
                 var uList = guild.Users.ToList();
 
@@ -100,9 +103,9 @@ namespace GameWatcher.Commands
                         Debug.Print(ex.Message);
                     }
                 }
-            }
 
-            await sktMessage.Channel.SendMessageAsync("Scan completed");
+                await sktMessage.Channel.SendMessageAsync("Scan completed");
+            }
         }
 
         private async void ListGames(SocketMessage sktMessage)

@@ -10,6 +10,7 @@ using Discord.Rest;
 using Discord.WebSocket;
 using GameWatcher.DB;
 using GlobalLogger.AdvancedLogger;
+using PluginManager;
 
 namespace GameWatcher
 {
@@ -34,7 +35,9 @@ namespace GameWatcher
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         private readonly List<GameRoleMemory> _roleMemory = new List<GameRoleMemory>();
         public DiscordSocketClient DiscordSocketClient { get; set; }
-        private bool GameWatcherTimerRunning;
+        public PluginRouter PluginRouter { get; set; }
+
+        private bool _gameWatcherTimerRunning;
 
         public GameHandler()
         {
@@ -43,10 +46,10 @@ namespace GameWatcher
 
         public void StartGameWatcherTimer()
         {
-            GameWatcherTimerRunning = true;
+            _gameWatcherTimerRunning = true;
             var thread = new Thread(async () =>
             {
-                while (GameWatcherTimerRunning)
+                while (_gameWatcherTimerRunning)
                 {
                     try
                     {
@@ -55,16 +58,32 @@ namespace GameWatcher
 
                         foreach (var guild in DiscordSocketClient.Guilds)
                         {
-                            foreach (var role in guild.Roles)
+                            if (PluginRouter.IsPluginExecutableOnGuild(guild.Id))
                             {
-                                // Check for our roles
-                                if (role.Name.StartsWith("Playing:"))
+                                foreach (var role in guild.Roles)
                                 {
-                                    // Check for any memory of this role
-                                    if (_roleMemory.All(x => x.RoleId != role.Id))
+                                    // Check for our roles
+                                    if (role.Name.StartsWith("Playing:"))
                                     {
-                                        // We have none, the role should be empty, let's delete it
-                                        await role.DeleteAsync();
+                                        // Check for any memory of this role
+                                        if (_roleMemory.All(x => x.RoleId != role.Id))
+                                        {
+                                            // We have none, the role should be empty, let's delete it
+                                            await role.DeleteAsync();
+                                        }
+                                    }
+                                }
+
+                                foreach (var user in guild.Users)
+                                {
+                                    var playingRoles = user.Roles.Where(x => x.Name.StartsWith("Playing:"));
+                                    foreach (var playingRole in playingRoles)
+                                    {
+                                        // User is not playing anything, but they are part of a role that says they are, remove them.
+                                        if (user.Activity?.Type != ActivityType.Playing)
+                                        {
+                                            await user.RemoveRoleAsync(playingRole);
+                                        }
                                     }
                                 }
                             }
@@ -84,7 +103,7 @@ namespace GameWatcher
 
         public void Dispose()
         {
-            GameWatcherTimerRunning = false;
+            _gameWatcherTimerRunning = false;
         }
 
         public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser)
@@ -101,7 +120,7 @@ namespace GameWatcher
                 if (newGuildUser.Guild is SocketGuild socketGuild)
                 {
                     // Check to see if the activity is now nothing (aka, the user quit their app)
-                    if (newGuildUser.Activity?.Type != ActivityType.Playing)
+                    if (newGuildUser.Activity?.Type != ActivityType.Playing || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
                     {
                         var foundMemory = _roleMemory?.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.UserId == newGuildUser.Id && newGuildUser.Roles.Any(y => y.Id == x.RoleId));
                         if (foundMemory == null)
@@ -109,7 +128,7 @@ namespace GameWatcher
 
                         try
                         {
-                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} had an activity of {oldGuildUser.Activity.Name} but now doesn't - attempting to find role");
+                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} had an activity of {oldGuildUser.Activity.Name} but now doesn't - attempting to find role");
 
                             var foundRole = socketGuild.GetRole(foundMemory.RoleId);
 
@@ -119,7 +138,7 @@ namespace GameWatcher
                                 try
                                 {
                                     await newGuildUser.RemoveRoleAsync(foundRole);
-                                    logger.Log($"[{newGuildUser.Id} | {randomNumber}] User successfully removed from role");
+                                    //logger.Log($"[{newGuildUser.Id} | {randomNumber}] User successfully removed from role");
                                 }
                                 catch (Exception ex)
                                 {
@@ -129,7 +148,7 @@ namespace GameWatcher
                                 // Cleanup the role if there is no one left in it
                                 if (!foundRole.Members.Any())
                                 {
-                                    logger.Log($"[{newGuildUser.Id} | {randomNumber}] Role has no users left inside it, attempting to remove the role");
+                                    //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Role has no users left inside it, attempting to remove the role");
                                     try
                                     {
                                         await foundRole.DeleteAsync();
@@ -141,9 +160,9 @@ namespace GameWatcher
                                 }
                             }
 
-                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] Removing user from role dictionary");
+                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Removing user from role dictionary");
                             _roleMemory.Remove(foundMemory);
-                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] Process complete");
+                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Process complete");
                         }
                         catch (Exception ex)
                         {
@@ -155,7 +174,7 @@ namespace GameWatcher
                         if (newGuildUser.Activity is Game game && newGuildUser.Activity.Type == ActivityType.Playing)
                         {
 
-                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database");
+                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database");
 
                             if (!DatabaseHandler.Instance.Exists(game.Name))
                             {
@@ -164,17 +183,17 @@ namespace GameWatcher
                                 return;
                             }
 
-                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] Game is in db, processing...");
+                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Game is in db, processing...");
 
                             var roles = socketGuild.Roles;
                             var gameName = $"Playing: {game.Name}";
 
-                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the user is already in a role named {gameName}");
+                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the user is already in a role named {gameName}");
 
                             // Check to see if this user is already part of the role, if they are ignore this.
                             if (newGuildUser.Roles.Any(x => x.Name.Equals(gameName))) return;
 
-                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the role with the name of {gameName} exists within the guild");
+                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the role with the name of {gameName} exists within the guild");
 
                             // Does this role exist?
                             if (roles.Any(x => x.Name == gameName))
@@ -182,7 +201,7 @@ namespace GameWatcher
                                 // Get the role, and add the user to it
                                 var foundRole = roles.First(x => x.Name.Equals(gameName));
 
-                                logger.Log($"[{newGuildUser.Id} | {randomNumber}] Found an existing role, adding the user to the role now");
+                                //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Found an existing role, adding the user to the role now");
                                 try
                                 {
                                     await newGuildUser.AddRoleAsync(foundRole);
@@ -195,7 +214,7 @@ namespace GameWatcher
                             }
                             else
                             {
-                                logger.Log($"[{newGuildUser.Id} | {randomNumber}] Role not found, will attempt to create it");
+                                //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Role not found, will attempt to create it");
 
                                 // Create the new role, and add the user to it
                                 try
@@ -203,22 +222,21 @@ namespace GameWatcher
                                     var newRole = await socketGuild.CreateRoleAsync(gameName, isHoisted: true,
                                         color: Color.Red);
 
-                                    logger.Log(
-                                        $"[{newGuildUser.Id} | {randomNumber}] Role created, attempting to modify its position");
+                                    //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Role created, attempting to modify its position");
 
-                                    await newRole.ModifyAsync(properties =>
-                                        properties.Position = socketGuild.Roles.Count - 2);
+                                    var botUser = newGuildUser.Guild.CurrentUser;
+                                    var botRoles = botUser.Roles.OrderByDescending(x => x.Position);
 
-                                    logger.Log(
-                                        $"[{newGuildUser.Id} | {randomNumber}] Position modified successfully, adding user to the role and saving memory.");
+                                    await newRole.ModifyAsync(properties => properties.Position = botRoles.First().Position-1);
+
+                                    //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Position modified successfully, adding user to the role and saving memory.");
 
                                     await newGuildUser.AddRoleAsync(newRole);
                                     _roleMemory.Add(new GameRoleMemory(newRole.Id, newGuildUser.Id));
                                 }
                                 catch (Exception ex)
                                 {
-                                    logger.Log(
-                                        $"[{newGuildUser.Id} | {randomNumber}] Unable to create or modify role, error is: {ex.Message}\r\n{ex.StackTrace}");
+                                    logger.Log($"[{newGuildUser.Id} | {randomNumber}] Unable to create or modify role, error is: {ex.Message}\r\n{ex.StackTrace}");
                                 }
                             }
                         }
