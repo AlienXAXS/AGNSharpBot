@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -43,7 +44,7 @@ namespace HARATSeATSRP
 
                 if (System.IO.File.Exists(srpMemoryFile))
                 {
-                    srpMemories = JsonConvert.DeserializeObject<List<SRPMemory>>(srpMemoryFile);
+                    srpMemories = JsonConvert.DeserializeObject<List<SRPMemory>>(System.IO.File.ReadAllText(srpMemoryFile));
                 }
                 else
                 {
@@ -98,6 +99,9 @@ namespace HARATSeATSRP
                                 }
                         }
                     }
+                } catch (Exception ex)
+                {
+                    Debug.Print("Lol");
                 }
                 finally
                 {
