@@ -74,6 +74,7 @@ namespace GameWatcher
                                     }
                                 }
 
+                                // Remove roles from users that are in a "Playing:" role but do not have the "Playing" activity.
                                 foreach (var user in guild.Users)
                                 {
                                     var playingRoles = user.Roles.Where(x => x.Name.StartsWith("Playing:"));
@@ -85,6 +86,9 @@ namespace GameWatcher
                                             await user.RemoveRoleAsync(playingRole);
                                         }
                                     }
+
+                                    // Scan all users for playing games, and update discord accordingly.
+                                    await GameScan(user, user, true);
                                 }
                             }
                         }
@@ -106,7 +110,7 @@ namespace GameWatcher
             _gameWatcherTimerRunning = false;
         }
 
-        public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser)
+        public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool skipWait = false)
         {
             var random = new Random(DateTime.Now.Millisecond);
             var randomNumber = random.Next(1000, 10000);
@@ -114,7 +118,8 @@ namespace GameWatcher
 
             try
             {
-                await _semaphoreSlim.WaitAsync();
+                if ( ! skipWait )
+                    await _semaphoreSlim.WaitAsync();
                 
                 // Grab the guild
                 if (newGuildUser.Guild is SocketGuild socketGuild)
@@ -178,8 +183,6 @@ namespace GameWatcher
 
                             if (!DatabaseHandler.Instance.Exists(game.Name))
                             {
-                                logger.Log(
-                                    $"[{newGuildUser.Id} | {randomNumber}] Game not found in database, bailing out");
                                 return;
                             }
 
@@ -249,7 +252,8 @@ namespace GameWatcher
             }
             finally
             {
-                _semaphoreSlim.Release();
+                if ( ! skipWait )
+                    _semaphoreSlim.Release();
             }
         }
     }
