@@ -39,7 +39,7 @@ namespace HomeLabReporting.SNMP
             }
         }
 
-        private async void RaisedOnTrapReceived(object sender, IpAddress ipAddress, VbCollection snmpVbCollection)
+        private void RaisedOnTrapReceived(object sender, IpAddress ipAddress, VbCollection snmpVbCollection)
         {
             var snmpHost = _snmpHosts.FirstOrDefault(x => x.IpAddress ==
                 (ipAddress.ToString().Contains(":") ? ipAddress.ToString().Split(':')[0] : ipAddress.ToString()));

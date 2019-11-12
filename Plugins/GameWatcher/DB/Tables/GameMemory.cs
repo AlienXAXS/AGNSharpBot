@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SQLite;
+using SQLite.Net.Attributes;
+using AutoIncrementAttribute = SQLite.Net.Attributes.AutoIncrementAttribute;
+using IndexedAttribute = SQLite.Net.Attributes.IndexedAttribute;
+using PrimaryKeyAttribute = SQLite.Net.Attributes.PrimaryKeyAttribute;
 
 namespace GameWatcher.DB.Tables
 {

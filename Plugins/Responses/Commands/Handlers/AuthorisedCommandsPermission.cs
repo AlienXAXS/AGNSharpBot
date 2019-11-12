@@ -30,7 +30,7 @@ namespace Responses.Commands.Handlers
 
         public AuthorisedCommandsPermission()
         {
-            LoadConfigAsync().Wait();
+            LoadConfig();
         }
 
         public bool UserHasPermission(string command, SocketMessage socketMessage)
@@ -49,7 +49,7 @@ namespace Responses.Commands.Handlers
             throw new Exception($"Unable to find a matching permission node for command {command}");
         }
 
-        public async Task LoadConfigAsync()
+        public void LoadConfig()
         {
             _commandPermissions.Clear();
 
