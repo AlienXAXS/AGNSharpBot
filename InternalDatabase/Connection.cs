@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using SQLite;
 using SQLitePCL;
+using SQLiteConnection = SQLite.SQLiteConnection;
 
 namespace InternalDatabase
 {

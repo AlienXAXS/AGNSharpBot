@@ -117,7 +117,7 @@ namespace Responses.Commands
 
             await sktMessage.Channel.SendMessageAsync($"Channel ID is {sktMessage.Channel.Id} which is in the guild {_guildID}");
         }
-
+        /*
         [Command("rmmsg", "rmmsg <userid> <#messages> [from msg id] - Removes the specified number of messages for a user in the channel you execute the command in")]
         public async void RemoveUserMessages(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
@@ -203,5 +203,6 @@ namespace Responses.Commands
                 }
             }
         }
+        */
     }
 }
