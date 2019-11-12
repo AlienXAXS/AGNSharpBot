@@ -81,14 +81,14 @@ namespace GameWatcher
                                     foreach (var playingRole in playingRoles)
                                     {
                                         // User is not playing anything, but they are part of a role that says they are, remove them.
-                                        if (user.Activity?.Type != ActivityType.Playing)
+                                        if (!(user.Activity is CustomStatusGame))
                                         {
                                             await user.RemoveRoleAsync(playingRole);
                                         }
                                     }
 
-                                    // Scan all users for playing games, and update discord accordingly.
-                                    await GameScan(user, user, true);
+                                    if ( user.Status != UserStatus.Offline )
+                                        await GameScan(user, user, true);
                                 }
                             }
                         }
@@ -124,8 +124,8 @@ namespace GameWatcher
                 // Grab the guild
                 if (newGuildUser.Guild is SocketGuild socketGuild)
                 {
-                    // Check to see if the activity is now nothing (aka, the user quit their app)
-                    if (newGuildUser.Activity?.Type != ActivityType.Playing || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
+                    //if (newGuildUser.Activity?.Type != ActivityType.Playing || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
+                    if (!(newGuildUser.Activity is CustomStatusGame) || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
                     {
                         var foundMemory = _roleMemory?.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.UserId == newGuildUser.Id && newGuildUser.Roles.Any(y => y.Id == x.RoleId));
                         if (foundMemory == null)
@@ -174,9 +174,9 @@ namespace GameWatcher
                             logger.Log($"[{newGuildUser.Id} | {randomNumber}] Unhandled exception for this event, message follows: {ex.Message}\r\n{ex.StackTrace}");
                         }
                     }
-                    else if(newGuildUser.Activity?.Type == ActivityType.Playing)
+                    else if(newGuildUser.Activity is CustomStatusGame)
                     {
-                        if (newGuildUser.Activity is Game game && newGuildUser.Activity.Type == ActivityType.Playing)
+                        if (newGuildUser.Activity is Game game)
                         {
 
                             //logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database");
