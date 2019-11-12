@@ -216,8 +216,8 @@ namespace CommandHandler
                 }
                 catch (Exception ex)
                 {
-                    await socketMessage.Channel.SendMessageAsync(ex.Message);
-                    await socketMessage.Channel.SendMessageAsync(ex.StackTrace);
+                    socketMessage.Channel.SendMessageAsync(ex.Message);
+                    socketMessage.Channel.SendMessageAsync(ex.StackTrace);
                 }
             }
             else

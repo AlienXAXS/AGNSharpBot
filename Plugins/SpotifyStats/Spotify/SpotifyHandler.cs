@@ -50,7 +50,7 @@ namespace SpotifyStats.Spotify
             public int PlayCount;
         }
 
-        private Task OnGuildMemberUpdated(SocketGuildUser oldMember, SocketGuildUser newMember)
+        private async Task OnGuildMemberUpdated(SocketGuildUser oldMember, SocketGuildUser newMember)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace SpotifyStats.Spotify
                     if (newMember.Activity is SpotifyGame sGameNew)
                     {
                         if (sGameOld.TrackId == sGameNew.TrackId)
-                            return Task.CompletedTask;
+                            return;
                     }
                 }
 
@@ -97,8 +97,6 @@ namespace SpotifyStats.Spotify
                         }
 
                         discordEmbedBuilder.AddField("Top Users", outputString);
-
-                        return Task.CompletedTask;
                         
                         //TODO: Fix this shit
                         //GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(null, GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.LoggerType.ConsoleAndDiscord, discordEmbed: discordEmbedBuilder.Build());
@@ -109,8 +107,6 @@ namespace SpotifyStats.Spotify
             {
                 GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"FATAL EXCEPTION\r\n{ex.Message}\r\n\r\nSTACK:\r\n{ex.StackTrace}))");
             }
-
-            return Task.CompletedTask;
         }
     }
 }

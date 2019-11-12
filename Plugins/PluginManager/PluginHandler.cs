@@ -102,7 +102,7 @@ namespace PluginManager
             return foundEntry.Enabled;
         }
 
-        private void InitPluginsReady()
+        private async void InitPluginsReady()
         {
             if (_hasExecutedPlugins) return;
             _hasExecutedPlugins = true;

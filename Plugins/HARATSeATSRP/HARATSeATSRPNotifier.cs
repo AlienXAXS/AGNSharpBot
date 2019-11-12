@@ -28,6 +28,7 @@ namespace HARATSeATSRP
         public PluginRouter PluginRouter { get; set; }
 
         private bool _seatWatcherRequestStop;
+        private ulong _notificationChannelId = 328624738077507584;
 
         private List<SRPMemory> srpMemories;
         private const string srpMemoryFile = "Plugins\\Config\\SRPMemory.json";
