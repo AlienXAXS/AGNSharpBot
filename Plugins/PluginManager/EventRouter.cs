@@ -456,6 +456,22 @@ namespace PluginManager
 
                 return Task.CompletedTask;
             };
+
+            dsc.UserLeft += user =>
+            {
+                if (UserLeftEvent.HasSubscribers)
+                {
+                    var guildId = user.Guild.Id;
+                    foreach (var sub in UserLeftEvent.Subscriptions)
+                    {
+                        var moduleName = sub.Method.Module.Name;
+                        if (PluginManager.PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
+                            sub.Invoke(user);
+                    }
+                }
+
+                return Task.CompletedTask;
+            };
         }
     }
 }

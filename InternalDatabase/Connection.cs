@@ -11,6 +11,8 @@ using SQLite;
 using SQLitePCL;
 using SQLiteConnection = SQLite.SQLiteConnection;
 
+//using SQLiteConnection = SQLite.SQLiteConnection;
+
 namespace InternalDatabase
 {
     public class Connection
