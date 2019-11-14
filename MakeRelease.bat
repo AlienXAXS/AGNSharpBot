@@ -41,6 +41,9 @@ copy /Y .\DiscordMenu\bin\Release\DiscordMenu.dll .\Release_Builder\Plugins
 echo   - SpotifyStats
 copy /Y .\Plugins\SpotifyStats\bin\Release\SpotifyStats.dll .\Release_Builder\Plugins
 
+echo   - JoinQuitMessages
+copy /Y .\Plugins\JoinQuitMessages\JoinQuitMessages\bin\Release\JoinQuitMessages.dll .\Release_Builder\Plugins
+
 echo   - HARATSeATSRPNotification
 copy /Y .\Plugins\HARATSeATSRP\bin\Release\HARATSeATSRP.dll .\Release_Builder\Plugins
 echo 
