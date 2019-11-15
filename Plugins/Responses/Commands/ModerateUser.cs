@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Permissions;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord;
 using Discord.WebSocket;
 using DiscordMenu;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Responses.Commands
 {
-    class ModerateUserSession : IDisposable
+    internal class ModerateUserSession : IDisposable
     {
         private DiscordMenu.MenuHandler _menuHandler;
         public DiscordSocketClient DiscordSocketClient { get; set; }
@@ -19,6 +16,7 @@ namespace Responses.Commands
         public SocketGuildUser Victim { get; set; }
 
         public delegate void SessionPreDispose();
+
         public event SessionPreDispose OnSessionPreDispose;
 
         private bool IsFinished;
@@ -74,10 +72,12 @@ namespace Responses.Commands
                     await Victim.KickAsync($"You were kicked by {SocketMessage.Author.Username}");
                     _menuHandler?.Dispose($"Victim {Victim.Username} was kicked by {SocketMessage.Author.Username}");
                     break;
+
                 case 2:
                     await Victim.BanAsync(reason: $"You were banned by {SocketMessage.Author.Username}");
                     _menuHandler?.Dispose($"Victim {Victim.Username} was banned by {SocketMessage.Author.Username}");
                     break;
+
                 case 3:
                 case 4:
                 case 5:
@@ -94,7 +94,7 @@ namespace Responses.Commands
         }
     }
 
-    class ModerateUser
+    internal class ModerateUser
     {
         [Command("mod", "!mod <userid> - Moderate a user using an interactive menu")]
         public async void MenuTest(string[] parameters, SocketMessage sktMessage,

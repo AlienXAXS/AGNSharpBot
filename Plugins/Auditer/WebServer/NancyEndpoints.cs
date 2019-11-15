@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Cryptography.X509Certificates;
-using Auditor.WebServer.Models;
-using Auditor.WebServer.Models.Messages;
+﻿using Auditor.WebServer.Models.Messages;
 using Discord;
 using Discord.WebSocket;
 using Nancy;
 using Nancy.Helpers;
 using Nancy.ModelBinding;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Auditor.WebServer
 {
@@ -59,8 +56,8 @@ namespace Auditor.WebServer
                         return "Cannot find your discord guild id. You have been logged out!";
                     }
 
-                    var sktGuildId = (long) sktGuild.Id;
-                    
+                    var sktGuildId = (long)sktGuild.Id;
+
                     var auditDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql.AuditEntry>();
 
                     var homepageModel = new Models.HomepageModel();
@@ -97,7 +94,7 @@ namespace Auditor.WebServer
 
                 var request = this.Bind<RequestObjects.LoginRequest>();
 
-                if ( request.Key == null )
+                if (request.Key == null)
                     return View["NoAuth", this.Request.Url];
 
                 var authDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql.AuditorNancyLoginSession>();
@@ -165,7 +162,7 @@ namespace Auditor.WebServer
                     model = new ByUser()
                     {
                         IsErrored = true,
-                        ErrorMessage =  ex.Message
+                        ErrorMessage = ex.Message
                     };
                 }
 
@@ -189,7 +186,7 @@ namespace Auditor.WebServer
             {
                 var postData = this.Bind<Models.Messages.PostData>();
 
-                foreach (var user in model.Users )
+                foreach (var user in model.Users)
                 {
                     if (user.Id.ToString() == postData.User)
                     {
@@ -202,7 +199,7 @@ namespace Auditor.WebServer
 
                 var auditDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql.AuditEntry>();
 
-                long gId = (long) sktGuild.Id;
+                long gId = (long)sktGuild.Id;
 
                 if (!long.TryParse(postData.User, out var uId))
                     throw new Exception("Cannot convert user to Long, oopsie!");
@@ -222,11 +219,11 @@ namespace Auditor.WebServer
                     audit.Notes = HttpUtility.HtmlEncode(audit.Notes).Replace("@", "&#64;");
 
                     if ((postData.DatetimeRange_From != null && postData.DatetimeRange_To != null))
-                        if ( !(audit.Timestamp.Ticks > dtFrom.Ticks && audit.Timestamp.Ticks < dtTo.Ticks) ) continue;
+                        if (!(audit.Timestamp.Ticks > dtFrom.Ticks && audit.Timestamp.Ticks < dtTo.Ticks)) continue;
 
                     if (!channelMemory.ContainsKey(audit.ChannelId.ToString()))
                     {
-                        var foundChannel = sktGuild.GetChannel((ulong) audit.ChannelId);
+                        var foundChannel = sktGuild.GetChannel((ulong)audit.ChannelId);
                         if (foundChannel == null)
                         {
                             if (audit.ChannelName == null)

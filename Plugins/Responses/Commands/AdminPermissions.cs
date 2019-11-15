@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord.WebSocket;
 using PermissionHandler;
 using PermissionHandler.DB;
+using System;
+using System.Linq;
 
 namespace Responses.Commands
 {
-    class AdminPermissions
+    internal class AdminPermissions
     {
         [Command("perm", "Manages the permission system (try !perm help)")]
         public async void AdminPermission(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
-
             // No params given, other than !perm itself
             if (parameters.Length == 1)
             {
@@ -113,7 +109,7 @@ namespace Responses.Commands
             var mention = parameters[3];
 
             // Check if the last param was a true/false for explicit deny
-            var explicitDeny = parameters[parameters.Length-1].Equals("true", StringComparison.OrdinalIgnoreCase);
+            var explicitDeny = parameters[parameters.Length - 1].Equals("true", StringComparison.OrdinalIgnoreCase);
 
             // Will catch any raised exception from the Permissions system here.
             try
@@ -122,8 +118,8 @@ namespace Responses.Commands
                     (sktMessage.MentionedUsers.Count == 0
                         ? sktMessage.MentionedRoles.First().Id
                         : sktMessage.MentionedUsers.First().Id),
-                    (explicitDeny 
-                        ? NodePermission.Deny 
+                    (explicitDeny
+                        ? NodePermission.Deny
                         : NodePermission.Allow),
                     (sktMessage.MentionedUsers.Count == 0 ? OwnerType.Role : OwnerType.User));
                 SendMessage($"Permission has been set successfully", sktMessage);

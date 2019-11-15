@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using PermissionHandler.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using GlobalLogger;
-using Newtonsoft.Json;
-using PermissionHandler.DB;
 
 namespace PermissionHandler
 {
-    class Database
+    internal class Database
     {
         // The db in memory
         private List<Node> _nodes = new List<Node>();
@@ -67,7 +65,7 @@ namespace PermissionHandler
             // Find the root path node
             var node = GetRootPermissionNode(path);
 
-            if ( node == null )
+            if (node == null)
                 throw new Exception($"Unable to Update Permission for {owner}, unable to find root node called {path}");
 
             var updatedNode = node.UpdateOwner(owner, permission, ownerType);
@@ -78,7 +76,7 @@ namespace PermissionHandler
 
         public void RemovePermission(string path, ulong owner)
         {
-            // Find the root path node 
+            // Find the root path node
             var node = GetRootPermissionNode(path);
             if (node == null)
                 throw new Exception($"Unable to Remove Permission for {owner}, unable to find root node called {path}");
@@ -93,6 +91,7 @@ namespace PermissionHandler
         }
 
         #region Save / Load Functionality
+
         public void Load()
         {
             lock (_nodes)
@@ -127,6 +126,7 @@ namespace PermissionHandler
                 }
             }
         }
-        #endregion
+
+        #endregion Save / Load Functionality
     }
 }

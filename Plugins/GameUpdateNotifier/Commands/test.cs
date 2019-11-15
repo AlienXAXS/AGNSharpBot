@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord.WebSocket;
 using HtmlAgilityPack;
+using System.Linq;
 
 namespace GameUpdateNotifier.Commands
 {
-    class test
+    internal class test
     {
         [Command("test", "Test cmd.")]
         public async void TestCmd(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)

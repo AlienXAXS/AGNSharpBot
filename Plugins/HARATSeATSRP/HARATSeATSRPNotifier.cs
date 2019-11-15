@@ -1,18 +1,15 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using Interface;
+using Newtonsoft.Json;
+using PluginManager;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Discord;
-using Discord.WebSocket;
-using Interface;
-using Newtonsoft.Json;
-using PluginManager;
 
 namespace HARATSeATSRP
 {
@@ -35,7 +32,6 @@ namespace HARATSeATSRP
 
         public void ExecutePlugin()
         {
-
             GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
 
             try
@@ -68,15 +64,15 @@ namespace HARATSeATSRP
                     using (var client = new WebClient())
                     {
                         var jsonFromSeAT = client.DownloadString("https://seat.housearatus.space/alienx/srpquery.php");
-                        List<SRPTableItem> srpRequests =JsonConvert.DeserializeObject<List<SRPTableItem>>(jsonFromSeAT);
+                        List<SRPTableItem> srpRequests = JsonConvert.DeserializeObject<List<SRPTableItem>>(jsonFromSeAT);
 
                         foreach (var guild in EventRouter.GetDiscordSocketClient().Guilds)
                         {
-                            if ( !PluginRouter.IsPluginExecutableOnGuild(guild.Id) ) continue;
+                            if (!PluginRouter.IsPluginExecutableOnGuild(guild.Id)) continue;
 
                             var notificationChannel = guild.Channels.DefaultIfEmpty(null).FirstOrDefault(x => x.Name.Equals("seat-srp-notifications"));
 
-                            if ( notificationChannel != null )
+                            if (notificationChannel != null)
                                 foreach (var srpRequest in srpRequests)
                                 {
                                     if (srpMemories.Any(x => x.KillToken.Equals(srpRequest.Kill_Token))) continue;
@@ -85,9 +81,9 @@ namespace HARATSeATSRP
                                     var builder = new EmbedBuilder();
                                     builder.Title = $"SRP Request From {srpRequest.Character_Name}";
                                     builder.AddField("Ship Type", srpRequest.Ship_Type);
-                                    builder.AddField("ISK Value",shipValue);
+                                    builder.AddField("ISK Value", shipValue);
                                     builder.AddField("Created At", srpRequest.Created_At);
-                                    builder.AddField("zKillboard Link",$"https://zkillboard.com/kill/{srpRequest.Kill_Id}");
+                                    builder.AddField("zKillboard Link", $"https://zkillboard.com/kill/{srpRequest.Kill_Id}");
 
                                     if (notificationChannel is ISocketMessageChannel socketGuildChannel)
                                     {
@@ -99,7 +95,8 @@ namespace HARATSeATSRP
                                 }
                         }
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Debug.Print("Lol");
                 }
@@ -124,7 +121,6 @@ namespace HARATSeATSRP
         {
             KillToken = killToken;
         }
-
     }
 
     public class SRPTableItem

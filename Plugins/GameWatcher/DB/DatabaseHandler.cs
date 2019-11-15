@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace GameWatcher.DB
 {
-    class DatabaseHandler
+    internal class DatabaseHandler
     {
         private static DatabaseHandler _instance;
         public static DatabaseHandler Instance = _instance ?? (_instance = new DatabaseHandler());
 
         private readonly InternalDatabase.Connection _dbConnection;
+
         public DatabaseHandler()
         {
-
             _dbConnection = InternalDatabase.Handler.Instance.NewConnection();
             _dbConnection.RegisterTable<DB.Tables.GameMemory>();
         }
@@ -26,7 +22,7 @@ namespace GameWatcher.DB
 
         public void Add(string name)
         {
-            var newRecord = new DB.Tables.GameMemory() {Name = name};
+            var newRecord = new DB.Tables.GameMemory() { Name = name };
             _dbConnection.DbConnection.Insert(newRecord);
         }
 
@@ -35,7 +31,7 @@ namespace GameWatcher.DB
             var record = _dbConnection.DbConnection.Table<DB.Tables.GameMemory>().DefaultIfEmpty(null)
                 .FirstOrDefault(x => x.Name.Equals(name));
 
-            if ( record != null )
+            if (record != null)
                 _dbConnection.DbConnection.Delete(record);
         }
     }

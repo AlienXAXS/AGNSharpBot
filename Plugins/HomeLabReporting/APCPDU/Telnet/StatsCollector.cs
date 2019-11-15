@@ -1,20 +1,19 @@
-﻿using System;
+﻿using Discord;
+using SimpleTCP;
+using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Discord;
-using SimpleTCP;
 
 namespace HomeLabReporting.APCPDU.Telnet
 {
-
-    class StatsCollected
+    internal class StatsCollected
     {
         public string Uptime { get; set; }
         public string OutputCurrent { get; set; }
         public string TotalPower { get; set; }
     }
 
-    class StatsCollector
+    internal class StatsCollector
     {
         public void GetStats()
         {
@@ -94,7 +93,6 @@ namespace HomeLabReporting.APCPDU.Telnet
 
             tcpClient.DataReceived += (sender, tcpClientResponse) =>
             {
-
                 cmds++;
                 if (cmds > 100)
                 {
@@ -104,7 +102,6 @@ namespace HomeLabReporting.APCPDU.Telnet
                     tcpClient.Disconnect();
                     return;
                 }
-
 
                 // USERNAME PROMPT
                 if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(tcpClientResponse.MessageString, "User Name", CompareOptions.IgnoreCase) >= 0)

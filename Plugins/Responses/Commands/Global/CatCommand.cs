@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CommandHandler;
+using Discord.WebSocket;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using CommandHandler;
-using Discord.WebSocket;
 
 namespace Responses.Commands.Global
 {
-    class CatCommand
+    internal class CatCommand
     {
         public async Task<Stream> GetCatPictureAsync(string text, bool gif)
         {
@@ -32,7 +30,7 @@ namespace Responses.Commands.Global
         [Permissions(Permissions.PermissionTypes.Guest)]
         public async void Cat(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
-            var sktGuildUser = ((SocketGuildUser) sktMessage.Author);
+            var sktGuildUser = ((SocketGuildUser)sktMessage.Author);
             var nickname = sktGuildUser.Nickname ?? sktGuildUser.Username;
 
             if (ContainsUnicodeCharacter(nickname))

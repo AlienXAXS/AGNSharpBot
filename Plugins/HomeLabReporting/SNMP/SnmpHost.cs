@@ -1,12 +1,12 @@
-﻿using System;
+﻿using GlobalLogger.AdvancedLogger;
+using Newtonsoft.Json;
+using SnmpSharpNet;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using GlobalLogger.AdvancedLogger;
-using Newtonsoft.Json;
-using SnmpSharpNet;
 
 namespace HomeLabReporting.SNMP
 {
@@ -57,7 +57,7 @@ namespace HomeLabReporting.SNMP
         }
     }
 
-    class SnmpHost
+    internal class SnmpHost
     {
         public string Name { get; set; }
         public string Command { get; set; }
@@ -76,7 +76,7 @@ namespace HomeLabReporting.SNMP
         public List<SnmpHostTrapDefinition> SnmpHostTraps = new List<SnmpHostTrapDefinition>();
 
         /// <summary>
-        /// Executes the SNMP Queries needed to grab the Oid's data - usually this is 
+        /// Executes the SNMP Queries needed to grab the Oid's data - usually this is
         /// </summary>
         public void Execute()
         {
@@ -86,16 +86,16 @@ namespace HomeLabReporting.SNMP
                 var community = new OctetString(CommunityString);
 
                 // Define agent parameters class
-                var param = new AgentParameters(community) {Version = SnmpVersion.Ver1};
+                var param = new AgentParameters(community) { Version = SnmpVersion.Ver1 };
                 var agent = new IpAddress(IpAddress);
-                var target = new UdpTarget((IPAddress) agent, Port, ConnectionTimeout, 1);
+                var target = new UdpTarget((IPAddress)agent, Port, ConnectionTimeout, 1);
 
                 var pdu = new Pdu(PduType.Get);
 
                 foreach (var oidEntry in OidList.Where(x => !x.Oid.Equals(""))) //do not read empty OID's here
                     pdu.VbList.Add(oidEntry.Oid);
 
-                var result = (SnmpV1Packet) target.Request(pdu, param);
+                var result = (SnmpV1Packet)target.Request(pdu, param);
                 if (result == null) return;
 
                 if (result.Pdu.ErrorStatus != 0)
@@ -142,11 +142,10 @@ namespace HomeLabReporting.SNMP
                 var row = table.NewRow();
                 table.Rows.Add(row);
 
-            
-                var attemptedExpressionResult = double.Parse((string) row["expression"]);
+                var attemptedExpressionResult = double.Parse((string)row["expression"]);
                 return attemptedExpressionResult;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return 0f;
             }

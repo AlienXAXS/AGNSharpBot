@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Auditor.WebServer;
+﻿using Auditor.WebServer;
 using Discord;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
 using Interface;
 using PluginManager;
+using System;
+using System.ComponentModel.Composition;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Auditor
 {
@@ -21,12 +18,13 @@ namespace Auditor
 
         public string Description =>
             "Audits all actions of users within your guild, accessable and searchable via a web interface.";
+
         public EventRouter EventRouter { get; set; }
 
         public void ExecutePlugin()
         {
             // Setup logger
-            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions(){Compress = true, Days = 1});
+            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions() { Compress = true, Days = 1 });
 
             // Register our SQL Tables
             InternalDatabase.Handler.Instance.NewConnection().RegisterTable<AuditorSql.AuditEntry>().RegisterTable<AuditorSql.AuditorNancyLoginSession>();
@@ -60,10 +58,10 @@ namespace Auditor
                 UserId = (long)userId,
                 PreviousContents = prevContents,
                 MessageId = (long)messageId,
-                GuildId = (long)guildId, 
-                Notes = notes, 
-                ImageUrls = imgUrls, 
-                Nickname =  Nickname,
+                GuildId = (long)guildId,
+                Notes = notes,
+                ImageUrls = imgUrls,
+                Nickname = Nickname,
                 ChannelName = ChannelName,
                 UserName = Username
             });
@@ -122,7 +120,7 @@ namespace Auditor
             {
                 // Nickname removed
                 if (oldGuildUser.Nickname != null)
-                    WriteToDatabase(AuditorSql.AuditEntry.AuditType.NICKNAME_DELETED, userId: newGuildUser.Id, notes:$"User {newGuildUser.Username} removed their nickname which was {oldGuildUser.Nickname}", guildId: newGuildUser.Guild.Id, Username: newGuildUser.Username, Nickname: newGuildUser.Nickname);
+                    WriteToDatabase(AuditorSql.AuditEntry.AuditType.NICKNAME_DELETED, userId: newGuildUser.Id, notes: $"User {newGuildUser.Username} removed their nickname which was {oldGuildUser.Nickname}", guildId: newGuildUser.Guild.Id, Username: newGuildUser.Username, Nickname: newGuildUser.Nickname);
             }
 
             return Task.CompletedTask;
@@ -138,14 +136,14 @@ namespace Auditor
 
             var imgUrls = sktMessage.Attachments.Aggregate("", (current, attachment) => current + $"{attachment.Url}|");
 
-            WriteToDatabase(AuditorSql.AuditEntry.AuditType.MESSAGE_NEW, sktMessage.Channel.Id, sktMessage.Author.Id, sktMessage.Content, notes: $"Message Received by {sktMessage.Author.Username} in channel {sktMessage.Channel.Name}", guildId: guildId, messageId: sktMessage.Id, imgUrls: imgUrls, Username: sktMessage.Author.Username, ChannelName:sktMessage.Channel.Name);
+            WriteToDatabase(AuditorSql.AuditEntry.AuditType.MESSAGE_NEW, sktMessage.Channel.Id, sktMessage.Author.Id, sktMessage.Content, notes: $"Message Received by {sktMessage.Author.Username} in channel {sktMessage.Channel.Name}", guildId: guildId, messageId: sktMessage.Id, imgUrls: imgUrls, Username: sktMessage.Author.Username, ChannelName: sktMessage.Channel.Name);
             return Task.CompletedTask;
         }
 
         private Task DiscordClientOnMessageUpdated(Cacheable<IMessage, ulong> prevMessage, SocketMessage message, ISocketMessageChannel sktChannel)
         {
             // If the message is from a bot, we dont care
-            if ( message.Author.IsBot ) return Task.CompletedTask;
+            if (message.Author.IsBot) return Task.CompletedTask;
 
             ulong guildId = 0;
             if (sktChannel is SocketGuildChannel socketGuildChannel)

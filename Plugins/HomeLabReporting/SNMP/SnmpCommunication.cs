@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using GlobalLogger.AdvancedLogger;
+using Newtonsoft.Json;
+using SnmpSharpNet;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
-using SnmpSharpNet;
-using Newtonsoft.Json;
 
 namespace HomeLabReporting.SNMP
 {
-    class SnmpCommunication
+    internal class SnmpCommunication
     {
         private static SnmpCommunication _instance;
         public static SnmpCommunication Instance = _instance ?? (_instance = new SnmpCommunication());
@@ -25,7 +25,7 @@ namespace HomeLabReporting.SNMP
             try
             {
                 AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                    .SetRetentionOptions(new RetentionOptions() {Compress = true, Days = 1});
+                    .SetRetentionOptions(new RetentionOptions() { Compress = true, Days = 1 });
 
                 var config =
                     JsonConvert.DeserializeObject<List<SnmpHost>>(

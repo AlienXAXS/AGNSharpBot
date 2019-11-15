@@ -1,24 +1,18 @@
-﻿using System;
+﻿using InternalDatabase;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using InternalDatabase;
-using SQLite;
-using SQLitePCL;
 
 namespace SpotifyStats.SQLite
 {
-
-    class SongEntry
+    internal class SongEntry
     {
         public Tables.Song Song;
         public List<Tables.Listener> Listeners;
     }
 
-    static class SQLiteHandler
+    internal static class SQLiteHandler
     {
-
         public static SongEntry AddSongAndListener(Connection connection, string songId, string artist, string name, ulong discordId)
         {
             var song = connection.DbConnection.Table<Tables.Song>().Where(x => x.SongId.Equals(songId)).DefaultIfEmpty(null)
@@ -38,7 +32,7 @@ namespace SpotifyStats.SQLite
             var listener = new Tables.Listener()
             {
                 SongId = song.Id,
-                DiscordId = (long) discordId,
+                DiscordId = (long)discordId,
                 DateTime = DateTime.Now
             };
             connection.DbConnection.Insert(listener);

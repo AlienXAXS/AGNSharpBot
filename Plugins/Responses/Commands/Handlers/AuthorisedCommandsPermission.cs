@@ -1,14 +1,13 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord.WebSocket;
-using GlobalLogger;
-using Newtonsoft.Json;
 
 namespace Responses.Commands.Handlers
 {
-    class CommandPermission
+    internal class CommandPermission
     {
         // The command itself, such as !move
         public string Command;
@@ -23,7 +22,7 @@ namespace Responses.Commands.Handlers
         }
     }
 
-    class AuthorisedCommandsPermission
+    internal class AuthorisedCommandsPermission
     {
         private const string ConfigurationPath = "Plugins\\Config\\AuthCommandPermissions.json";
         private List<CommandPermission> _commandPermissions = new List<CommandPermission>();

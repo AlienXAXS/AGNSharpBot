@@ -7,22 +7,18 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
-using GlobalLogger;
 using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace HomeLabReporting.SNMP
 {
+    using SnmpSharpNet;
     using System;
     using System.Net;
     using System.Net.Sockets;
 
-    using SnmpSharpNet;
-
-    class TrapReceiverConfiguration
+    internal class TrapReceiverConfiguration
     {
         public int Port { get; set; } = 162;
     }
@@ -84,7 +80,7 @@ namespace HomeLabReporting.SNMP
         /// </summary>
         private void StartTrapReceiver()
         {
-            // Construct a socket and bind it to the trap manager port 162 
+            // Construct a socket and bind it to the trap manager port 162
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             var ipep = new IPEndPoint(IPAddress.Any, 162);
             EndPoint ep = ipep;
@@ -99,7 +95,7 @@ namespace HomeLabReporting.SNMP
                 return;
             }
 
-            // Disable timeout processing. Just block until packet is received 
+            // Disable timeout processing. Just block until packet is received
             socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 0);
             while (true)
             {
@@ -120,11 +116,11 @@ namespace HomeLabReporting.SNMP
 
                 if (inLength > 0)
                 {
-                    // Check protocol version int 
+                    // Check protocol version int
                     var ver = SnmpPacket.GetProtocolVersion(inData, inLength);
-                    if (ver == (int) SnmpVersion.Ver1)
+                    if (ver == (int)SnmpVersion.Ver1)
                     {
-                        // Parse SNMP Version 1 TRAP packet 
+                        // Parse SNMP Version 1 TRAP packet
                         var pkt = new SnmpV1TrapPacket();
                         pkt.decode(inData, inLength);
 

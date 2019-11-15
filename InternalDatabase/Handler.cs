@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using GlobalLogger.AdvancedLogger;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using GlobalLogger.AdvancedLogger;
-using SQLite;
 
 namespace InternalDatabase
 {
@@ -15,7 +14,7 @@ namespace InternalDatabase
         public Handler()
         {
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+                .SetRetentionOptions(new RetentionOptions() { Compress = true });
         }
 
         /// <summary>

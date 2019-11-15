@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord.WebSocket;
+using System;
+using System.Threading.Tasks;
 
 namespace JoinQuitMessages.Configuration
 {
     // This class is the handler for all discord messages sent to this plugin.
-    class DiscordConfigurationHandler
+    internal class DiscordConfigurationHandler
     {
         [Command("joinquitmessages", "Configures Join and Quit messages for your discord guild.")]
         [Alias("jqm")]
@@ -30,6 +26,7 @@ namespace JoinQuitMessages.Configuration
                     await sktMessage.Channel.SendMessageAsync("\r\n`JoinQuitMessages System Help`\r\n" +
                                                               "`!jqm assign`\r\nAssigns the channel you type this command in to be the area where the bot will send Join and Quit Messages");
                     break;
+
                 case "assign":
                     await HandleAssign(parameters, sktMessage, discordSocketClient);
                     break;

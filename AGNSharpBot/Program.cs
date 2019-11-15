@@ -1,19 +1,19 @@
-﻿using System;
+﻿using AGNSharpBot.DiscordHandler;
+using CommandHandler;
+using GlobalLogger.AdvancedLogger;
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using AGNSharpBot.DiscordHandler;
-using CommandHandler;
-using GlobalLogger.AdvancedLogger;
 
 namespace AGNSharpBot
 {
-    class Program
+    internal class Program
     {
         [DllImport("Kernel32")]
         private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             try
             {
@@ -23,17 +23,19 @@ namespace AGNSharpBot
             {
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"Fatal Error: {ex.Message}\r\n\r\n{ex.StackTrace}");
 
-                if ( ex.InnerException != null )
+                if (ex.InnerException != null)
                     AdvancedLoggerHandler.Instance.GetLogger().Log($"Inner Exception Error: {ex.InnerException.Message}\r\n\r\n{ex.InnerException.StackTrace}");
             }
         }
 
         private readonly Client _discordClient = Client.Instance;
+
         private delegate bool EventHandler(CtrlType sig);
-        static EventHandler _handler;
+
+        private static EventHandler _handler;
         private static bool _running = true;
 
-        enum CtrlType
+        private enum CtrlType
         {
             CTRL_C_EVENT = 0,
             CTRL_BREAK_EVENT = 1,
@@ -56,6 +58,7 @@ namespace AGNSharpBot
                     System.Threading.Thread.Sleep(1500);
                     _running = false;
                     return true;
+
                 default:
                     return false;
             }
@@ -120,7 +123,7 @@ namespace AGNSharpBot
                 {
                     var discordClient = _discordClient.GetDiscordSocket();
 
-                    if ( discordClient == null) continue;
+                    if (discordClient == null) continue;
 
                     var totalUsers = discordClient.Guilds.Sum(guild => guild.MemberCount);
 

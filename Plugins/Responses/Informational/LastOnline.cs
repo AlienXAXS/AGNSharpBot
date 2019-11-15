@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord;
 using Discord.WebSocket;
-using Responses.SQLTables;
+using System;
+using System.Linq;
 
 namespace Responses.Informational
 {
-    class LastOnline
+    internal class LastOnline
     {
         [Command("lo",
             "lo <@user> - Returns when a user was last seen online, you can pass multiple users into this command.")]
@@ -26,7 +21,6 @@ namespace Responses.Informational
             // We have a mention, use that ID
             if (sktMessage.MentionedUsers.Count > 0)
             {
-
                 var outputMessage = "";
                 foreach (var user in sktMessage.MentionedUsers)
                 {
@@ -34,7 +28,7 @@ namespace Responses.Informational
                     {
                         case UserStatus.Offline:
                             var foundUser = sqlDb.DefaultIfEmpty(null)
-                                .FirstOrDefault(x => x != null && x.DiscordId.Equals((long) user.Id));
+                                .FirstOrDefault(x => x != null && x.DiscordId.Equals((long)user.Id));
                             if (foundUser == null)
                                 outputMessage +=
                                     $"User {user.Username} cannot be found in my database, I've just not seen them online yet\r\n";

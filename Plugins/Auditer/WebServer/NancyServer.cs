@@ -1,26 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Configuration;
 using Nancy.Conventions;
-using Nancy.Extensions;
-using Nancy.Hosting.Self;
 using Nancy.Session;
 using Nancy.TinyIoc;
-using Nancy.ViewEngines.SuperSimpleViewEngine;
-using Newtonsoft.Json;
+using System;
+using System.Threading;
 
 namespace Auditor.WebServer
 {
-    class NancyServer
+    internal class NancyServer
     {
         private static readonly NancyServer _instance;
         public static NancyServer Instance = _instance ?? (_instance = new NancyServer());
@@ -49,7 +40,7 @@ namespace Auditor.WebServer
                 throw new Exception("NancyServer is already running");
 
             //if ( DiscordSocketClient == null )
-                //throw new Exception("DiscordSocketClient not set - unable to start Nancy");
+            //throw new Exception("DiscordSocketClient not set - unable to start Nancy");
 
             try
             {
@@ -101,7 +92,6 @@ namespace Auditor.WebServer
         }
     }
 
-
     public class CustomRootPathProvider : IRootPathProvider
     {
         public string GetRootPath()
@@ -126,7 +116,7 @@ namespace Auditor.WebServer
         public override void Configure(INancyEnvironment environment)
         {
             base.Configure(environment);
-            environment.Views(runtimeViewUpdates:true);
+            environment.Views(runtimeViewUpdates: true);
         }
 
         protected override IRootPathProvider RootPathProvider => new CustomRootPathProvider();

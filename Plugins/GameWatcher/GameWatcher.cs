@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Discord;
-using Discord.WebSocket;
-using GameWatcher.DB;
+﻿using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
 using Interface;
 using PluginManager;
+using System;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace GameWatcher
 {
@@ -30,7 +23,7 @@ namespace GameWatcher
         {
             try
             {
-                AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions() {Compress = true});
+                AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions() { Compress = true });
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER] Checking Discord...");
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]  >  Complete");
 

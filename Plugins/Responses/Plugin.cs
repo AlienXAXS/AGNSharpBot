@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.ComponentModel.Composition;
-using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
+﻿using GlobalLogger.AdvancedLogger;
 using Interface;
 using PluginManager;
 using Responses.Informational;
 using Responses.SQLTables;
+using System.ComponentModel.Composition;
 
 namespace Responses
 {
@@ -22,7 +18,7 @@ namespace Responses
         void IPlugin.ExecutePlugin()
         {
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+                .SetRetentionOptions(new RetentionOptions() { Compress = true });
             AdvancedLoggerHandler.Instance.GetLogger().Log($"Responses.dll Plugin Loading...");
 
             // SQL Database Setup
@@ -51,6 +47,5 @@ namespace Responses
         {
             AdvancedLoggerHandler.Instance.GetLogger().Log("Responses Disposed");
         }
-
     }
 }

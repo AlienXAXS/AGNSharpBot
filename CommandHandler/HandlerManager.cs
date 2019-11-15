@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using PermissionHandler;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
-using PermissionHandler;
 
 namespace CommandHandler
 {
@@ -36,7 +36,7 @@ namespace CommandHandler
         public void RegisterHandler<T>()
         {
             // Register our handler
-            _registeredHandlers.Add( new HandlerType() { Assembly = Assembly.GetCallingAssembly(), Type = typeof(T) });
+            _registeredHandlers.Add(new HandlerType() { Assembly = Assembly.GetCallingAssembly(), Type = typeof(T) });
 
             // Register it with the permission system
             Permission.Instance.RegisterPermission<T>(Assembly.GetCallingAssembly());
@@ -88,10 +88,10 @@ namespace CommandHandler
                 {
                     foreach (var method in handler.Type.GetMethods())
                     {
-                        var cmdString = (Command) method.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
-                        var cmdAliases = (Alias) method.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
+                        var cmdString = (Command)method.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
+                        var cmdAliases = (Alias)method.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
                         var cmdPermissions =
-                            (Permissions) method.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
+                            (Permissions)method.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
 
                         if (cmdString != null)
                             methodHelpers.Add(new MethodInfoHelper()
@@ -152,7 +152,6 @@ namespace CommandHandler
 
                 if (paramCommand.Equals("help", StringComparison.OrdinalIgnoreCase))
                 {
-
                     var discordEmbedBuilder = new EmbedBuilder();
                     discordEmbedBuilder.WithTitle("Kitty Cat Commands");
                     discordEmbedBuilder.Color = Color.Blue;
@@ -161,7 +160,7 @@ namespace CommandHandler
                     foreach (var thisMethod in methodHelpers)
                     {
                         if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
-                            Permission.Instance.CheckPermission((SocketGuildUser) socketMessage.Author,
+                            Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author,
                                 $"{thisMethod.MethodInfo.ReflectedType?.FullName}.{thisMethod.MethodInfo.Name}"))
                         {
                             discordEmbedBuilder.AddField($"!{thisMethod.Command.Value}",
@@ -199,9 +198,8 @@ namespace CommandHandler
                                 if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
                                     hasExplicitPermission)
                                 {
-
                                     // Execute the method
-                                    var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
+                                    var paramArray = new object[] { parameters, socketMessage, _discordSocketClient };
                                     var activator = Activator.CreateInstance(thisMethod.Type);
                                     thisMethod.MethodInfo.Invoke(activator, paramArray);
                                 }
@@ -225,7 +223,7 @@ namespace CommandHandler
                 await socketMessage.Author.SendMessageAsync("Sorry, this bot does not support any type of configuration via Private Messages.");
             }
         }
-        
+
         private async Task SetPluginState(string[] parameters, SocketMessage socketMessage, bool status)
         {
             if (parameters.Length != 3)
@@ -243,7 +241,7 @@ namespace CommandHandler
                 try
                 {
                     PluginManager.PluginHandler.Instance.SetPluginState(pluginName, socketGuildUser.Guild.Id, status);
-                    if ( status )
+                    if (status)
                         await socketMessage.Channel.SendMessageAsync($"The plugin was successfully enabled.");
                     else
                         await socketMessage.Channel.SendMessageAsync($"The plugin was successfully disabled.");

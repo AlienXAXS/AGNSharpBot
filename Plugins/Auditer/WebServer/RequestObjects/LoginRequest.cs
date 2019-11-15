@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Auditor.WebServer.RequestObjects
+﻿namespace Auditor.WebServer.RequestObjects
 {
-    class LoginRequest
+    internal class LoginRequest
     {
         public string Key { get; set; }
     }

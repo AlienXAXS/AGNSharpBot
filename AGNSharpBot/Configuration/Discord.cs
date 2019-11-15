@@ -1,10 +1,10 @@
-﻿using System;
-using GlobalLogger.AdvancedLogger;
+﻿using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
+using System;
 
 namespace AGNSharpBot.Configuration
 {
-    class Discord
+    internal class Discord
     {
         public static Discord Instance = _instance ?? (_instance = new Discord());
         private static readonly Discord _instance;
@@ -18,7 +18,7 @@ namespace AGNSharpBot.Configuration
             if (System.IO.File.Exists("config.json"))
             {
                 var config = JsonConvert.DeserializeObject<Discord>(System.IO.File.ReadAllText("config.json"));
-                if ( config.Token.Equals("") || config.CommandPrefix.Equals('\0') )
+                if (config.Token.Equals("") || config.CommandPrefix.Equals('\0'))
                     throw new Exceptions.InvalidConfigurationFile();
 
                 try
@@ -40,6 +40,7 @@ namespace AGNSharpBot.Configuration
             }
         }
     }
+
     public class Exceptions
     {
         public class MissingConfigurationFile : Exception

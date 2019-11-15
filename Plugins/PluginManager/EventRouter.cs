@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 
 namespace PluginManager
 {
     public class EventRouter
     {
         private readonly List<string> _socketClientAllowedBinaries = new List<string>() { "Auditor.dll", "GameWatcher.dll", "HARATSeATSRP.dll" };
-
 
         private DiscordSocketClient _discordSocketClient;
 
@@ -32,7 +31,9 @@ namespace PluginManager
             add => ChannelCreatedEvent.Add(value);
             remove => ChannelCreatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketChannel, Task>> ChannelCreatedEvent = new AsyncEvent<Func<SocketChannel, Task>>();
+
         /// <summary> Fired when a channel is destroyed. </summary>
         /// <remarks>
         ///     <para>
@@ -54,7 +55,9 @@ namespace PluginManager
             add => ChannelDestroyedEvent.Add(value);
             remove => ChannelDestroyedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketChannel, Task>> ChannelDestroyedEvent = new AsyncEvent<Func<SocketChannel, Task>>();
+
         /// <summary> Fired when a channel is updated. </summary>
         /// <remarks>
         ///     <para>
@@ -77,6 +80,7 @@ namespace PluginManager
             add => ChannelUpdatedEvent.Add(value);
             remove => ChannelUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketChannel, SocketChannel, Task>> ChannelUpdatedEvent = new AsyncEvent<Func<SocketChannel, SocketChannel, Task>>();
 
         //Messages
@@ -103,12 +107,14 @@ namespace PluginManager
             add => MessageReceivedEvent.Add(value);
             remove => MessageReceivedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketMessage, Task>> MessageReceivedEvent = new AsyncEvent<Func<SocketMessage, Task>>();
+
         /// <summary> Fired when a message is deleted. </summary>
         /// <remarks>
         ///     <para>
         ///         This event is fired when a message is deleted. The event handler must return a
-        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/> and 
+        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/> and
         ///         <see cref="ISocketMessageChannel"/> as its parameters.
         ///     </para>
         ///     <para>
@@ -119,11 +125,11 @@ namespace PluginManager
         ///         </note>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the deleted message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
-        ///         The source channel of the removed message will be passed into the 
+        ///         The source channel of the removed message will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
@@ -136,7 +142,9 @@ namespace PluginManager
             add => MessageDeletedEvent.Add(value);
             remove => MessageDeletedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>> MessageDeletedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, ISocketMessageChannel, Task>>();
+
         /// <summary> Fired when multiple messages are bulk deleted. </summary>
         /// <remarks>
         ///     <note>
@@ -144,7 +152,7 @@ namespace PluginManager
         ///     </note>
         ///     <para>
         ///         This event is fired when multiple messages are bulk deleted. The event handler must return a
-        ///         <see cref="Task"/> and accept an <see cref="IReadOnlyCollection{Cacheable}"/> and 
+        ///         <see cref="Task"/> and accept an <see cref="IReadOnlyCollection{Cacheable}"/> and
         ///         <see cref="ISocketMessageChannel"/> as its parameters.
         ///     </para>
         ///     <para>
@@ -155,11 +163,11 @@ namespace PluginManager
         ///         </note>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the deleted message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
-        ///         The source channel of the removed message will be passed into the 
+        ///         The source channel of the removed message will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
@@ -168,7 +176,9 @@ namespace PluginManager
             add => MessagesBulkDeletedEvent.Add(value);
             remove => MessagesBulkDeletedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>> MessagesBulkDeletedEvent = new AsyncEvent<Func<IReadOnlyCollection<Cacheable<IMessage, ulong>>, ISocketMessageChannel, Task>>();
+
         /// <summary> Fired when a message is updated. </summary>
         /// <remarks>
         ///     <para>
@@ -179,14 +189,14 @@ namespace PluginManager
         ///     <para>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the original message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
         ///         The updated message will be passed into the <see cref="SocketMessage"/> parameter.
         ///     </para>
         ///     <para>
-        ///         The source channel of the updated message will be passed into the 
+        ///         The source channel of the updated message will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         /// </remarks>
@@ -195,29 +205,31 @@ namespace PluginManager
             add => MessageUpdatedEvent.Add(value);
             remove => MessageUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>> MessageUpdatedEvent = new AsyncEvent<Func<Cacheable<IMessage, ulong>, SocketMessage, ISocketMessageChannel, Task>>();
+
         /// <summary> Fired when a reaction is added to a message. </summary>
         /// <remarks>
         ///     <para>
         ///         This event is fired when a reaction is added to a user message. The event handler must return a
-        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/>, an 
+        ///         <see cref="Task"/> and accept a <see cref="Cacheable{TEntity,TId}"/>, an
         ///         <see cref="ISocketMessageChannel"/>, and a <see cref="SocketReaction"/> as its parameter.
         ///     </para>
         ///     <para>
         ///         If caching is enabled via <see cref="DiscordSocketConfig"/>, the
         ///         <see cref="Cacheable{TEntity,TId}"/> entity will contain the original message; otherwise, in event
-        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the 
+        ///         that the message cannot be retrieved, the snowflake ID of the message is preserved in the
         ///         <see cref="ulong"/>.
         ///     </para>
         ///     <para>
-        ///         The source channel of the reaction addition will be passed into the 
+        ///         The source channel of the reaction addition will be passed into the
         ///         <see cref="ISocketMessageChannel"/> parameter.
         ///     </para>
         ///     <para>
         ///         The reaction that was added will be passed into the <see cref="SocketReaction"/> parameter.
         ///     </para>
         ///     <note>
-        ///         When fetching the reaction from this event, a user may not be provided under 
+        ///         When fetching the reaction from this event, a user may not be provided under
         ///         <see cref="SocketReaction.User"/>. Please see the documentation of the property for more
         ///         information.
         ///     </note>
@@ -231,20 +243,25 @@ namespace PluginManager
             add => ReactionAddedEvent.Add(value);
             remove => ReactionAddedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> ReactionAddedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
+
         /// <summary> Fired when a reaction is removed from a message. </summary>
         public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task> ReactionRemoved
         {
             add => ReactionRemovedEvent.Add(value);
             remove => ReactionRemovedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>> ReactionRemovedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, SocketReaction, Task>>();
+
         /// <summary> Fired when all reactions to a message are cleared. </summary>
         public event Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task> ReactionsCleared
         {
             add => ReactionsClearedEvent.Add(value);
             remove => ReactionsClearedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>> ReactionsClearedEvent = new AsyncEvent<Func<Cacheable<IUserMessage, ulong>, ISocketMessageChannel, Task>>();
 
         //Roles
@@ -254,20 +271,25 @@ namespace PluginManager
             add => RoleCreatedEvent.Add(value);
             remove => RoleCreatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketRole, Task>> RoleCreatedEvent = new AsyncEvent<Func<SocketRole, Task>>();
+
         /// <summary> Fired when a role is deleted. </summary>
         public event Func<SocketRole, Task> RoleDeleted
         {
             add => RoleDeletedEvent.Add(value);
             remove => RoleDeletedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketRole, Task>> RoleDeletedEvent = new AsyncEvent<Func<SocketRole, Task>>();
+
         /// <summary> Fired when a role is updated. </summary>
         public event Func<SocketRole, SocketRole, Task> RoleUpdated
         {
             add => RoleUpdatedEvent.Add(value);
             remove => RoleUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketRole, SocketRole, Task>> RoleUpdatedEvent = new AsyncEvent<Func<SocketRole, SocketRole, Task>>();
 
         //Guilds
@@ -277,41 +299,52 @@ namespace PluginManager
             add => JoinedGuildEvent.Add(value);
             remove => JoinedGuildEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuild, Task>> JoinedGuildEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+
         /// <summary> Fired when the connected account leaves a guild. </summary>
         public event Func<SocketGuild, Task> LeftGuild
         {
             add => LeftGuildEvent.Add(value);
             remove => LeftGuildEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuild, Task>> LeftGuildEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+
         /// <summary> Fired when a guild becomes available. </summary>
         public event Func<SocketGuild, Task> GuildAvailable
         {
             add => GuildAvailableEvent.Add(value);
             remove => GuildAvailableEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuild, Task>> GuildAvailableEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+
         /// <summary> Fired when a guild becomes unavailable. </summary>
         public event Func<SocketGuild, Task> GuildUnavailable
         {
             add => GuildUnavailableEvent.Add(value);
             remove => GuildUnavailableEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuild, Task>> GuildUnavailableEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+
         /// <summary> Fired when offline guild members are downloaded. </summary>
         public event Func<SocketGuild, Task> GuildMembersDownloaded
         {
             add => GuildMembersDownloadedEvent.Add(value);
             remove => GuildMembersDownloadedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuild, Task>> GuildMembersDownloadedEvent = new AsyncEvent<Func<SocketGuild, Task>>();
+
         /// <summary> Fired when a guild is updated. </summary>
         public event Func<SocketGuild, SocketGuild, Task> GuildUpdated
         {
             add => GuildUpdatedEvent.Add(value);
             remove => GuildUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuild, SocketGuild, Task>> GuildUpdatedEvent = new AsyncEvent<Func<SocketGuild, SocketGuild, Task>>();
 
         //Users
@@ -321,88 +354,110 @@ namespace PluginManager
             add => UserJoinedEvent.Add(value);
             remove => UserJoinedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuildUser, Task>> UserJoinedEvent = new AsyncEvent<Func<SocketGuildUser, Task>>();
+
         /// <summary> Fired when a user leaves a guild. </summary>
         public event Func<SocketGuildUser, Task> UserLeft
         {
             add => UserLeftEvent.Add(value);
             remove => UserLeftEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuildUser, Task>> UserLeftEvent = new AsyncEvent<Func<SocketGuildUser, Task>>();
+
         /// <summary> Fired when a user is banned from a guild. </summary>
         public event Func<SocketUser, SocketGuild, Task> UserBanned
         {
             add => UserBannedEvent.Add(value);
             remove => UserBannedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketUser, SocketGuild, Task>> UserBannedEvent = new AsyncEvent<Func<SocketUser, SocketGuild, Task>>();
+
         /// <summary> Fired when a user is unbanned from a guild. </summary>
         public event Func<SocketUser, SocketGuild, Task> UserUnbanned
         {
             add => UserUnbannedEvent.Add(value);
             remove => UserUnbannedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketUser, SocketGuild, Task>> UserUnbannedEvent = new AsyncEvent<Func<SocketUser, SocketGuild, Task>>();
+
         /// <summary> Fired when a user is updated. </summary>
         public event Func<SocketUser, SocketUser, Task> UserUpdated
         {
             add => UserUpdatedEvent.Add(value);
             remove => UserUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketUser, SocketUser, Task>> UserUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketUser, Task>>();
+
         /// <summary> Fired when a guild member is updated, or a member presence is updated. </summary>
         public event Func<SocketGuildUser, SocketGuildUser, Task> GuildMemberUpdated
         {
             add => GuildMemberUpdatedEvent.Add(value);
             remove => GuildMemberUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>> GuildMemberUpdatedEvent = new AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>>();
+
         /// <summary> Fired when a user joins, leaves, or moves voice channels. </summary>
         public event Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> UserVoiceStateUpdated
         {
             add => UserVoiceStateUpdatedEvent.Add(value);
             remove => UserVoiceStateUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>> UserVoiceStateUpdatedEvent = new AsyncEvent<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>>();
+
         /// <summary> Fired when the bot connects to a Discord voice server. </summary>
         public event Func<SocketVoiceServer, Task> VoiceServerUpdated
         {
             add => VoiceServerUpdatedEvent.Add(value);
             remove => VoiceServerUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketVoiceServer, Task>> VoiceServerUpdatedEvent = new AsyncEvent<Func<SocketVoiceServer, Task>>();
+
         /// <summary> Fired when the connected account is updated. </summary>
         public event Func<SocketSelfUser, SocketSelfUser, Task> CurrentUserUpdated
         {
             add => SelfUpdatedEvent.Add(value);
             remove => SelfUpdatedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>> SelfUpdatedEvent = new AsyncEvent<Func<SocketSelfUser, SocketSelfUser, Task>>();
+
         /// <summary> Fired when a user starts typing. </summary>
         public event Func<SocketUser, ISocketMessageChannel, Task> UserIsTyping
         {
             add => UserIsTypingEvent.Add(value);
             remove => UserIsTypingEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketUser, ISocketMessageChannel, Task>> UserIsTypingEvent = new AsyncEvent<Func<SocketUser, ISocketMessageChannel, Task>>();
+
         /// <summary> Fired when a user joins a group channel. </summary>
         public event Func<SocketGroupUser, Task> RecipientAdded
         {
             add => RecipientAddedEvent.Add(value);
             remove => RecipientAddedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGroupUser, Task>> RecipientAddedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
+
         /// <summary> Fired when a user is removed from a group channel. </summary>
         public event Func<SocketGroupUser, Task> RecipientRemoved
         {
             add => RecipientRemovedEvent.Add(value);
             remove => RecipientRemovedEvent.Remove(value);
         }
+
         internal readonly AsyncEvent<Func<SocketGroupUser, Task>> RecipientRemovedEvent = new AsyncEvent<Func<SocketGroupUser, Task>>();
 
         public void SetupEventRouter(DiscordSocketClient dsc)
         {
-
             _discordSocketClient = dsc;
 
             dsc.UserJoined += user =>
@@ -449,7 +504,7 @@ namespace PluginManager
                     foreach (var sub in GuildMemberUpdatedEvent.Subscriptions)
                     {
                         var moduleName = sub.Method.Module.Name;
-                        if ( PluginManager.PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId) )
+                        if (PluginManager.PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
                             sub.Invoke(oldUser, newUser);
                     }
                 }

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord.WebSocket;
 using Responses.Commands.Handlers;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Responses.Commands
 {
-    class AuthorisedCommands
+    internal class AuthorisedCommands
     {
         private readonly AuthorisedCommandsPermission _authCmdsPermissonsHandler = new AuthorisedCommandsPermission();
 
@@ -26,7 +22,7 @@ namespace Responses.Commands
             }
 
             var CollectedUsers = new List<SocketGuildUser>();
-            var sktAuthorUser = (SocketGuildUser) sktMessage.Author;
+            var sktAuthorUser = (SocketGuildUser)sktMessage.Author;
 
             if (sktAuthorUser.VoiceChannel == null)
             {

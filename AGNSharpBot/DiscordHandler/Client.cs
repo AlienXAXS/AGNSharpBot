@@ -1,14 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
 
 namespace AGNSharpBot.DiscordHandler
 {
-    class Client : IDisposable
+    internal class Client : IDisposable
     {
         private static Client _instance;
         public static Client Instance = _instance ?? (_instance = new Client());
@@ -22,7 +19,7 @@ namespace AGNSharpBot.DiscordHandler
         {
             _services = services;
 
-            var _config = new DiscordSocketConfig {MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true, LogLevel = LogSeverity.Info};
+            var _config = new DiscordSocketConfig { MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true, LogLevel = LogSeverity.Info };
             _discordSocket = new DiscordSocketClient(_config);
             _discordSocket.Log += message =>
             {
@@ -32,9 +29,8 @@ namespace AGNSharpBot.DiscordHandler
                     GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(message.Message);
                 return Task.CompletedTask;
             };
-            
         }
-        
+
         internal async Task Connect()
         {
             await _discordSocket.LoginAsync(TokenType.Bot, Configuration.Discord.Instance.Token);

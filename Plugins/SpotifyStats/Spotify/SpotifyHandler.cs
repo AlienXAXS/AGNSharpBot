@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
-using GlobalLogger;
 using PluginManager;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SpotifyStats.Spotify
 {
-    class SpotifyHandler
+    internal class SpotifyHandler
     {
         // Instancing handler for this class
         private static SpotifyHandler _instance;
+
         public static SpotifyHandler Instance = _instance ?? (_instance = new SpotifyHandler());
 
         private InternalDatabase.Connection dbConnection;
@@ -32,13 +28,12 @@ namespace SpotifyStats.Spotify
         {
             try
             {
-                var lId = (long) socketGuildUser.Id;
+                var lId = (long)socketGuildUser.Id;
                 dbConnection.DbConnection.Table<SQLite.Tables.Listener>()
                     .Delete(x => x.DiscordId == lId);
             }
             catch (Exception)
             {
-
             }
 
             return Task.CompletedTask;
@@ -77,7 +72,7 @@ namespace SpotifyStats.Spotify
 
                         var top = group.Take(3);
 
-                        var topUsersList = (from topEntry in top let foundUser = newMember.Guild.GetUser((ulong) topEntry.Key) where foundUser != null select new TopPlayEntry() {Username = foundUser.Username, PlayCount = topEntry.Count()}).ToList();
+                        var topUsersList = (from topEntry in top let foundUser = newMember.Guild.GetUser((ulong)topEntry.Key) where foundUser != null select new TopPlayEntry() { Username = foundUser.Username, PlayCount = topEntry.Count() }).ToList();
 
                         var discordEmbedBuilder = new EmbedBuilder();
                         discordEmbedBuilder.WithTitle($"{returnedSong.Song.Artist} - {returnedSong.Song.Name}")
@@ -97,13 +92,13 @@ namespace SpotifyStats.Spotify
                         }
 
                         discordEmbedBuilder.AddField("Top Users", outputString);
-                        
+
                         //TODO: Fix this shit
                         //GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(null, GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.LoggerType.ConsoleAndDiscord, discordEmbed: discordEmbedBuilder.Build());
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"FATAL EXCEPTION\r\n{ex.Message}\r\n\r\nSTACK:\r\n{ex.StackTrace}))");
             }

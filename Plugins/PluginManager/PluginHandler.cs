@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using GlobalLogger.AdvancedLogger;
+using Interface;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
@@ -6,9 +9,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
-using Interface;
 
 namespace PluginManager
 {
@@ -21,13 +21,14 @@ namespace PluginManager
         public static PluginHandler Instance = _instance ?? (_instance = new PluginHandler());
 
         public EventRouter EventRouter = new EventRouter();
-        
+
         public PluginRouter PluginRouter = new PluginRouter();
 
         private DiscordSocketClient _discordSocketClient;
+
         public DiscordSocketClient DiscordSocketClient
         {
-            internal get { return _discordSocketClient;}
+            internal get { return _discordSocketClient; }
             set
             {
                 _discordSocketClient = value;
@@ -35,7 +36,7 @@ namespace PluginManager
                 EventRouter.SetupEventRouter(value);
             }
         }
-        
+
         private Task DiscordSocketClientOnReady()
         {
             InitPluginsReady();
@@ -153,7 +154,7 @@ namespace PluginManager
         {
             return Plugins;
         }
-        
+
         public void Dispose()
         {
             foreach (var plugin in Plugins)

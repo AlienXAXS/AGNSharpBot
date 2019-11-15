@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Discord.WebSocket;
+using GlobalLogger.AdvancedLogger;
+using PermissionHandler.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using Discord.Commands;
-using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
-using PermissionHandler.DB;
 
 namespace PermissionHandler
 {
@@ -14,6 +12,7 @@ namespace PermissionHandler
     {
         // Instance
         private static Permission _instance;
+
         public static Permission Instance = _instance ?? (_instance = new Permission());
 
         private readonly Database _database = new Database();
@@ -53,10 +52,10 @@ namespace PermissionHandler
         public Node Add(string path, ulong owner, NodePermission permission, OwnerType ownerType)
         {
             var foundPath = _database.GetData().DefaultIfEmpty(null).FirstOrDefault(x => x.Path.Equals(path));
-            if ( foundPath == null )
+            if (foundPath == null)
                 throw new Exception("The supplied path is invalid");
 
-            if ( foundPath.Permissions.Any(x => x.Owner == owner) )
+            if (foundPath.Permissions.Any(x => x.Owner == owner))
                 throw new Exception("The supplied user is already a member of this permission path, either modify them or remove them");
 
             return _database.AddPermission(path, owner, permission, ownerType);
@@ -71,7 +70,7 @@ namespace PermissionHandler
             if (foundPath.Permissions.Where(x => x.Owner == owner).DefaultIfEmpty(null).FirstOrDefault() == null)
                 throw new Exception("The supplied user is not a member of this permission path");
 
-            _database.RemovePermission(path,owner);
+            _database.RemovePermission(path, owner);
         }
 
         public bool CheckPermission(SocketGuildUser sktUser,
@@ -102,6 +101,7 @@ namespace PermissionHandler
                     case NodePermission.Allow:
                         canPermit = true;
                         break;
+
                     case NodePermission.Deny:
                         foundExplicitRoleDeny = true;
                         break;
@@ -112,9 +112,9 @@ namespace PermissionHandler
             }
 
             // Find explicit user allow
-            if ( !canPermit )
-            canPermit = permissionNode.Permissions
-                .Any(x => x.Owner.Equals(sktUser.Id) && x.Permission == NodePermission.Allow);
+            if (!canPermit)
+                canPermit = permissionNode.Permissions
+                    .Any(x => x.Owner.Equals(sktUser.Id) && x.Permission == NodePermission.Allow);
 
             // Find explicit user deny
             var foundExplicitDeny = permissionNode.Permissions
@@ -124,4 +124,3 @@ namespace PermissionHandler
         }
     }
 }
-

@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using GlobalLogger.AdvancedLogger;
 using PluginManager;
 using Responses.SQLTables;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Responses.Informational
 {
-    class LastOnlineDbHandler
+    internal class LastOnlineDbHandler
     {
-
         public Task StartOnlineScanner(EventRouter discordSocketClient)
         {
             discordSocketClient.GuildMemberUpdated += delegate (SocketGuildUser oldUser, SocketGuildUser NewUser)
@@ -30,12 +27,12 @@ namespace Responses.Informational
                         .Table<SQLTables.LastOnlineTable>();
 
                     var foundUser = sqlDb.DefaultIfEmpty(null)
-                        .FirstOrDefault(x => x != null && x.DiscordId.Equals((long) NewUser.Id)) ?? new LastOnlineTable();
+                        .FirstOrDefault(x => x != null && x.DiscordId.Equals((long)NewUser.Id)) ?? new LastOnlineTable();
                     var isInsert = foundUser.DiscordId.Equals(0);
 
                     if (NewUser.Status == UserStatus.Offline)
                     {
-                        foundUser.DiscordId = (long) NewUser.Id;
+                        foundUser.DiscordId = (long)NewUser.Id;
                         foundUser.DateTime = DateTime.Now;
 
                         if (isInsert)

@@ -1,16 +1,14 @@
-﻿using System;
+﻿using CommandHandler;
+using Discord.WebSocket;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
-using Discord.WebSocket;
 
 namespace Responses.Commands.GameGiveaway
 {
-    class GameGiveawayAdmin
+    internal class GameGiveawayAdmin
     {
-        [Command("ggadmin","Game Giveaway Admin Commands")]
+        [Command("ggadmin", "Game Giveaway Admin Commands")]
         public async void GameGiveawayAdminCmd(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
@@ -24,15 +22,16 @@ namespace Responses.Commands.GameGiveaway
                 await sktMessage.Channel.SendMessageAsync("Invalid use of command");
                 return;
             }
-            
+
             foreach (var game in parameters.Where(x => !x.Equals("!ggadmin")))
             {
                 var gameSplit = game.Split('|');
                 if (gameSplit.Length != 2)
                 {
                     gamesErrored.Add($"{game} [Error: Game is not formatted correctly - Game Name|Key]");
-                } else { 
-
+                }
+                else
+                {
                     // Grab the game and the key, split by a '|'
                     var gameName = gameSplit[0].Trim();
                     var gameKey = gameSplit[1].Trim();
@@ -45,7 +44,7 @@ namespace Responses.Commands.GameGiveaway
                     }
 
                     var newGame = new SQL.GameGiveawayGameDb()
-                        {Key = gameKey, Name = gameName};
+                    { Key = gameKey, Name = gameName };
 
                     try
                     {
@@ -61,7 +60,7 @@ namespace Responses.Commands.GameGiveaway
 
             await sktMessage.Channel.SendMessageAsync(
                 $"" + $"Games Added: {(gamesAdded.Count > 0 ? gamesAdded.Aggregate((x, y) => x + Environment.NewLine + y) : "None")}\r\n" +
-                $"Games Errored: { (gamesErrored.Count > 0 ? gamesErrored.Aggregate((x,y) => x + Environment.NewLine + y) : "None")}");
+                $"Games Errored: { (gamesErrored.Count > 0 ? gamesErrored.Aggregate((x, y) => x + Environment.NewLine + y) : "None")}");
         }
     }
 }

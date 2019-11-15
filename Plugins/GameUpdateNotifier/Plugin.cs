@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Discord.WebSocket;
-using HtmlAgilityPack;
+﻿using Discord.WebSocket;
 using Interface;
 using PluginManager;
+using System.ComponentModel.Composition;
 
 namespace GameUpdateNotifier
 {
@@ -18,6 +12,7 @@ namespace GameUpdateNotifier
         public string Name => "GameUpdateNotifier";
         public string Description => "Game Update Notifier - Does nothing, is a test plugin";
         public DiscordSocketClient DiscordClient { get; set; }
+
         public void ExecutePlugin()
         {
             var logger = GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
@@ -28,7 +23,6 @@ namespace GameUpdateNotifier
 
         public void Dispose()
         {
-            
         }
     }
 }

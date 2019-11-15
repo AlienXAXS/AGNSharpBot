@@ -1,14 +1,6 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
-using SQLite;
-using SQLitePCL;
 using SQLiteConnection = SQLite.SQLiteConnection;
 
 //using SQLiteConnection = SQLite.SQLiteConnection;

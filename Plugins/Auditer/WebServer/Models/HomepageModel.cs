@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Auditor.WebServer.Models
+﻿namespace Auditor.WebServer.Models
 {
-    class HomepageModel
+    internal class HomepageModel
     {
         public int OnlineUsers { get; set; }
         public int OfflineUsers { get; set; }

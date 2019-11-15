@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Threading;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord;
 using Discord.WebSocket;
-using DiscordMenu;
+using System;
+using System.Linq;
 
 namespace Responses.Commands
 {
-    class AdminCommands
+    internal class AdminCommands
     {
         [Command("svr", "Switches the voice server to a random one, and back to the original one again to reconnect everyone in voice channels")]
         [Alias("switchvoiceregion")]
@@ -87,7 +83,6 @@ namespace Responses.Commands
                             $"{user.JoinedAt.Value.Date} ({(DateTime.Now - user.JoinedAt.Value.Date).Days} days ago)");
                     }
 
-
                     embedBuilder.AddField("Current Nickname", user.Nickname ?? "None");
                     embedBuilder.AddField("Avatar Identifier", user.AvatarId);
                     embedBuilder.AddField("Is Deafened", user.IsDeafened);
@@ -108,7 +103,6 @@ namespace Responses.Commands
         public async void GetChannelInfo(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
-
             var _guildID = "UNKNOWN";
             if (sktMessage.Channel is SocketGuildChannel _socketGuild)
             {
@@ -117,6 +111,7 @@ namespace Responses.Commands
 
             await sktMessage.Channel.SendMessageAsync($"Channel ID is {sktMessage.Channel.Id} which is in the guild {_guildID}");
         }
+
         /*
         [Command("rmmsg", "rmmsg <userid> <#messages> [from msg id] - Removes the specified number of messages for a user in the channel you execute the command in")]
         public async void RemoveUserMessages(string[] parameters, SocketMessage sktMessage,

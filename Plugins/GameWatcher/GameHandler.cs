@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord;
-using Discord.Rest;
+﻿using Discord;
 using Discord.WebSocket;
 using GameWatcher.DB;
 using GlobalLogger.AdvancedLogger;
 using PluginManager;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GameWatcher
 {
-    class GameHandler : IDisposable
+    internal class GameHandler : IDisposable
     {
-
         private class GameRoleMemory
         {
             public ulong RoleId { get; set; }
@@ -87,7 +83,7 @@ namespace GameWatcher
                                         }
                                     }
 
-                                    if ( user.Status != UserStatus.Offline )
+                                    if (user.Status != UserStatus.Offline)
                                         await GameScan(user, user, true);
                                 }
                             }
@@ -118,9 +114,9 @@ namespace GameWatcher
 
             try
             {
-                if ( ! skipWait )
+                if (!skipWait)
                     await _semaphoreSlim.WaitAsync();
-                
+
                 // Grab the guild
                 if (newGuildUser.Guild is SocketGuild socketGuild)
                 {
@@ -174,11 +170,10 @@ namespace GameWatcher
                             logger.Log($"[{newGuildUser.Id} | {randomNumber}] Unhandled exception for this event, message follows: {ex.Message}\r\n{ex.StackTrace}");
                         }
                     }
-                    else if(newGuildUser.Activity is CustomStatusGame)
+                    else if (newGuildUser.Activity is CustomStatusGame)
                     {
                         if (newGuildUser.Activity is Game game)
                         {
-
                             //logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database");
 
                             if (!DatabaseHandler.Instance.Exists(game.Name))
@@ -230,7 +225,7 @@ namespace GameWatcher
                                     var botUser = newGuildUser.Guild.CurrentUser;
                                     var botRoles = botUser.Roles.OrderByDescending(x => x.Position);
 
-                                    await newRole.ModifyAsync(properties => properties.Position = botRoles.First().Position-1);
+                                    await newRole.ModifyAsync(properties => properties.Position = botRoles.First().Position - 1);
 
                                     //logger.Log($"[{newGuildUser.Id} | {randomNumber}] Position modified successfully, adding user to the role and saving memory.");
 
@@ -252,7 +247,7 @@ namespace GameWatcher
             }
             finally
             {
-                if ( ! skipWait )
+                if (!skipWait)
                     _semaphoreSlim.Release();
             }
         }

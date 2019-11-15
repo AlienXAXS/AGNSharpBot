@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CommandHandler;
+using Discord.WebSocket;
+using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
-using Discord.WebSocket;
 
 namespace GameWatcher.Commands
 {
-    class Control
+    internal class Control
     {
         [Command("gamewatcher", "Manages the Game Watcher, add and remove games to watch for.")]
         public async void GameWatcher(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
-
             if (InternalDatabase.Handler.Instance.GetConnection() == null)
             {
                 await sktMessage.Channel.SendMessageAsync($"`Game Watcher Control`\r\nUnable to connect to the internal database.");
@@ -33,7 +29,7 @@ namespace GameWatcher.Commands
                 case "help":
                     await sktMessage.Channel.SendMessageAsync($"`Game Watcher Control`\r\n" +
                                                               "`!gamewatcher add \"GAME NAME\"` - Adds a game to the database.\r\n" +
-                                                              "`!gamewatcher remove \"GAME NAME\"` - Removes a game from the database.\r\n"+
+                                                              "`!gamewatcher remove \"GAME NAME\"` - Removes a game from the database.\r\n" +
                                                               "`!gamewatcher list` - Lists all games that are added to the database.\r\n" +
                                                               "`!gamewatcher scan` - Scans all users for games.");
                     break;
@@ -67,20 +63,19 @@ namespace GameWatcher.Commands
                 case "rolepos":
                     var msg = "";
                     foreach (var x in discordSocketClient.Guilds)
-                    foreach (var y in x.Roles)
-                    {
-                        if (!y.IsEveryone)
-                            msg += $"{y.Name} = {y.Position}\r\n";
-                    }
+                        foreach (var y in x.Roles)
+                        {
+                            if (!y.IsEveryone)
+                                msg += $"{y.Name} = {y.Position}\r\n";
+                        }
 
                     await sktMessage.Channel.SendMessageAsync(msg);
                     break;
             }
         }
 
-        private async void ScanUsers(DiscordSocketClient discordSocketClient,SocketMessage sktMessage)
+        private async void ScanUsers(DiscordSocketClient discordSocketClient, SocketMessage sktMessage)
         {
-
             await sktMessage.Channel.SendMessageAsync(
                 "Scanning this guild for users playing games that exist in the database");
 

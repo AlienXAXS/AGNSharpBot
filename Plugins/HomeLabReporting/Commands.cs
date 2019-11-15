@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 namespace HomeLabReporting
 {
-    class Commands
+    internal class Commands
     {
         [Command("home", "Get's home information, for AlienX's House :)")]
         public async void HomeCommand(string[] parameters, SocketMessage sktMessage,

@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord;
 using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Auditor.WebServer
 {
-    class ControllerCommands
+    internal class ControllerCommands
     {
         private class ReturnValue
         {
@@ -30,11 +25,10 @@ namespace Auditor.WebServer
         public async void AuditorPublicCmd(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
-
             if (!NancyServer.Instance.GetServerRunning())
             {
                 await sktMessage.Channel.SendMessageAsync(
-                    $"Sorry {sktMessage.Author.Username} but while the Auditor is logging for your discord server, the web server has been configured yet.");
+                    $"Sorry {sktMessage.Author.Username} but while the Auditor is logging for your discord server, the web server has not been configured yet.");
                 return;
             }
 
@@ -58,7 +52,7 @@ namespace Auditor.WebServer
                     // Remove all old known keys that this user once had
                     foreach (var result in authDb.ToArray())
                     {
-                        if ( result.UserId == (long)sktMessage.Author.Id )
+                        if (result.UserId == (long)sktMessage.Author.Id)
                             authDb.Connection.Delete(result);
                     }
 

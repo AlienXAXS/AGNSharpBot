@@ -1,9 +1,8 @@
-﻿using System;
-using SQLite;
+﻿using SQLite;
+using System;
 
 namespace Auditor
 {
-
     public class AuditorSql
     {
         public class AuditEntry
@@ -25,6 +24,7 @@ namespace Auditor
 
             [PrimaryKey, AutoIncrement]
             public long Id { get; set; }
+
             public AuditType Type { get; set; }
             public DateTime Timestamp { get; set; }
             public long UserId { get; set; }
@@ -44,6 +44,7 @@ namespace Auditor
         {
             [PrimaryKey, AutoIncrement]
             public int Id { get; set; }
+
             public long UserId { get; set; }
             public string AuthKey { get; set; }
             public long GuildId { get; set; }

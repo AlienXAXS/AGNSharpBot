@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -7,13 +6,13 @@ namespace GlobalLogger.AdvancedLogger
 {
     public class Logger
     {
-        private RetentionOptions _retentionOptions = new RetentionOptions() {Compress = false, Days = 1};
+        private RetentionOptions _retentionOptions = new RetentionOptions() { Compress = false, Days = 1 };
         public string LogName;
 
         private bool _toConsole = false;
         private object lockable = new object();
 
-        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1,1);
+        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public Logger()
         {
@@ -48,42 +47,43 @@ namespace GlobalLogger.AdvancedLogger
             string memberFilePath = "", [System.Runtime.CompilerServices.CallerLineNumber]
             int memberLineNumber = 0)
         {
-
             _semaphoreSlim.Wait();
-
-            var logName = Assembly.GetCallingAssembly().GetName().Name;
-            var date = DateTime.Now;
-
-            var logFolderPath = $"Logs\\{date.Year}{date.Month:00}\\{logName}";
-            var logFilePath = $"{logFolderPath}\\{date.Year}-{date.Month:00}-{date.Day:00}.log";
-
-            try
+            lock (_semaphoreSlim)
             {
-                if (!System.IO.Directory.Exists(logFolderPath))
-                    System.IO.Directory.CreateDirectory(logFolderPath);
+                var logName = Assembly.GetCallingAssembly().GetName().Name;
+                var date = DateTime.Now;
 
-                string compiledString = "";
-                foreach (var splitString in message.Split(Environment.NewLine.ToCharArray()))
+                var logFolderPath = $"Logs\\{date.Year}{date.Month:00}\\{logName}";
+                var logFilePath = $"{logFolderPath}\\{date.Year}-{date.Month:00}-{date.Day:00}.log";
+
+                try
                 {
-                    var str =
-                        $"[{date.Year}/{date.Month:00}/{date.Day:00} @ {date.Hour:00}:{date.Minute:00}:{date.Second:00}] T:{System.Threading.Thread.CurrentThread.ManagedThreadId:00000} - {logName} - {splitString}";
-                    compiledString += str + Environment.NewLine;
+                    if (!System.IO.Directory.Exists(logFolderPath))
+                        System.IO.Directory.CreateDirectory(logFolderPath);
 
-                    if (_toConsole)
-                        Console.WriteLine(str);
+                    string compiledString = "";
+                    foreach (var splitString in message.Split(Environment.NewLine.ToCharArray()))
+                    {
+                        var str =
+                            $"[{date.Year}/{date.Month:00}/{date.Day:00} @ {date.Hour:00}:{date.Minute:00}:{date.Second:00}] T:{System.Threading.Thread.CurrentThread.ManagedThreadId:00000} - {logName} - {splitString}";
+                        compiledString += str + Environment.NewLine;
+
+                        if (_toConsole)
+                            Console.WriteLine(str);
+                    }
+
+                    System.IO.File.AppendAllText(logFilePath, compiledString);
                 }
-
-                System.IO.File.AppendAllText(logFilePath, compiledString);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(
-                    $"###########################################\r\n"+
-                    $"Unable to log for {logName} to {logFilePath}.\r\n\r\n" +
-                    $"Error Message:{ex.Message}\r\n\r\n" + 
-                    $"Log Contents:{message}\r\n\r\n" + 
-                    $"Calling Routine: {memberName} @ {memberLineNumber}\r\n" +
-                    $"###########################################\r\n");
+                catch (Exception ex)
+                {
+                    Console.WriteLine(
+                        $"###########################################\r\n" +
+                        $"Unable to log for {logName} to {logFilePath}.\r\n\r\n" +
+                        $"Error Message:{ex.Message}\r\n\r\n" +
+                        $"Log Contents:{message}\r\n\r\n" +
+                        $"Calling Routine: {memberName} @ {memberLineNumber}\r\n" +
+                        $"###########################################\r\n");
+                }
             }
 
             _semaphoreSlim.Release();

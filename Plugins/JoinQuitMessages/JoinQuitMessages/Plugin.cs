@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using System.Threading.Tasks;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 using Interface;
 using PluginManager;
+using System;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 
 namespace JoinQuitMessages
 {
@@ -12,6 +12,7 @@ namespace JoinQuitMessages
     {
         public string Name => "JoinQuitMessages";
         public string Description => "Logs when people join and quit your discord server into a channel of your choice";
+
         public void ExecutePlugin()
         {
             try
@@ -28,8 +29,9 @@ namespace JoinQuitMessages
                 // Setup our event router
                 EventRouter.UserJoined += EventRouterOnUserJoined;
                 EventRouter.UserLeft += EventRouterOnUserLeft;
-            } catch(Exception ex)
-            { 
+            }
+            catch (Exception ex)
+            {
                 GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Exception in plugin {Name}\r\n{ex.Message}\r\n\r\n\r\n{ex.StackTrace}");
 
                 if (ex.InnerException != null)

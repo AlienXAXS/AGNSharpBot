@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Responses.Util
 {
-    static class ReadableTimespan
+    internal static class ReadableTimespan
     {
         public static string GetReadableTimespan(TimeSpan ts)
         {
@@ -40,7 +38,7 @@ namespace Responses.Util
     public class HMSFormatter : ICustomFormatter, IFormatProvider
     {
         // list of Formats, with a P customformat for pluralization
-        static Dictionary<string, string> timeformats = new Dictionary<string, string> {
+        private static Dictionary<string, string> timeformats = new Dictionary<string, string> {
             {"S", "{0:P:Seconds:Second}"},
             {"M", "{0:P:Minutes:Minute}"},
             {"H","{0:P:Hours:Hour}"},
@@ -60,7 +58,6 @@ namespace Responses.Util
 
     public class PluralFormatter : ICustomFormatter, IFormatProvider
     {
-
         public string Format(string format, object arg, IFormatProvider formatProvider)
         {
             if (arg != null)

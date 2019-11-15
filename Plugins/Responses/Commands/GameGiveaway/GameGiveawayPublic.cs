@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord;
 using Discord.WebSocket;
 using DiscordMenu;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Responses.Commands.GameGiveaway
 {
-    class GameGiveawayHumbleMenu
+    internal class GameGiveawayHumbleMenu
     {
         public SocketMessage SktMessage { get; set; }
         public DiscordSocketClient DiscordSocketClient { get; set; }
@@ -23,7 +20,6 @@ namespace Responses.Commands.GameGiveaway
         {
             var usersDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.GameGiveawayUserDb>();
             var dbUser = usersDb.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.DiscordId.Equals((long)SktMessage.Author.Id));
-
 
             _menu.Author = SktMessage.Author;
             _menu.DiscordSocketClient = DiscordSocketClient;
@@ -89,7 +85,9 @@ namespace Responses.Commands.GameGiveaway
                 {
                     usersDb.Connection.Insert(new SQL.GameGiveawayUserDb()
                     {
-                        DateTime = DateTime.Now, DiscordId = (long) SktMessage.Author.Id, isHumbleRegistered = menuoption.Metadata.Equals("yes")
+                        DateTime = DateTime.Now,
+                        DiscordId = (long)SktMessage.Author.Id,
+                        isHumbleRegistered = menuoption.Metadata.Equals("yes")
                     });
                 }
 
@@ -130,7 +128,7 @@ namespace Responses.Commands.GameGiveaway
                 // Code will only reach here if the user either isn't in the claims database, or if they didn't claim within the last GiveawayAccessDurationInDays value
 
                 // Insert our user into the database
-                if ( dbUser == null )
+                if (dbUser == null)
                     usersDb.Connection.Insert(new SQL.GameGiveawayUserDb() { DiscordId = (long)SktMessage.Author.Id, DateTime = DateTime.Now });
                 else
                 {
@@ -160,13 +158,12 @@ namespace Responses.Commands.GameGiveaway
         }
     }
 
-    class GameGiveawayPublic
+    internal class GameGiveawayPublic
     {
         [Command("gamegiveaway", "Game Giveaway - Get free Steam Keys")]
         [Alias("gg", "ggz")]
         public async void GameGiveawayCmd(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
-
             var author = sktMessage.Author;
             if (author is SocketGuildUser guildUser)
             {
@@ -180,7 +177,8 @@ namespace Responses.Commands.GameGiveaway
 
             var giveaway = new GameGiveawayHumbleMenu
             {
-                SktMessage = sktMessage, DiscordSocketClient = discordSocketClient
+                SktMessage = sktMessage,
+                DiscordSocketClient = discordSocketClient
             };
             giveaway.StartMenu();
         }

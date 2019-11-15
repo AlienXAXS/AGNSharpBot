@@ -1,12 +1,12 @@
-﻿using System;
-using System.Net.Http;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Net.Http;
 
 namespace AGNSharpBot.DiscordHandler
 {
-    class ServiceDefiner
+    internal class ServiceDefiner
     {
         private IServiceProvider Services;
 

@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CommandHandler;
+using Discord.WebSocket;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using CommandHandler;
-using Discord.WebSocket;
 
 namespace Responses.Commands.Global
 {
-    class DogCommand
+    internal class DogCommand
     {
         public async Task<Stream> GetDogPictureAsync(bool gif)
         {
@@ -36,7 +34,7 @@ namespace Responses.Commands.Global
         {
             try
             {
-                var sktGuildUser = ((SocketGuildUser) sktMessage.Author);
+                var sktGuildUser = ((SocketGuildUser)sktMessage.Author);
                 var nickname = sktGuildUser.Nickname ?? sktGuildUser.Username;
 
                 if (ContainsUnicodeCharacter(nickname))

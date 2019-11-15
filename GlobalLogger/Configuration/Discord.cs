@@ -1,16 +1,14 @@
-﻿using System;
-using GlobalLogger;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace GlobalLogger.Configuration
 {
-
-    class uLongValueContainer
+    internal class uLongValueContainer
     {
         public ulong Value { get; set; }
     }
 
-    class LoggerDiscordConfiguration
+    internal class LoggerDiscordConfiguration
     {
         public string _comment_DiscordChannelId = "The discord channel ID that you wish to use for logger messages";
         public uLongValueContainer DiscordChannelId { get; set; } = new uLongValueContainer();
@@ -19,7 +17,7 @@ namespace GlobalLogger.Configuration
         public uLongValueContainer DiscordGuildId { get; set; } = new uLongValueContainer();
     }
 
-    class Discord
+    internal class Discord
     {
         private const string ConfigurationPath = "config_logger.json";
         private static Discord _instance;
@@ -29,7 +27,7 @@ namespace GlobalLogger.Configuration
 
         public Discord()
         {
-            AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new AdvancedLogger.RetentionOptions(){Days = 1, Compress = true});
+            AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new AdvancedLogger.RetentionOptions() { Days = 1, Compress = true });
         }
 
         public ulong GetDiscordLoggerChannelId()

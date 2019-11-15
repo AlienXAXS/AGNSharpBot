@@ -1,33 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using GlobalLogger.AdvancedLogger;
+﻿using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
+using System;
+using System.Net;
 
 namespace Auditor.WebServer.Configuration
 {
-    class StartupConfig
+    internal class StartupConfig
     {
         public bool Enabled { get; set; }
 
         private IPAddress _ipAddress;
+
         public IPAddress IpAddress
         {
-            get { return _ipAddress ?? new IPAddress(new byte[4] {0, 0, 0, 0}); }
+            get { return _ipAddress ?? new IPAddress(new byte[4] { 0, 0, 0, 0 }); }
             set => _ipAddress = value;
         }
 
         private int _port = 0;
+
         public int Port
         {
-            get { return _port == 0 ? 8080 : _port;}
+            get { return _port == 0 ? 8080 : _port; }
             set => _port = value;
         }
 
         private string _uri;
+
         public string URI
         {
             get { return _uri ?? "http://localhost.example.com"; }
@@ -35,8 +34,7 @@ namespace Auditor.WebServer.Configuration
         }
     }
 
-
-    class IPAddressConverter : JsonConverter
+    internal class IPAddressConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
@@ -54,7 +52,7 @@ namespace Auditor.WebServer.Configuration
         }
     }
 
-    class ConfigHandler
+    internal class ConfigHandler
     {
         private static readonly ConfigHandler _instance;
         public static ConfigHandler Instance = _instance ?? (_instance = new ConfigHandler());
@@ -65,7 +63,6 @@ namespace Auditor.WebServer.Configuration
 
         public ConfigHandler()
         {
-
             var settings = new JsonSerializerSettings();
             settings.Converters.Add(new IPAddressConverter());
             settings.Formatting = Formatting.Indented;

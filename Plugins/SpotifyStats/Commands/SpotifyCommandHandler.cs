@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using CommandHandler;
+﻿using CommandHandler;
 using Discord;
 using Discord.WebSocket;
-using SpotifyStats.SQLite.Tables;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SpotifyStats.Commands
 {
-    class SpotifyCommandHandler
+    internal class SpotifyCommandHandler
     {
         private struct TopEntry
         {
@@ -19,7 +15,7 @@ namespace SpotifyStats.Commands
             public int PlayCount;
         }
 
-        [Command("spotify","Gets information about Spotify usage on this Discord server (try !spotify help)")]
+        [Command("spotify", "Gets information about Spotify usage on this Discord server (try !spotify help)")]
         [Permissions(Permissions.PermissionTypes.Guest)]
         public async void Spotify(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
@@ -36,6 +32,7 @@ namespace SpotifyStats.Commands
                     await sktMessage.Channel.SendMessageAsync("\r\n`Spotify System Help`\r\n" +
                                                         "`!spotify top [number]`\r\nDisplays the top three Spotify listerers, optionally you can specify how many top listeners you want, for example !spotify top 10");
                     break;
+
                 case "top":
                     await HandleTop(parameters, sktMessage, discordSocketClient);
                     break;
@@ -71,11 +68,11 @@ namespace SpotifyStats.Commands
             var listeners = InternalDatabase.Handler.Instance.GetConnection();
             var listenersTable = listeners.DbConnection.Table<SQLite.Tables.Listener>();
 
-            var unknownUsers = (from listener in listenersTable.GroupBy(x => x.DiscordId) where discordSocketClient.GetUser((ulong) listener.Key) == null select (ulong) listener.Key).ToList();
+            var unknownUsers = (from listener in listenersTable.GroupBy(x => x.DiscordId) where discordSocketClient.GetUser((ulong)listener.Key) == null select (ulong)listener.Key).ToList();
 
             foreach (var unknownUser in unknownUsers)
             {
-                var uid = (long) unknownUser;
+                var uid = (long)unknownUser;
                 listenersTable.Delete(x => x.DiscordId == uid);
             }
 
@@ -103,12 +100,12 @@ namespace SpotifyStats.Commands
             }
 
             var listeners = InternalDatabase.Handler.Instance.GetConnection()?.DbConnection.Table<SQLite.Tables.Listener>();
-            if ( listeners == null ) throw new Exception("DB FAIL IN SPOTIFY");
+            if (listeners == null) throw new Exception("DB FAIL IN SPOTIFY");
 
             var group = listeners.GroupBy(x => x.DiscordId);
             var topTake = group.OrderByDescending(x => x.Count()).Take(topLength);
 
-            var topUsersList = (from topEntry in topTake let foundUser = discordSocketClient.GetUser((ulong) topEntry.Key) select new TopEntry() {Username = foundUser != null ? foundUser.Username : "Unknown User", PlayCount = topEntry.Count()}).ToList();
+            var topUsersList = (from topEntry in topTake let foundUser = discordSocketClient.GetUser((ulong)topEntry.Key) select new TopEntry() { Username = foundUser != null ? foundUser.Username : "Unknown User", PlayCount = topEntry.Count() }).ToList();
 
             var discordEmbedBuilder = new EmbedBuilder();
             discordEmbedBuilder.WithTitle($"Top {topLength} Spotify Users");

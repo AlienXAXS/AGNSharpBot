@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Threading.Tasks;
-using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
+﻿using GlobalLogger.AdvancedLogger;
 using Interface;
 using PluginManager;
+using System.ComponentModel.Composition;
 
 namespace SpotifyStats
 {
@@ -19,10 +15,10 @@ namespace SpotifyStats
         public void ExecutePlugin()
         {
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+                .SetRetentionOptions(new RetentionOptions() { Compress = true });
 
             AdvancedLoggerHandler.Instance.GetLogger().Log($"SpotifyStats.dll Plugin Loading...");
-            
+
             // Register our tables with the SQLHandler
             var dbConn = InternalDatabase.Handler.Instance.NewConnection();
             dbConn.RegisterTable<SQLite.Tables.Listener>();
@@ -35,7 +31,6 @@ namespace SpotifyStats
 
         public void Dispose()
         {
-            
         }
 
         public EventRouter EventRouter { get; set; }

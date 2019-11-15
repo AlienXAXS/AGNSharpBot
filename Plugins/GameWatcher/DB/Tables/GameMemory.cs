@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SQLite;
+﻿using SQLite;
 
 namespace GameWatcher.DB.Tables
 {
-    class GameMemory
+    internal class GameMemory
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }

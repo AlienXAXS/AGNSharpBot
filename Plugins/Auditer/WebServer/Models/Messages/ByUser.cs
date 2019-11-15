@@ -1,15 +1,10 @@
-﻿using System;
+﻿using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Discord.WebSocket;
 
 namespace Auditor.WebServer.Models.Messages
 {
-
-    class UserMakeup
+    internal class UserMakeup
     {
         public string Name { get; private set; }
         public string Nickname { get; private set; }
@@ -24,7 +19,7 @@ namespace Auditor.WebServer.Models.Messages
             Name = name;
             Nickname = nickname;
             HasNickname = Nickname != null;
-            Id = (long) id;
+            Id = (long)id;
             Username = Nickname != null ? $"{Name} ({Nickname})" : Name;
             InnerHtml = $"<option value=\"{id}\">{Username}</option>";
         }
@@ -35,9 +30,8 @@ namespace Auditor.WebServer.Models.Messages
         }
     }
 
-    class SearchResults
+    internal class SearchResults
     {
-
         public string Username { get; set; } //The username in format: USERNAME (NICKNAME)
         public string Message { get; set; } // The actual message
         public string EntryType { get; set; } // Deleted, Modified, New
@@ -79,7 +73,7 @@ namespace Auditor.WebServer.Models.Messages
         }
     }
 
-    class ByUser
+    internal class ByUser
     {
         public bool IsErrored { get; set; }
         public string ErrorMessage { get; set; }

@@ -2,10 +2,11 @@
 
 namespace JoinQuitMessages.Configuration
 {
-    class ConfigurationHandler
+    internal class ConfigurationHandler
     {
         // ReSharper disable once InconsistentNaming
         private static readonly ConfigurationHandler _instance;
+
         public static ConfigurationHandler Instance = _instance ?? (_instance = new ConfigurationHandler());
 
         public void AssignChannel(ulong GuildId, ulong ChannelId)
@@ -25,7 +26,7 @@ namespace JoinQuitMessages.Configuration
         public SQLTables.Configuration GetConfiguration(ulong GuildId)
         {
             var database = InternalDatabase.Handler.Instance.GetConnection();
-            var config = database?.DbConnection.Table<SQLTables.Configuration>().DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.GuildId.Equals((long) GuildId));
+            var config = database?.DbConnection.Table<SQLTables.Configuration>().DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.GuildId.Equals((long)GuildId));
             return config;
         }
     }

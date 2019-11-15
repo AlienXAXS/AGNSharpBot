@@ -1,15 +1,10 @@
-﻿using CommandHandler;
-using GlobalLogger.AdvancedLogger;
+﻿using GlobalLogger.AdvancedLogger;
 using Interface;
 using PluginManager;
 
 namespace HomeLabReporting
 {
-    using System;
-    using System.Collections.Generic;
     using System.ComponentModel.Composition;
-    using System.Threading.Tasks;
-    using Discord.WebSocket;
 
     [Export(typeof(IPlugin))]
     public sealed class Plugin : IPlugin
@@ -21,11 +16,11 @@ namespace HomeLabReporting
         public void ExecutePlugin()
         {
             AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() {Compress = true});
+                .SetRetentionOptions(new RetentionOptions() { Compress = true });
 
             AdvancedLoggerHandler.Instance.GetLogger().Log($"HomeLabReporting.dll Plugin Loading...");
             SNMP.SnmpCommunication.Instance.StartCapture();
-            
+
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands>();
         }
 
