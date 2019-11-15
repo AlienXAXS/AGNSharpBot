@@ -46,7 +46,7 @@
     <Compile Include="Commands\AdminPermissions.cs" />
     <Compile Include="Informational\LastOnline.cs" />
     <Compile Include="Informational\LastOnlineDbHandler.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="PluginResponses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLTables\LastOnlineTable.cs" />
     <Compile Include="Util\ReadableTimespan.cs" />

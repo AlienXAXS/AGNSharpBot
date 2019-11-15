@@ -37,7 +37,7 @@
     <Compile Include="SNMP\SnmpCommunication.cs" />
     <Compile Include="SNMP\TrapReceiver.cs" />
     <Compile Include="APCPDU\Telnet\StatsCollector.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="PluginHomeLabReporting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

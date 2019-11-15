@@ -7,7 +7,7 @@ namespace HomeLabReporting
     using System.ComponentModel.Composition;
 
     [Export(typeof(IPlugin))]
-    public sealed class Plugin : IPlugin
+    public sealed class PluginHomeLabReporting : IPlugin
     {
         string IPlugin.Name => "AlienX's HomeLab Reporting";
         public string Description => "Homelab Reporting for AlienX's House";

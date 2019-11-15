@@ -6,7 +6,7 @@ using System.ComponentModel.Composition;
 namespace SpotifyStats
 {
     [Export(typeof(IPlugin))]
-    public sealed class Plugin : IPlugin
+    public sealed class PluginSpotifyStats : IPlugin
     {
         string IPlugin.Name => "Spotify Stats";
 

@@ -8,7 +8,7 @@ using System.ComponentModel.Composition;
 namespace Responses
 {
     [Export(typeof(IPlugin))]
-    public sealed class Plugin : IPlugin
+    public sealed class PluginResponses : IPlugin
     {
         string IPlugin.Name => "AdminUtilities";
         public EventRouter EventRouter { get; set; }
