@@ -108,19 +108,19 @@
     <Compile Include="SQLTables\Configuration.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CommandHandler\CommandHandler.csproj">
+    <ProjectReference Include="..\..\CommandHandler\CommandHandler.csproj">
       <Project>{A945612B-37AC-4E68-86BB-2797D2CC3DD7}</Project>
       <Name>CommandHandler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\GlobalLogger\GlobalLogger.csproj">
+    <ProjectReference Include="..\..\GlobalLogger\GlobalLogger.csproj">
       <Project>{fc26bc37-d892-4531-abe2-c3f65ccdc4fb}</Project>
       <Name>GlobalLogger</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\InternalDatabase\InternalDatabase.csproj">
+    <ProjectReference Include="..\..\InternalDatabase\InternalDatabase.csproj">
       <Project>{14a4d566-2a4d-4e44-a0cf-318558867a57}</Project>
       <Name>InternalDatabase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PluginManager\PluginManager.csproj">
+    <ProjectReference Include="..\PluginManager\PluginManager.csproj">
       <Project>{405f6757-6cc0-4e7e-9e11-28c7113be03e}</Project>
       <Name>PluginManager</Name>
     </ProjectReference>

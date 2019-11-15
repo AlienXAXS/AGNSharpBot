@@ -50,7 +50,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeLabReporting", "Plugins
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HARATSeATSRP", "Plugins\HARATSeATSRP\HARATSeATSRP.csproj", "{47D5A86A-F50A-4934-B559-39BCD8DC3EB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinQuitMessages", "Plugins\JoinQuitMessages\JoinQuitMessages\JoinQuitMessages.csproj", "{94F19DFB-6BF0-4AD8-A360-A9B2C3690874}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JoinQuitMessages", "Plugins\JoinQuitMessages\JoinQuitMessages.csproj", "{94F19DFB-6BF0-4AD8-A360-A9B2C3690874}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

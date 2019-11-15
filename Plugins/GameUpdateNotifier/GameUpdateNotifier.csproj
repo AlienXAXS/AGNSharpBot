@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\test.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="PluginGameUpdateNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

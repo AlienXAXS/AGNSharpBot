@@ -6,7 +6,7 @@ using System.ComponentModel.Composition;
 namespace GameUpdateNotifier
 {
     [Export(typeof(IPlugin))]
-    public class Plugin : IPlugin
+    public class PluginGameUpdateNotifier : IPlugin
     {
         public EventRouter EventRouter { get; set; }
         public string Name => "GameUpdateNotifier";
