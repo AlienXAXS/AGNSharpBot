@@ -198,7 +198,7 @@
       <Link>Plugins\HomeLabReporting.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Plugins\JoinQuitMessages\JoinQuitMessages\bin\Debug\JoinQuitMessages.dll">
+    <Content Include="..\Plugins\JoinQuitMessages\bin\Debug\JoinQuitMessages.dll">
       <Link>Plugins\JoinQuitMessages.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
