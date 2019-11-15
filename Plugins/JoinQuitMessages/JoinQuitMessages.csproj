@@ -103,7 +103,7 @@
   <ItemGroup>
     <Compile Include="Configuration\ConfigurationHandler.cs" />
     <Compile Include="Configuration\DiscordConfigurationHandler.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="PluginJoinQuitMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLTables\Configuration.cs" />
   </ItemGroup>

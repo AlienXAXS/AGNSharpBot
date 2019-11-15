@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace JoinQuitMessages
 {
     [Export(typeof(IPlugin))]
-    public class Plugin : IPlugin
+    public class PluginJoinQuitMessages : IPlugin
     {
         public string Name => "JoinQuitMessages";
         public string Description => "Logs when people join and quit your discord server into a channel of your choice";
