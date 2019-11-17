@@ -17,6 +17,7 @@ namespace HomeLabReporting.SNMP
     using System;
     using System.Net;
     using System.Net.Sockets;
+    using System.Threading;
 
     internal class TrapReceiverConfiguration
     {
@@ -39,7 +40,9 @@ namespace HomeLabReporting.SNMP
 
         private const string ConfigurationPath = "Plugins\\Config\\Snmp.json";
 
-        private readonly Task _trapReceiverTask;
+        private readonly Thread _trapReceiverThread;
+
+        private Socket socket;
 
         public TrapReceiver()
         {
@@ -72,7 +75,8 @@ namespace HomeLabReporting.SNMP
                 }
             }
 
-            _trapReceiverTask = Task.Run(() => StartTrapReceiver());
+            _trapReceiverThread = new Thread(new ThreadStart(StartTrapReceiver)) { Name = "SNMPTrapSocketListener" };
+            _trapReceiverThread.Start();
         }
 
         /// <summary>
@@ -81,7 +85,7 @@ namespace HomeLabReporting.SNMP
         private void StartTrapReceiver()
         {
             // Construct a socket and bind it to the trap manager port 162
-            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             var ipep = new IPEndPoint(IPAddress.Any, 162);
             EndPoint ep = ipep;
 
@@ -97,7 +101,7 @@ namespace HomeLabReporting.SNMP
 
             // Disable timeout processing. Just block until packet is received
             socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 0);
-            while (true)
+            while (socket.IsBound)
             {
                 var inData = new byte[16 * 1024];
 
@@ -132,8 +136,14 @@ namespace HomeLabReporting.SNMP
 
         public void Dispose()
         {
-            _trapReceiverTask?.Dispose();
-            GC.SuppressFinalize(this);
+            if (socket != null)
+            {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+                socket.Dispose();
+            }
+
+            _trapReceiverThread?.Abort();
         }
     }
 }

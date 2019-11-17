@@ -26,7 +26,7 @@ namespace HomeLabReporting
 
         void IPlugin.Dispose()
         {
-            //SNMP.SnmpCommunication.Instance.Dispose();
+            SNMP.SnmpCommunication.Instance.Dispose();
             AdvancedLoggerHandler.Instance.GetLogger().Log("HomeLabReporting Disposed");
         }
     }

@@ -30,13 +30,15 @@ namespace HARATSeATSRP
         private List<SRPMemory> srpMemories;
         private const string srpMemoryFile = "Plugins\\Config\\SRPMemory.json";
 
+        private Thread watcherThread;
+
         public void ExecutePlugin()
         {
             GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
 
             try
             {
-                var watcherThread = new Thread(StartSeatWatcher);
+                watcherThread = new Thread(StartSeatWatcher) { IsBackground = true };
 
                 if (System.IO.File.Exists(srpMemoryFile))
                 {
@@ -63,6 +65,8 @@ namespace HARATSeATSRP
                 {
                     using (var client = new WebClient())
                     {
+                        Thread.Sleep(1000 * 60 * 5);
+
                         var jsonFromSeAT = client.DownloadString("https://seat.housearatus.space/alienx/srpquery.php");
                         List<SRPTableItem> srpRequests = JsonConvert.DeserializeObject<List<SRPTableItem>>(jsonFromSeAT);
 
@@ -96,13 +100,13 @@ namespace HARATSeATSRP
                         }
                     }
                 }
+                catch (ThreadInterruptedException)
+                {
+                    return;
+                }
                 catch (Exception ex)
                 {
-                    Debug.Print("Lol");
-                }
-                finally
-                {
-                    Thread.Sleep(1000 * 60 * 5);
+                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to download the SeAT JSON file, error follows: {ex.Message}\r\n\r\n{ex.StackTrace}");
                 }
             }
         }
@@ -110,6 +114,7 @@ namespace HARATSeATSRP
         public void Dispose()
         {
             _seatWatcherRequestStop = true;
+            watcherThread?.Interrupt();
         }
     }
 

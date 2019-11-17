@@ -83,6 +83,7 @@ namespace HomeLabReporting.SNMP
         public void Dispose()
         {
             _stopCapture = true;
+            TrapReceiver.Instance.Dispose();
         }
 
         public async void StartCapture()

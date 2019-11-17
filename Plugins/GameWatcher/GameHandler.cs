@@ -35,6 +35,8 @@ namespace GameWatcher
 
         private bool _gameWatcherTimerRunning;
 
+        private Thread gameWatcherThread;
+
         public GameHandler()
         {
             StartGameWatcherTimer();
@@ -43,14 +45,13 @@ namespace GameWatcher
         public void StartGameWatcherTimer()
         {
             _gameWatcherTimerRunning = true;
-            var thread = new Thread(async () =>
+            gameWatcherThread = new Thread(async () =>
             {
                 while (_gameWatcherTimerRunning)
                 {
                     try
                     {
                         Thread.Sleep(10000);
-                        await _semaphoreSlim.WaitAsync();
 
                         foreach (var guild in DiscordSocketClient.Guilds)
                         {
@@ -89,21 +90,20 @@ namespace GameWatcher
                             }
                         }
                     }
-                    catch
+                    catch (ThreadInterruptedException)
                     {
-                    }
-                    finally
-                    {
-                        _semaphoreSlim.Release();
+                        return;
                     }
                 }
-            });
-            thread.Start();
+            })
+            { IsBackground = true };
+            gameWatcherThread.Start();
         }
 
         public void Dispose()
         {
             _gameWatcherTimerRunning = false;
+            gameWatcherThread?.Interrupt();
         }
 
         public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool skipWait = false)
