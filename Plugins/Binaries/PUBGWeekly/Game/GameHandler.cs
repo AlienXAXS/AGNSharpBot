@@ -17,8 +17,6 @@ namespace PUBGWeekly.Game
         private List<Player> _players = new List<Player>();
         public bool IsLive = false;
 
-
-
         public void NewPlayer(string name, ulong discordId)
         {
 
@@ -67,6 +65,11 @@ namespace PUBGWeekly.Game
 
         public async void SendStatusMessage(string msg)
         {
+#if DEBUG
+            // Skip sending status messages in debug mode.
+            return;
+#endif
+
             var statusChannelId = Configuration.PluginConfigurator.Instance.Configuration.StatusChannel;
             if ( statusChannelId != 0 )
             {
@@ -88,7 +91,15 @@ namespace PUBGWeekly.Game
             var user = guild.GetUser(playerId);
             var channel = guild.GetVoiceChannel(voiceChannelId);
 
-            await user.ModifyAsync(properties => properties.Channel = channel);
+            if (user.VoiceChannel != null)
+            {
+                try
+                {
+                    await user.ModifyAsync(properties => properties.Channel = channel);
+                }
+                catch (Exception)
+                { }
+            }
         }
 
         public void AssignTeams(int playersPerTeam)
