@@ -67,7 +67,7 @@ namespace HARATSeATSRP
                     {
                         
 
-                        var jsonFromSeAT = client.DownloadString("https://haratseat.agngaming.com/alienx/srpquery.php");
+                        var jsonFromSeAT = client.DownloadString("https://seat.housearatus.space/alienx/srpquery.php");
                         if (jsonFromSeAT == "{}") continue;
 
                         List<SRPTableItem> srpRequests = JsonConvert.DeserializeObject<List<SRPTableItem>>(jsonFromSeAT);
