@@ -25,7 +25,6 @@ namespace GameWatcher
             {
                 AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions() { Compress = true });
                 AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER] Checking Discord...");
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER]  >  Complete");
 
                 _discordClient = EventRouter.GetDiscordSocketClient();
                 GameHandler.Instance.DiscordSocketClient = _discordClient;

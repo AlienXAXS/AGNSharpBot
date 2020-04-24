@@ -78,7 +78,7 @@ namespace GameWatcher
                                     foreach (var playingRole in playingRoles)
                                     {
                                         // User is not playing anything, but they are part of a role that says they are, remove them.
-                                        if (!(user.Activity is CustomStatusGame))
+                                        if (!(user.Activity is Game))
                                         {
                                             await user.RemoveRoleAsync(playingRole);
                                         }
@@ -120,7 +120,7 @@ namespace GameWatcher
                 if (newGuildUser.Guild is SocketGuild socketGuild)
                 {
                     //if (newGuildUser.Activity?.Type != ActivityType.Playing || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
-                    if (!(newGuildUser.Activity is CustomStatusGame) || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
+                    if (!(newGuildUser.Activity is Game) || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
                     {
                         var foundMemory = _roleMemory?.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.UserId == newGuildUser.Id && newGuildUser.Roles.Any(y => y.Id == x.RoleId));
                         if (foundMemory == null)
@@ -128,7 +128,7 @@ namespace GameWatcher
 
                         try
                         {
-                            //logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} had an activity of {oldGuildUser.Activity.Name} but now doesn't - attempting to find role");
+                            logger.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} had an activity of {oldGuildUser.Activity.Name} but now doesn't - attempting to find role");
 
                             var foundRole = socketGuild.GetRole(foundMemory.RoleId);
 
@@ -169,7 +169,7 @@ namespace GameWatcher
                             logger.Log($"[{newGuildUser.Id} | {randomNumber}] Unhandled exception for this event, message follows: {ex.Message}\r\n{ex.StackTrace}");
                         }
                     }
-                    else if (newGuildUser.Activity is CustomStatusGame)
+                    else if (newGuildUser.Activity is Game)
                     {
                         if (newGuildUser.Activity is Game game)
                         {
