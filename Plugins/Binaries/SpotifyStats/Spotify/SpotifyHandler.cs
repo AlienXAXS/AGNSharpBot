@@ -4,6 +4,7 @@ using PluginManager;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GlobalLogger;
 
 namespace SpotifyStats.Spotify
 {
@@ -62,7 +63,7 @@ namespace SpotifyStats.Spotify
                 if (newMember.Activity?.Type == ActivityType.Listening)
                 {
                     // It's spotify listing type
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"User {newMember.Username} is listening to spotify");
+                    Log4NetHandler.Log($"User {newMember.Username} is listening to spotify", Log4NetHandler.LogLevel.DEBUG);
 
                     if (newMember.Activity is SpotifyGame spotifyGame)
                     {
@@ -81,7 +82,7 @@ namespace SpotifyStats.Spotify
                         discordEmbedBuilder.AddField("Person Listening",
                             newMember?.Nickname ?? newMember.Username, true);
 
-                        GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"User {newMember.Username} Listening to Spotify | SID:{spotifyGame.SessionId} | ID: {spotifyGame.TrackId} | A:{spotifyGame.Artists.First()} | T: {spotifyGame.TrackTitle}");
+                        Log4NetHandler.Log($"User {newMember.Username} Listening to Spotify | SID:{spotifyGame.SessionId} | ID: {spotifyGame.TrackId} | A:{spotifyGame.Artists.First()} | T: {spotifyGame.TrackTitle}", Log4NetHandler.LogLevel.DEBUG);
 
                         var outputString = "";
                         for (var i = 0; i <= topUsersList.Count - 1; i++)
@@ -99,7 +100,7 @@ namespace SpotifyStats.Spotify
             }
             catch (Exception ex)
             {
-                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"FATAL EXCEPTION\r\n{ex.Message}\r\n\r\nSTACK:\r\n{ex.StackTrace}))");
+                Log4NetHandler.Log($"Unhandled Exception in SpotifyStats OnGuildMemberUpdated", Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
     }

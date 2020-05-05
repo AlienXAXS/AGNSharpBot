@@ -11,7 +11,7 @@ namespace Interface
 
         void Dispose();
 
-        PluginManager.EventRouter EventRouter { get; set; }
+        EventRouter EventRouter { get; set; }
     }
 
     public interface IPluginWithRouter : IPlugin

@@ -10,7 +10,7 @@ namespace Responses.Commands
 {
     internal class ModerateUserSession : IDisposable
     {
-        private DiscordMenu.MenuHandler _menuHandler;
+        private MenuHandler _menuHandler;
         public DiscordSocketClient DiscordSocketClient { get; set; }
         public SocketMessage SocketMessage { get; set; }
         public SocketGuildUser Victim { get; set; }
@@ -23,7 +23,7 @@ namespace Responses.Commands
 
         public void Start()
         {
-            _menuHandler = new DiscordMenu.MenuHandler()
+            _menuHandler = new MenuHandler()
             {
                 DiscordSocketClient = DiscordSocketClient,
                 MenuTitle = $"Moderation Menu for user {Victim.Username}",

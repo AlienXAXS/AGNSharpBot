@@ -88,7 +88,7 @@ namespace SQLite
 			: base (r, message)
 		{
 			if (mapping != null && obj != null) {
-				this.Columns = from c in mapping.Columns
+				Columns = from c in mapping.Columns
 							   where c.IsNullable == false && c.GetValue (obj) == null
 							   select c;
 			}
@@ -168,7 +168,7 @@ namespace SQLite
 		private bool _open;
 		private TimeSpan _busyTimeout;
 		readonly static Dictionary<string, TableMapping> _mappings = new Dictionary<string, TableMapping> ();
-		private System.Diagnostics.Stopwatch _sw;
+		private Stopwatch _sw;
 		private long _elapsedMilliseconds = 0;
 
 		private int _transactionDepth = 0;
@@ -401,9 +401,9 @@ namespace SQLite
 #if !USE_SQLITEPCL_RAW
 		static byte[] GetNullTerminatedUtf8 (string s)
 		{
-			var utf8Length = System.Text.Encoding.UTF8.GetByteCount (s);
+			var utf8Length = Encoding.UTF8.GetByteCount (s);
 			var bytes = new byte [utf8Length + 1];
-			utf8Length = System.Text.Encoding.UTF8.GetBytes(s, 0, s.Length, bytes, 0);
+			utf8Length = Encoding.UTF8.GetBytes(s, 0, s.Length, bytes, 0);
 			return bytes;
 		}
 #endif
@@ -1466,7 +1466,7 @@ namespace SQLite
 		/// <returns>
 		/// The number of rows added to the table.
 		/// </returns>
-		public int InsertAll (System.Collections.IEnumerable objects, bool runInTransaction = true)
+		public int InsertAll (IEnumerable objects, bool runInTransaction = true)
 		{
 			var c = 0;
 			if (runInTransaction) {
@@ -1499,7 +1499,7 @@ namespace SQLite
 		/// <returns>
 		/// The number of rows added to the table.
 		/// </returns>
-		public int InsertAll (System.Collections.IEnumerable objects, string extra, bool runInTransaction = true)
+		public int InsertAll (IEnumerable objects, string extra, bool runInTransaction = true)
 		{
 			var c = 0;
 			if (runInTransaction) {
@@ -1532,7 +1532,7 @@ namespace SQLite
 		/// <returns>
 		/// The number of rows added to the table.
 		/// </returns>
-		public int InsertAll (System.Collections.IEnumerable objects, Type objType, bool runInTransaction = true)
+		public int InsertAll (IEnumerable objects, Type objType, bool runInTransaction = true)
 		{
 			var c = 0;
 			if (runInTransaction) {
@@ -1703,7 +1703,7 @@ namespace SQLite
 					count = insertCmd.ExecuteNonQuery (vals);
 				}
 				catch (SQLiteException ex) {
-					if (SQLite3.ExtendedErrCode (this.Handle) == SQLite3.ExtendedResult.ConstraintNotNull) {
+					if (SQLite3.ExtendedErrCode (Handle) == SQLite3.ExtendedResult.ConstraintNotNull) {
 						throw NotNullConstraintViolationException.New (ex.Result, ex.Message, map, obj);
 					}
 					throw;
@@ -1845,7 +1845,7 @@ namespace SQLite
 			}
 			catch (SQLiteException ex) {
 
-				if (ex.Result == SQLite3.Result.Constraint && SQLite3.ExtendedErrCode (this.Handle) == SQLite3.ExtendedResult.ConstraintNotNull) {
+				if (ex.Result == SQLite3.Result.Constraint && SQLite3.ExtendedErrCode (Handle) == SQLite3.ExtendedResult.ConstraintNotNull) {
 					throw NotNullConstraintViolationException.New (ex, map, obj);
 				}
 
@@ -1870,7 +1870,7 @@ namespace SQLite
 		/// <returns>
 		/// The number of rows modified.
 		/// </returns>
-		public int UpdateAll (System.Collections.IEnumerable objects, bool runInTransaction = true)
+		public int UpdateAll (IEnumerable objects, bool runInTransaction = true)
 		{
 			var c = 0;
 			if (runInTransaction) {
@@ -2336,7 +2336,7 @@ namespace SQLite
 		}
 	}
 
-	public sealed class PreserveAttribute : System.Attribute
+	public sealed class PreserveAttribute : Attribute
 	{
 		public bool AllMembers;
 		public bool Conditional;
@@ -3739,11 +3739,11 @@ namespace SQLite
 					//
 					// Work special magic for enumerables
 					//
-					if (val != null && val is System.Collections.IEnumerable && !(val is string) && !(val is System.Collections.Generic.IEnumerable<byte>)) {
-						var sb = new System.Text.StringBuilder ();
+					if (val != null && val is IEnumerable && !(val is string) && !(val is IEnumerable<byte>)) {
+						var sb = new StringBuilder ();
 						sb.Append ("(");
 						var head = "";
-						foreach (var a in (System.Collections.IEnumerable)val) {
+						foreach (var a in (IEnumerable)val) {
 							queryArgs.Add (a);
 							sb.Append (head);
 							sb.Append ("?");
@@ -3861,7 +3861,7 @@ namespace SQLite
 			return GenerateCommand ("*").ExecuteDeferredQuery<T> ().GetEnumerator ();
 		}
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+		IEnumerator IEnumerable.GetEnumerator ()
 		{
 			return GetEnumerator ();
 		}
@@ -4072,7 +4072,7 @@ namespace SQLite
             byte[] queryBytes = System.Text.UTF8Encoding.UTF8.GetBytes (query);
             var r = Prepare2 (db, queryBytes, queryBytes.Length, out stmt, IntPtr.Zero);
 #else
-            var r = Prepare2 (db, query, System.Text.UTF8Encoding.UTF8.GetByteCount (query), out stmt, IntPtr.Zero);
+            var r = Prepare2 (db, query, Encoding.UTF8.GetByteCount (query), out stmt, IntPtr.Zero);
 #endif
 			if (r != Result.OK) {
 				throw SQLiteException.New (r, GetErrmsg (db));
@@ -4160,7 +4160,7 @@ namespace SQLite
 
 		public static string ColumnString (IntPtr stmt, int index)
 		{
-			return Marshal.PtrToStringUni (SQLite3.ColumnText16 (stmt, index));
+			return Marshal.PtrToStringUni (ColumnText16 (stmt, index));
 		}
 
 		public static byte[] ColumnByteArray (IntPtr stmt, int index)

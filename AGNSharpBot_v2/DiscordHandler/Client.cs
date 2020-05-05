@@ -23,10 +23,11 @@ namespace AGNSharpBot.DiscordHandler
             _discordSocket = new DiscordSocketClient(_config);
             _discordSocket.Log += message =>
             {
-                if (message.Message == null)
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(message.Exception.Message);
+                if ( message.Exception != null )
+                    GlobalLogger.Log4NetHandler.Log($"Discord.NET Message: {message.Message}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:message.Exception);
                 else
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(message.Message);
+                    GlobalLogger.Log4NetHandler.Log($"Discord.NET Message: {message.Message}", GlobalLogger.Log4NetHandler.LogLevel.INFO);
+
                 return Task.CompletedTask;
             };
         }

@@ -1,5 +1,4 @@
-﻿using GlobalLogger.AdvancedLogger;
-using Interface;
+﻿using Interface;
 using PluginManager;
 
 namespace HomeLabReporting
@@ -15,19 +14,13 @@ namespace HomeLabReporting
 
         public void ExecutePlugin()
         {
-            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() { Compress = true });
-
-            AdvancedLoggerHandler.Instance.GetLogger().Log($"HomeLabReporting.dll Plugin Loading...");
             SNMP.SnmpCommunication.Instance.StartCapture();
-
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands>();
         }
 
         void IPlugin.Dispose()
         {
             SNMP.SnmpCommunication.Instance.Dispose();
-            AdvancedLoggerHandler.Instance.GetLogger().Log("HomeLabReporting Disposed");
         }
     }
 }

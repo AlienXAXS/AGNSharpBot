@@ -1,5 +1,4 @@
 ﻿using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
 using Interface;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using GlobalLogger;
 using ImportManyAttribute = System.ComponentModel.Composition.ImportManyAttribute;
 
 namespace PluginManager
@@ -46,15 +46,11 @@ namespace PluginManager
 
         private bool _hasExecutedPlugins = false;
 
-        public PluginHandler()
-        {
-            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions() { Compress = true });
-            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<SQL.PluginManager>();
-        }
-
         public void LoadPlugins()
         {
-            AdvancedLoggerHandler.Instance.GetLogger().Log("Loading Plugins from Plugins directory");
+            Log4NetHandler.Log("Plugin Manager Loading", Log4NetHandler.LogLevel.INFO);
+
+            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<SQL.PluginManager>();
 
             var catalog = new DirectoryCatalog("Plugins");
             using (var container = new CompositionContainer(catalog))
@@ -63,20 +59,20 @@ namespace PluginManager
                 {
                     container.ComposeParts(this);
                 }
-                catch (System.Reflection.ReflectionTypeLoadException ex)
+                catch (ReflectionTypeLoadException ex)
                 {
-                    AdvancedLoggerHandler.Instance.GetLogger().Log("Unable to load plugins...");
+                    Log4NetHandler.Log("Unable to load one or more plugins", Log4NetHandler.LogLevel.ERROR);
 
                     foreach (var x in ex.LoaderExceptions)
-                        AdvancedLoggerHandler.Instance.GetLogger().Log(x.Message);
+                        Log4NetHandler.Log($"Plugin failed to load: {x.Message}", Log4NetHandler.LogLevel.ERROR, exception:x);
                 }
                 catch (Exception ex)
                 {
-                    AdvancedLoggerHandler.Instance.GetLogger().Log(ex.Message);
+                    Log4NetHandler.Log("Fatal error while attempting to compose plugin parts", Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
             }
 
-            AdvancedLoggerHandler.Instance.GetLogger().Log("Plugins loaded");
+            Log4NetHandler.Log("Plugin Manager finished loading plugins, will execute them when Discord is ready", Log4NetHandler.LogLevel.INFO);
         }
 
         public bool ShouldExecutePlugin(ulong guildId, Assembly assembly)
@@ -109,19 +105,14 @@ namespace PluginManager
             if (_hasExecutedPlugins) return;
             _hasExecutedPlugins = true;
 
-            AdvancedLoggerHandler.Instance.GetLogger().Log("AGNSharpBot Loading...");
+            Log4NetHandler.Log("AGNSharpBot Plugin System Init Plugins, Discord Status: Ready", Log4NetHandler.LogLevel.INFO);
 
             var pluginNameList = "";
-            AdvancedLoggerHandler.Instance.GetLogger().Log("Discord Is Ready - Executing Plugins");
-
-            var logger = GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
-
-            logger.Log($"{Plugins.Count()} plugins are loaded, executing them now.");
+            Log4NetHandler.Log($"{Plugins.Count()} plugins detected, attempting to load plugins.", Log4NetHandler.LogLevel.INFO);
 
             foreach (var plugin in Plugins)
             {
-                pluginNameList += $"{plugin.Name}, ";
-                logger.Log($"Pre-Execute Plugin {plugin.Name}");
+                Log4NetHandler.Log($"Plugin {plugin.Name} found, attempting ExecutePlugin procedure.", Log4NetHandler.LogLevel.INFO);
 
                 // Set the event router
                 plugin.EventRouter = EventRouter;
@@ -135,11 +126,16 @@ namespace PluginManager
                 {
                     try
                     {
+#if !DEBUG
                         plugin.ExecutePlugin();
+#endif
+                        Log4NetHandler.Log($"Plugin {plugin.Name} ExecutePlugin called successfully", Log4NetHandler.LogLevel.INFO);
+                        pluginNameList += $"{plugin.Name}, ";
+
                     }
                     catch (Exception ex)
                     {
-                        logger.Log($"Caught exception on Execute Plugin for {plugin.Name}\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                        Log4NetHandler.Log($"Plugin {plugin.Name} crashed during ExecutePlugin procedure.", Log4NetHandler.LogLevel.ERROR, exception:ex);
                     }
                 })
                 {
@@ -148,7 +144,7 @@ namespace PluginManager
                 newThread.Start();
             }
 
-            logger.Log($"{Plugins.Count()} plugins have been executed -> {pluginNameList}");
+            Log4NetHandler.Log($"{Plugins.Count()} plugins have been loaded: {pluginNameList}", Log4NetHandler.LogLevel.INFO);
         }
 
         public IEnumerable<IPlugin> GetPlugins()
@@ -160,8 +156,14 @@ namespace PluginManager
         {
             foreach (var plugin in Plugins)
             {
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"Shutting down plugin {plugin.Name}.");
-                plugin.Dispose();
+                Log4NetHandler.Log($"Disposing plugin {plugin.Name}.", Log4NetHandler.LogLevel.INFO);
+                try
+                {
+                    plugin.Dispose();
+                } catch (Exception ex)
+                {
+                    Log4NetHandler.Log($"Disposing plugin {plugin.Name} failed with an error", Log4NetHandler.LogLevel.ERROR, exception: ex);
+                }
             }
         }
 

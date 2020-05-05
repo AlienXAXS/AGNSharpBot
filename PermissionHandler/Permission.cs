@@ -1,10 +1,10 @@
 ﻿using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
 using PermissionHandler.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GlobalLogger;
 
 namespace PermissionHandler
 {
@@ -31,16 +31,13 @@ namespace PermissionHandler
                 var requiredAttributeFound =
                     thisMethod.GetCustomAttributesData().Any(x => x.AttributeType.Name.Equals("Command"));
 
-                if (requiredAttributeFound)
-                {
-                    var pathName = $"{typeof(T)}.{thisMethod.Name}";
-                    _registeredPermissionPaths.Add(pathName);
-                    _database.AddPermission(pathName);
+                if (!requiredAttributeFound) continue;
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Dynamically registered a new permission path node: {pathName}");
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                }
+                var pathName = $"{typeof(T)}.{thisMethod.Name}";
+                _registeredPermissionPaths.Add(pathName);
+                _database.AddPermission(pathName);
+
+                Log4NetHandler.Log($"Dynamically registered a new permission path node: {pathName}", Log4NetHandler.LogLevel.INFO);
             }
         }
 

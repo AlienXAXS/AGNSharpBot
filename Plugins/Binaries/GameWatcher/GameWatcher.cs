@@ -1,5 +1,4 @@
 ﻿using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
 using Interface;
 using PluginManager;
 using System;
@@ -23,9 +22,6 @@ namespace GameWatcher
         {
             try
             {
-                AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions() { Compress = true });
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"[GAMEWATCHER] Checking Discord...");
-
                 _discordClient = EventRouter.GetDiscordSocketClient();
                 GameHandler.Instance.DiscordSocketClient = _discordClient;
                 GameHandler.Instance.PluginRouter = PluginRouter;

@@ -11,7 +11,6 @@ namespace InternalDatabase
     {
         public SQLite.SQLiteConnection DbConnection;
         public string DatabaseName;
-        private ISQLitePlatform sqlitePlatform;
         private readonly char[] _invalidFileNameChars = Path.GetInvalidFileNameChars();
 
         public Connection(string name)
@@ -33,11 +32,11 @@ namespace InternalDatabase
 
                 DbConnection = new SQLite.SQLiteConnection(databasePath); // (new SQLite.Net.Platform.Win32.SQLitePlatformWin32(), databasePath);
 
-                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"[DATABASE] New DB Connection for {dbFileName} established!");
+                GlobalLogger.Log4NetHandler.Log($"[DATABASE] DB Connection for {dbFileName} established!", GlobalLogger.Log4NetHandler.LogLevel.INFO);
             }
             catch (Exception ex)
             {
-                //TODO: Catch the different types of exceptions here (io failure, sql failure, etc)
+                GlobalLogger.Log4NetHandler.Log($"Database module failed during Connection creation", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
 

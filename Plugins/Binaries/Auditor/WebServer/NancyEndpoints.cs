@@ -95,7 +95,7 @@ namespace Auditor.WebServer
                 var request = this.Bind<RequestObjects.LoginRequest>();
 
                 if (request.Key == null)
-                    return View["NoAuth", this.Request.Url];
+                    return View["NoAuth", Request.Url];
 
                 var authDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<AuditorSql.AuditorNancyLoginSession>();
 
@@ -123,7 +123,7 @@ namespace Auditor.WebServer
                         return "Cannot find your discord guild id. You have been logged out!";
                     }
 
-                    Models.Messages.ByUser model;
+                    ByUser model;
                     try
                     {
                         model = GenerateByUserModel(sktGuild);
@@ -152,7 +152,7 @@ namespace Auditor.WebServer
                     return "Cannot find your discord guild id. You have been logged out!";
                 }
 
-                Models.Messages.ByUser model;
+                ByUser model;
                 try
                 {
                     model = GenerateByUserModel(sktGuild);
@@ -170,21 +170,21 @@ namespace Auditor.WebServer
             });
         }
 
-        private Models.Messages.ByUser GenerateByUserModel(SocketGuild sktGuild)
+        private ByUser GenerateByUserModel(SocketGuild sktGuild)
         {
-            var model = new Models.Messages.ByUser();
+            var model = new ByUser();
 
             // Generate the drop down list of users
             var users = sktGuild.Users;
             foreach (var user in users.OrderBy(x => x.Username))
             {
-                model.Users.Add(new Models.Messages.UserMakeup(user.Username, user.Nickname, user.Id));
+                model.Users.Add(new UserMakeup(user.Username, user.Nickname, user.Id));
             }
 
             // See if we have results
             if (Context.Request.Method.Equals("POST"))
             {
-                var postData = this.Bind<Models.Messages.PostData>();
+                var postData = this.Bind<PostData>();
 
                 foreach (var user in model.Users)
                 {

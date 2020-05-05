@@ -1,5 +1,4 @@
-﻿using GlobalLogger.AdvancedLogger;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -10,12 +9,6 @@ namespace InternalDatabase
         private static readonly Handler _instance;
         public static Handler Instance = _instance ?? (_instance = new Handler());
         private readonly List<Connection> _connections = new List<Connection>();
-
-        public Handler()
-        {
-            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() { Compress = true });
-        }
 
         /// <summary>
         /// Gets a connection from the current calling assembly name, dynamically creates a new database file and connection if it does not exist.
@@ -43,7 +36,7 @@ namespace InternalDatabase
 
             if (foundConnection != null) return foundConnection;
 
-            AdvancedLoggerHandler.Instance.GetLogger().Log($"New SQLite Database requested from {connectionName}");
+            GlobalLogger.Log4NetHandler.Log($"SQLite database instance requested from {connectionName}", GlobalLogger.Log4NetHandler.LogLevel.INFO);
 
             _connections.Add(new Connection(connectionName));
             return _connections[_connections.Count - 1];

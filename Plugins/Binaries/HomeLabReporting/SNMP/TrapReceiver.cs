@@ -7,7 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 
@@ -46,8 +45,6 @@ namespace HomeLabReporting.SNMP
 
         public TrapReceiver()
         {
-            var logger = AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
-
             if (System.IO.File.Exists(ConfigurationPath))
             {
                 try
@@ -58,7 +55,7 @@ namespace HomeLabReporting.SNMP
                 }
                 catch (Exception ex)
                 {
-                    logger.Log($"Unable to deserialize snmp.json, error is as follows:\r\n{ex.Message}");
+                    GlobalLogger.Log4NetHandler.Log($"Unable to deserialize snmp.json", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
             }
             else
@@ -71,7 +68,7 @@ namespace HomeLabReporting.SNMP
                 }
                 catch (Exception ex)
                 {
-                    logger.Log($"Exception while attempting to write to snmp.json, error is as follows: {ex.Message}");
+                    GlobalLogger.Log4NetHandler.Log($"Exception while attempting to write to snmp.json", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
             }
 

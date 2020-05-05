@@ -14,7 +14,7 @@ namespace Responses.Commands.GameGiveaway
         public DiscordSocketClient DiscordSocketClient { get; set; }
         private bool _isFinished;
         private const double GiveawayAccessDurationInDays = 30.0;
-        private MenuHandler _menu = new DiscordMenu.MenuHandler();
+        private MenuHandler _menu = new MenuHandler();
 
         public async void StartMenu()
         {

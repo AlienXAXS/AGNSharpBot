@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
 using PluginManager;
 using Responses.SQLTables;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GlobalLogger;
 
 namespace Responses.Informational
 {
@@ -23,7 +23,7 @@ namespace Responses.Informational
                     // If the old user and the new user have the same status, we also dont care
                     if (oldUser.Status.Equals(NewUser.Status)) return Task.CompletedTask;
 
-                    var sqlDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQLTables.LastOnlineTable>();
+                    var sqlDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<LastOnlineTable>();
                     var foundUser = sqlDb.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.DiscordId.Equals((long)NewUser.Id)) ?? new LastOnlineTable();
                     var isInsert = foundUser.DiscordId.Equals(0);
 
@@ -48,7 +48,7 @@ namespace Responses.Informational
                 }
                 catch (Exception ex)
                 {
-                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Exception while attempting to handle GuildMemberUpdated for OnlineScanner:\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                    Log4NetHandler.Log($"Exception while attempting to handle GuildMemberUpdated for OnlineScanner LastOnline", Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
 
                 return Task.CompletedTask;

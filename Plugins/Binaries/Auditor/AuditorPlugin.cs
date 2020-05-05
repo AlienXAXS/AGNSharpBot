@@ -1,7 +1,6 @@
 ﻿using Auditor.WebServer;
 using Discord;
 using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
 using Interface;
 using PluginManager;
 using System;
@@ -23,14 +22,11 @@ namespace Auditor
 
         public void ExecutePlugin()
         {
-            // Setup logger
-            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true).SetRetentionOptions(new RetentionOptions() { Compress = true, Days = 1 });
-
             // Register our SQL Tables
             InternalDatabase.Handler.Instance.NewConnection().RegisterTable<AuditorSql.AuditEntry>().RegisterTable<AuditorSql.AuditorNancyLoginSession>();
 
             // Register commands
-            CommandHandler.HandlerManager.Instance.RegisterHandler<WebServer.ControllerCommands>();
+            CommandHandler.HandlerManager.Instance.RegisterHandler<ControllerCommands>();
 
             // Setup discord hooks
             EventRouter.MessageDeleted += DiscordClientOnMessageDeleted;
@@ -73,7 +69,7 @@ namespace Auditor
                 db.Connection.Insert(newRecord);
             } catch (Exception ex)
             {
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"Exception writing to database for Auditor\r\n{ex.Message}\r\n\r\n{ex.InnerException?.Message}");
+                GlobalLogger.Log4NetHandler.Log($"Exception writing to database for Auditor", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
 

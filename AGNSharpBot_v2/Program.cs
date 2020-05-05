@@ -1,10 +1,10 @@
 ﻿using AGNSharpBot.DiscordHandler;
 using CommandHandler;
-using GlobalLogger.AdvancedLogger;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using log4net;
 
 namespace AGNSharpBot
 {
@@ -21,10 +21,7 @@ namespace AGNSharpBot
             }
             catch (Exception ex)
             {
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"Fatal Error: {ex.Message}\r\n\r\n{ex.StackTrace}");
-
-                if (ex.InnerException != null)
-                    AdvancedLoggerHandler.Instance.GetLogger().Log($"Inner Exception Error: {ex.InnerException.Message}\r\n\r\n{ex.InnerException.StackTrace}");
+                GlobalLogger.Log4NetHandler.Log($"Fatal Error", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
 
@@ -54,7 +51,7 @@ namespace AGNSharpBot
                 case CtrlType.CTRL_CLOSE_EVENT:
                     Client.Instance.Dispose();
                     PluginManager.PluginHandler.Instance.Dispose();
-                    AdvancedLoggerHandler.Instance.GetLogger().Log("Shutting down application...");
+                    GlobalLogger.Log4NetHandler.Log("Shutting down application...", GlobalLogger.Log4NetHandler.LogLevel.INFO);
                     System.Threading.Thread.Sleep(1500);
                     _running = false;
                     return true;
@@ -66,15 +63,15 @@ namespace AGNSharpBot
 
         public async Task MainAsync()
         {
-            var logger = GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger()
-                .SetRetentionOptions(new RetentionOptions() { Compress = true, Days = 1 })
-                .OutputToConsole(true);
+            GlobalLogger.Log4NetHandler.Log("AGNSharpBot is starting up", GlobalLogger.Log4NetHandler.LogLevel.INFO);
 
-            logger.Log("AGNSharpBot is starting up");
-
-            logger.Log("Setting up exit handler capture");
+            GlobalLogger.Log4NetHandler.Log("Setting up exit handler capture", GlobalLogger.Log4NetHandler.LogLevel.INFO);
             _handler += Handler;
             SetConsoleCtrlHandler(_handler, true);
+
+
+            // Setup our unhandled exception events
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             try
             {
@@ -84,7 +81,7 @@ namespace AGNSharpBot
                 var serviceHandler = new ServiceDefiner();
 
                 // Start our discord client
-                logger.Log("Loading Discord");
+                GlobalLogger.Log4NetHandler.Log("Loading Discord", GlobalLogger.Log4NetHandler.LogLevel.INFO);
                 _discordClient.InitDiscordClient(serviceHandler.GetServiceProvider());
                 HandlerManager.Instance.RegisterDiscord(Client.Instance.GetDiscordSocket());
 
@@ -92,25 +89,29 @@ namespace AGNSharpBot
                 PluginManager.PluginHandler.Instance.DiscordSocketClient = _discordClient.GetDiscordSocket();
                 PluginManager.PluginHandler.Instance.LoadPlugins();
 
-                logger.Log("Connecting to Discord");
+                GlobalLogger.Log4NetHandler.Log("Connecting to Discord", GlobalLogger.Log4NetHandler.LogLevel.INFO);
                 await _discordClient.Connect();
                 await GetUserInputAsync();
             }
             catch (Configuration.Exceptions.MissingConfigurationFile)
             {
-                logger.Log("\r\n\r\nYou must provide a config.json file, rename the config.json.example to config.json before loading this application");
+                GlobalLogger.Log4NetHandler.Log("\r\n\r\nYou must provide a config.json file, rename the config.json.example to config.json before loading this application", GlobalLogger.Log4NetHandler.LogLevel.ERROR);
                 Console.WriteLine("Press <ENTER> to exit");
                 Console.ReadKey();
                 return;
             }
             catch (Configuration.Exceptions.InvalidConfigurationFile)
             {
-                logger.Log(
-                    "\r\n\r\nThe provided config.json is invalid, unable to load.");
+                GlobalLogger.Log4NetHandler.Log("\r\n\r\nThe provided config.json is invalid, unable to load.", GlobalLogger.Log4NetHandler.LogLevel.ERROR);
                 Console.WriteLine("Press <ENTER> to exit");
                 Console.ReadKey();
                 return;
             }
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            GlobalLogger.Log4NetHandler.Log($"Unhandled Exception in sender: {sender}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:(Exception)e.ExceptionObject);
         }
 
         private async Task GetUserInputAsync()

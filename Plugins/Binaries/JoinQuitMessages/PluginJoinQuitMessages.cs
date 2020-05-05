@@ -15,28 +15,15 @@ namespace JoinQuitMessages
 
         public void ExecutePlugin()
         {
-            try
-            {
-                // Setup the logger
-                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
+            // Register our connection, and our table.
+            InternalDatabase.Handler.Instance.NewConnection()?.RegisterTable<SQLTables.Configuration>();
 
-                // Register our connection, and our table.
-                InternalDatabase.Handler.Instance.NewConnection()?.RegisterTable<SQLTables.Configuration>();
+            // Add our commands to the cmdhandler
+            CommandHandler.HandlerManager.Instance.RegisterHandler<Configuration.DiscordConfigurationHandler>();
 
-                // Add our commands to the cmdhandler
-                CommandHandler.HandlerManager.Instance.RegisterHandler<Configuration.DiscordConfigurationHandler>();
-
-                // Setup our event router
-                EventRouter.UserJoined += EventRouterOnUserJoined;
-                EventRouter.UserLeft += EventRouterOnUserLeft;
-            }
-            catch (Exception ex)
-            {
-                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Exception in plugin {Name}\r\n{ex.Message}\r\n\r\n\r\n{ex.StackTrace}");
-
-                if (ex.InnerException != null)
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Inner Exception: {ex.InnerException.Message}\r\n\r\n\r\n{ex.InnerException.StackTrace}");
-            }
+            // Setup our event router
+            EventRouter.UserJoined += EventRouterOnUserJoined;
+            EventRouter.UserLeft += EventRouterOnUserLeft;
         }
 
         private Task EventRouterOnUserLeft(SocketGuildUser user)

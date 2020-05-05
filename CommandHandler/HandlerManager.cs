@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using GlobalLogger;
 
 namespace CommandHandler
 {
@@ -214,13 +215,13 @@ namespace CommandHandler
                 }
                 catch (Exception ex)
                 {
-                    socketMessage.Channel.SendMessageAsync(ex.Message);
-                    socketMessage.Channel.SendMessageAsync(ex.StackTrace);
+                    Log4NetHandler.Log($"Unable to parse command \"{parameters.Aggregate((x, y) => x + " " + y)}\"",
+                        Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
             }
             else
             {
-                await socketMessage.Author.SendMessageAsync("Sorry, this bot does not support any type of configuration via Private Messages.");
+                await socketMessage.Author.SendMessageAsync("Hey, thanks so much for sending me a private message - but AGNSharpBot just does not want to talk to you, go away now.... Shoo!");
             }
         }
 

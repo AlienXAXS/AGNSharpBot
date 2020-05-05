@@ -3,6 +3,7 @@ using PermissionHandler.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GlobalLogger;
 
 namespace PermissionHandler
 {
@@ -105,8 +106,8 @@ namespace PermissionHandler
                 }
                 catch (Exception ex)
                 {
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(
-                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to load permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                    Log4NetHandler.Log($"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to load permission database",
+                        Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
             }
         }
@@ -122,7 +123,9 @@ namespace PermissionHandler
                 }
                 catch (Exception ex)
                 {
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to save permission database, error follows:\r\n{ex.Message}\r\n{ex.StackTrace}");
+                    Log4NetHandler.Log(
+                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to save permission database",
+                        Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
             }
         }

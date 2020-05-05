@@ -12,23 +12,23 @@ namespace GameWatcher.DB
         public DatabaseHandler()
         {
             _dbConnection = InternalDatabase.Handler.Instance.NewConnection();
-            _dbConnection.RegisterTable<DB.Tables.GameMemory>();
+            _dbConnection.RegisterTable<Tables.GameMemory>();
         }
 
         public bool Exists(string name)
         {
-            return _dbConnection.DbConnection.Table<DB.Tables.GameMemory>().Any(x => x.Name.Equals(name));
+            return _dbConnection.DbConnection.Table<Tables.GameMemory>().Any(x => x.Name.Equals(name));
         }
 
         public void Add(string name)
         {
-            var newRecord = new DB.Tables.GameMemory() { Name = name };
+            var newRecord = new Tables.GameMemory() { Name = name };
             _dbConnection.DbConnection.Insert(newRecord);
         }
 
         public void Remove(string name)
         {
-            var record = _dbConnection.DbConnection.Table<DB.Tables.GameMemory>().DefaultIfEmpty(null)
+            var record = _dbConnection.DbConnection.Table<Tables.GameMemory>().DefaultIfEmpty(null)
                 .FirstOrDefault(x => x.Name.Equals(name));
 
             if (record != null)

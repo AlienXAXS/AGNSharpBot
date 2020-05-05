@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GlobalLogger;
 
 namespace Responses.Commands.Handlers
 {
@@ -62,7 +63,7 @@ namespace Responses.Commands.Handlers
                 }
                 catch (Exception ex)
                 {
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to parse SpotifySongs.json, error was:\r\n{ex.Message}");
+                    Log4NetHandler.Log($"Unable to parse SpotifySongs.json", Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
             }
             else
@@ -86,7 +87,7 @@ namespace Responses.Commands.Handlers
             }
             catch (Exception ex)
             {
-                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to init config for AuthorisedCommandsPermission\r\n{ex.Message}");
+                Log4NetHandler.Log($"Unable to init config for AuthorisedCommandsPermission", Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
     }

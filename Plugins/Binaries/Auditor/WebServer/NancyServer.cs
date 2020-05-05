@@ -1,5 +1,4 @@
 ﻿using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Configuration;
@@ -51,7 +50,7 @@ namespace Auditor.WebServer
 
                     if (!config.Enabled && !calledFromDiscord)
                     {
-                        AdvancedLoggerHandler.Instance.GetLogger().Log("NancyServer not starting as it's not enabled - skipping init.");
+                        GlobalLogger.Log4NetHandler.Log("NancyServer not starting as it's not enabled - skipping init.", GlobalLogger.Log4NetHandler.LogLevel.INFO);
                         return;
                     }
 
@@ -66,7 +65,7 @@ namespace Auditor.WebServer
                         {
                             nancyHost.Start();
                             _serverRunning = true;
-                            AdvancedLoggerHandler.Instance.GetLogger().Log($"NancyServer started, listening for connections on port {config.Port}");
+                            GlobalLogger.Log4NetHandler.Log($"NancyServer started, listening for connections on port {config.Port}", GlobalLogger.Log4NetHandler.LogLevel.INFO);
 
                             // Maybe a better way of doing this, but whatever.
                             while (!_stopRequested)
@@ -76,7 +75,7 @@ namespace Auditor.WebServer
                         }
                         catch (Exception ex)
                         {
-                            AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to start NancyServer: {ex.Message}\r\n\r\n{ex.StackTrace}");
+                            GlobalLogger.Log4NetHandler.Log($"Unable to start NancyServer: {ex.Message}\r\n\r\n{ex.StackTrace}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
                         }
                     }
 
@@ -87,7 +86,7 @@ namespace Auditor.WebServer
             }
             catch (Exception ex)
             {
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"NancyServer Start Error: {ex.Message}");
+                GlobalLogger.Log4NetHandler.Log($"NancyServer Start Error - unable to start Nancy", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
 

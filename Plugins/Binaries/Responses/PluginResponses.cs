@@ -1,5 +1,4 @@
-﻿using GlobalLogger.AdvancedLogger;
-using Interface;
+﻿using Interface;
 using PluginManager;
 using Responses.SQLTables;
 using System.ComponentModel.Composition;
@@ -16,10 +15,6 @@ namespace Responses
 
         void IPlugin.ExecutePlugin()
         {
-            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() { Compress = true });
-            AdvancedLoggerHandler.Instance.GetLogger().Log($"Responses.dll Plugin Loading...");
-
             // SQL Database Setup
             // Last Online
             InternalDatabase.Handler.Instance.NewConnection().RegisterTable<LastOnlineTable>();
@@ -44,7 +39,6 @@ namespace Responses
 
         void IPlugin.Dispose()
         {
-            AdvancedLoggerHandler.Instance.GetLogger().Log("Responses Disposed");
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using GlobalLogger.AdvancedLogger;
 using Newtonsoft.Json;
 using SnmpSharpNet;
 using System;
@@ -22,21 +21,9 @@ namespace HomeLabReporting.SNMP
         public SnmpCommunication()
         {
             // Load the config file
-            try
-            {
-                AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                    .SetRetentionOptions(new RetentionOptions() { Compress = true, Days = 1 });
-
-                var config =
-                    JsonConvert.DeserializeObject<List<SnmpHost>>(
-                        System.IO.File.ReadAllText("Plugins\\Config\\HomeLabReporting.json"));
-                _snmpHosts = config;
-                TrapReceiver.Instance.OnTrapReceived += RaisedOnTrapReceived;
-            }
-            catch (Exception ex)
-            {
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to parse JSON file for SNMP Communication\r\n{ex.Message}");
-            }
+            var config = JsonConvert.DeserializeObject<List<SnmpHost>>(System.IO.File.ReadAllText("Plugins\\Config\\HomeLabReporting.json"));
+            _snmpHosts = config;
+            TrapReceiver.Instance.OnTrapReceived += RaisedOnTrapReceived;
         }
 
         private async void RaisedOnTrapReceived(object sender, IpAddress ipAddress, VbCollection snmpVbCollection)
@@ -50,7 +37,7 @@ namespace HomeLabReporting.SNMP
                 foreach (var x in snmpVbCollection)
                     oidStrings += $"{x.Oid} = {x.Value}\r\n";
 
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"[SNMP TRAP] Received snmp trap from an unknown source\r\nIP Address:{ipAddress}\r\n{oidStrings}");
+                GlobalLogger.Log4NetHandler.Log($"[SNMP TRAP] Received snmp trap from an unknown source\r\nIP Address:{ipAddress}\r\n{oidStrings}", GlobalLogger.Log4NetHandler.LogLevel.WARN);
 
                 return;
             }
@@ -76,7 +63,7 @@ namespace HomeLabReporting.SNMP
                 foreach (var x in snmpVbCollection)
                     oidStrings += $"{x.Oid} = {x.Value}\r\n";
 
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"[SNMP TRAP] Received snmp trap from {snmpHost.Name}, but the OID was not known\r\nIP Address:{ipAddress}\r\n{oidStrings}");
+                GlobalLogger.Log4NetHandler.Log($"[SNMP TRAP] Received snmp trap from {snmpHost.Name}, but the OID was not known\r\nIP Address:{ipAddress}\r\n{oidStrings}", GlobalLogger.Log4NetHandler.LogLevel.WARN);
             }
         }
 
@@ -88,8 +75,6 @@ namespace HomeLabReporting.SNMP
 
         public async void StartCapture()
         {
-            // A crappy timer!
-
             var _tickDelay = 1000;
 
             while (!_stopCapture)

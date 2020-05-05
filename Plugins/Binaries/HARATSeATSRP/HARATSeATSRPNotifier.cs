@@ -34,8 +34,6 @@ namespace HARATSeATSRP
 
         public void ExecutePlugin()
         {
-            GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true);
-
             try
             {
                 watcherThread = new Thread(StartSeatWatcher) { IsBackground = true };
@@ -53,7 +51,7 @@ namespace HARATSeATSRP
             }
             catch (Exception ex)
             {
-                GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Error in HARAT SRP Handler: {ex.Message}\r\n{ex.StackTrace}");
+                GlobalLogger.Log4NetHandler.Log($"Error in HARAT SRP Log4NetHandler", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
 
@@ -108,7 +106,7 @@ namespace HARATSeATSRP
                 }
                 catch (Exception ex)
                 {
-                    GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log($"Unable to download the SeAT JSON file, error follows: {ex.Message}\r\n\r\n{ex.StackTrace}");
+                    GlobalLogger.Log4NetHandler.Log($"Unable to download the SeAT JSON file.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
                 finally
                 {

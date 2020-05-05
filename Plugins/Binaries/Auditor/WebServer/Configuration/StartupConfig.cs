@@ -1,5 +1,4 @@
-﻿using GlobalLogger.AdvancedLogger;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Net;
 
@@ -84,15 +83,13 @@ namespace Auditor.WebServer.Configuration
                     }
                     catch (Exception ex)
                     {
-                        AdvancedLoggerHandler.Instance.GetLogger().Log($"Error while attempting to load config file for Auditor from {ConfigFilePath}");
-                        AdvancedLoggerHandler.Instance.GetLogger().Log($"{ex.Message}\r\n\r\n{ex.StackTrace}");
+                        GlobalLogger.Log4NetHandler.Log($"Error while attempting to load config file for Auditor from {ConfigFilePath}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
                     }
                 }
             }
             catch (Exception ex)
             {
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"Error while attempting to save default config file for Auditor to {ConfigFilePath}");
-                AdvancedLoggerHandler.Instance.GetLogger().Log($"{ex.Message}\r\n\r\n{ex.StackTrace}");
+                GlobalLogger.Log4NetHandler.Log($"Error while attempting to save default config file for Auditor to {ConfigFilePath}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
     }

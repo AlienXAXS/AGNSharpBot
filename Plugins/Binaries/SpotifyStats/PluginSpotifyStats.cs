@@ -1,5 +1,4 @@
-﻿using GlobalLogger.AdvancedLogger;
-using Interface;
+﻿using Interface;
 using PluginManager;
 using System.ComponentModel.Composition;
 
@@ -14,11 +13,6 @@ namespace SpotifyStats
 
         public void ExecutePlugin()
         {
-            AdvancedLoggerHandler.Instance.GetLogger().OutputToConsole(true)
-                .SetRetentionOptions(new RetentionOptions() { Compress = true });
-
-            AdvancedLoggerHandler.Instance.GetLogger().Log($"SpotifyStats.dll Plugin Loading...");
-
             // Register our tables with the SQLHandler
             var dbConn = InternalDatabase.Handler.Instance.NewConnection();
             dbConn.RegisterTable<SQLite.Tables.Listener>();
