@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
+using GlobalLogger;
 
 namespace PUBGWeekly.Game
 {
@@ -10,11 +12,11 @@ namespace PUBGWeekly.Game
     {
 
         public static GameHandler Instance = _instance ?? (_instance = new GameHandler());
-        private static GameHandler _instance;
+        private static readonly GameHandler _instance;
 
         public Discord.WebSocket.DiscordSocketClient DiscordSocketClient;
 
-        private List<Player> _players = new List<Player>();
+        private readonly List<Player> _players = new List<Player>();
         public bool IsLive = false;
 
         public void NewPlayer(string name, ulong discordId)
@@ -54,28 +56,69 @@ namespace PUBGWeekly.Game
 
                     System.Threading.Thread.Sleep(750);
 
-                } catch (Exception)
+                } catch (Exception ex)
                 {
-
+                    GlobalLogger.Log4NetHandler.Log("[PubgWeekly-MovePlayersToTeamChannels] Exception while attempting to move players", Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
             }
 
             SendStatusMessage("All players were moved (at least, they should have been!)");
+
+            Game.PubgWatcher.Instance.OnPubgGameEnded += (instance, gameData) =>
+            {
+                OutputGameInfo(gameData);
+            };
+            Game.PubgWatcher.Instance.Start();
+
+            SendStatusMessage("PUBG API Watcher has started for this game, Will report match stats when the API allows it.");
         }
 
-        public async void SendStatusMessage(string msg)
+        private void OutputGameInfo(Pubg.Net.PubgMatch gameData)
         {
-#if DEBUG
-            // Skip sending status messages in debug mode.
-            return;
-#endif
+            TimeSpan t = TimeSpan.FromSeconds(gameData.Duration);
+            string duration = t.ToString(@"\:mm\:ss\:fff");
 
+            var embedBuilder = new EmbedBuilder
+            {
+                Title = $"New PUBG Game Detected",
+                Description = $"Found {gameData.Rosters.Count()} Teams",
+                ThumbnailUrl = "https://media.discordapp.net/attachments/490303333479874562/713320093588914216/5667059_0.png",
+                Author = new EmbedAuthorBuilder() { Name = "PUBG Weekly Bot" },
+                Footer = new EmbedFooterBuilder()
+                {
+                    Text = $"Map: {gameData.MapName} | Duration: {duration} | Teams: {gameData.Rosters.Count()}"
+                },
+                Color = new Color(255, 0, 0)
+            };
+
+            var teamCounter = 1;
+            foreach (var roster in gameData.Rosters)
+            {
+                var fieldValue = "";
+                foreach (var player in roster.Participants)
+                {
+                    fieldValue += $"> {player.Stats.Name}\r\n> Kills:{player.Stats.Kills}\r\n> DBNO's: {player.Stats.DBNOs}\r\n> Dmg: {player.Stats.DamageDealt}\r\r";
+                }
+                embedBuilder.AddField($"\r\n\r\nTeam {teamCounter}", fieldValue, true);
+                teamCounter++;
+            }
+
+            SendStatusMessage("", embedBuilder.Build());
+        }
+
+        public async void SendStatusMessage(string msg, Embed embed = null)
+        {
             var statusChannelId = Configuration.PluginConfigurator.Instance.Configuration.StatusChannel;
             if ( statusChannelId != 0 )
             {
                 var guild = DiscordSocketClient.GetGuild((ulong)Configuration.PluginConfigurator.Instance.Configuration.GuildId);
                 var channel = guild.GetTextChannel((ulong)Configuration.PluginConfigurator.Instance.Configuration.StatusChannel);
 
+                if (embed != null)
+                {
+                    await channel.SendMessageAsync(embed: embed);
+                    return;
+                }
                 await channel.SendMessageAsync($"```csharp\r\n### PUBG Weekly System Message ###```>{msg}");
             }
         }
@@ -97,8 +140,10 @@ namespace PUBGWeekly.Game
                 {
                     await user.ModifyAsync(properties => properties.Channel = channel);
                 }
-                catch (Exception)
-                { }
+                catch (Exception ex)
+                {
+                    GlobalLogger.Log4NetHandler.Log("[PubgWeekly-MovePlayerToVoiceChannel] Exception while moving player to voice channel", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                }
             }
         }
 
@@ -142,6 +187,7 @@ namespace PUBGWeekly.Game
         {
             _players.Clear();
             IsLive = false;
+            Game.PubgWatcher.Instance.Stop();
         }
 
         internal double TotalPlayerCount()

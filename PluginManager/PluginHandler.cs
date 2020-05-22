@@ -128,6 +128,11 @@ namespace PluginManager
                     {
 #if !DEBUG
                         plugin.ExecutePlugin();
+#else
+                        if (plugin.Name == "PUBGWeekly")
+                        {
+                            plugin.ExecutePlugin();
+                        }
 #endif
                         Log4NetHandler.Log($"Plugin {plugin.Name} ExecutePlugin called successfully", Log4NetHandler.LogLevel.INFO);
                         pluginNameList += $"{plugin.Name}, ";

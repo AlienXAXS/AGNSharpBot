@@ -4,8 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using GlobalLogger;
+using Newtonsoft.Json;
+using PUBGWeekly.Configuration.JSON;
 
 namespace PUBGWeekly
 {
@@ -27,6 +31,10 @@ namespace PUBGWeekly
 
         public void ExecutePlugin()
         {
+            if (!PubgAPIConfigHandler.Instance.InitJsonConfig())
+            {
+                return;
+            }
 
             Game.GameHandler.Instance.DiscordSocketClient = EventRouter.GetDiscordSocketClient();
 
@@ -36,7 +44,10 @@ namespace PUBGWeekly
             var db = InternalDatabase.Handler.Instance.GetConnection();
             db.RegisterTable<Configuration.SQL.Configuration>();
             db.RegisterTable<Configuration.SQL.TeamChannels>();
+            db.RegisterTable<Configuration.SQL.PubgAccountLink>();
+
             Configuration.PluginConfigurator.Instance.LoadConfiguration();
+            Configuration.PubgToDiscordManager.Instance.Load();
 
             EventRouter.GuildMemberUpdated += EventRouter_GuildMemberUpdated;
             EventRouter.UserVoiceStateUpdated += EventRouter_UserVoiceStateUpdated;

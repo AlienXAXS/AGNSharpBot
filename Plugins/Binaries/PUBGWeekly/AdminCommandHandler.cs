@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommandHandler;
+using Discord;
 using Discord.WebSocket;
+using GlobalLogger;
+using Pubg.Net;
 
 namespace PUBGWeekly
 {
@@ -120,7 +124,7 @@ namespace PUBGWeekly
                                 }
                         }
                         break;
-
+                    
                     case "move":
                         Game.GameHandler.Instance.MovePlayersToTeamChannels();
                         break;
@@ -169,17 +173,34 @@ namespace PUBGWeekly
                                     AssignStatusChannel(parameters[3], sktMessage);
                                     break;
 
+                                case "pubg2discord":
+                                    if (parameters.Length == 46)
+                                    {
+                                        AssignPubgAccountToDiscordUser(parameters[3], sktMessage);
+                                    } else if (parameters.Length == 5)
+                                    {
+                                        ulong ulongData;
+                                        if (!ulong.TryParse(parameters[4], out ulongData))
+                                        {
+                                            await sktMessage.Channel.SendMessageAsync("Unable to convert string to ulong for discord id.");
+                                            return;
+                                        }
+
+                                        AssignPubgAccountToDiscordUser(parameters[3], sktMessage, ulongData);
+                                    }
+                                    
+                                    break;
+
                                 default:
                                     await sktMessage.Channel.SendMessageAsync("Unknown admin command");
                                     break;
-
                             }
                         }
-                    break;
+                        break;
                 }
             } catch (Exception ex)
             {
-
+                GlobalLogger.Log4NetHandler.Log("[PubgWeekly] Exception in admin handler", Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
 
@@ -310,6 +331,24 @@ namespace PUBGWeekly
                         await sktMessage.Channel.SendMessageAsync($"Cannot find a channel with the ID of {strChannelId}, are you sure you're using a Voice Channel ID?");
                     }
                 }
+            }
+        }
+
+        private async void AssignPubgAccountToDiscordUser(string pubgId, SocketMessage sktMessage, ulong discordId = 0)
+        {
+            if (sktMessage.Channel is SocketGuildChannel socketChannel)
+            {
+                if (!pubgId.StartsWith("account."))
+                {
+                    await sktMessage.Channel.SendMessageAsync($"PUBG Id of {pubgId} does not look like a PUBG Id, try again.");
+                    return;
+                }
+
+                if (discordId == 0)
+                    discordId = sktMessage.Author.Id;
+
+                Configuration.PubgToDiscordManager.Instance.Add(pubgId, discordId);
+                await sktMessage.Channel.SendMessageAsync($"PUBG Id of {pubgId} has been linked to the discord ID of {discordId}");
             }
         }
 

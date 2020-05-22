@@ -29,4 +29,12 @@ namespace PUBGWeekly.Configuration.SQL
         public int TeamNumber { get; set; }
         public long ChannelId { get; set; }
     }
+
+    public class PubgAccountLink
+    {
+        [PrimaryKey, AutoIncrement]
+        public int Id { get; set; }
+        public string PubgAccountId { get; set; }
+        public long DiscordId { get; set; }
+    }
 }

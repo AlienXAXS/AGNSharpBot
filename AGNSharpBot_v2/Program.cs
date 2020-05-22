@@ -69,9 +69,11 @@ namespace AGNSharpBot
             _handler += Handler;
             SetConsoleCtrlHandler(_handler, true);
 
-
             // Setup our unhandled exception events
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                GlobalLogger.Log4NetHandler.Log($"Unhandled Exception in sender: {sender}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: (Exception)e.ExceptionObject);
+            };
 
             try
             {
@@ -107,11 +109,6 @@ namespace AGNSharpBot
                 Console.ReadKey();
                 return;
             }
-        }
-
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            GlobalLogger.Log4NetHandler.Log($"Unhandled Exception in sender: {sender}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:(Exception)e.ExceptionObject);
         }
 
         private async Task GetUserInputAsync()
