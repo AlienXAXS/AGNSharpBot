@@ -16,17 +16,17 @@ namespace PUBGWeekly.Game
         public delegate void OnPubgGameEndedHandler(PubgWatcher instance, PubgMatch gameData);
         public event OnPubgGameEndedHandler OnPubgGameEnded;
 
-        private readonly Thread _thread;
+        private Thread _thread;
         private bool _threadRunning = true;
 
         public PubgWatcher()
         {
             PubgApiConfiguration.Configure(x => x.ApiKey = Configuration.JSON.PubgAPIConfigHandler.Instance.GetApiKey());
-            _thread = new Thread(ThreadExecute) {IsBackground = true};
         }
 
         public void Start()
         {
+            _thread = new Thread(ThreadExecute) { IsBackground = true };
             _threadRunning = true;
             _thread.Start();
         }
@@ -56,12 +56,14 @@ namespace PUBGWeekly.Game
                         if (pubgMemory.ContainsKey(pubgAccount.PubgAccountId))
                         {
                             var key = pubgMemory[pubgAccount.PubgAccountId];
+                            Console.WriteLine($"###### Current Key {key}, new key: {firstMatchId}");
                             if (key != firstMatchId)
                             {
 
                                 var matchService = new PubgMatchService();
                                 var matchData = matchService.GetMatch(firstMatchId);
 
+                                Console.WriteLine("#### INVOKING!");
                                 OnPubgGameEnded?.Invoke(this, matchData);
                                 _threadRunning = false;
                                 break;
@@ -71,7 +73,10 @@ namespace PUBGWeekly.Game
                         {
                             // Store the first known match id (the latest one the API returns), we can then scan that later to see if it's changed.
                             if (firstMatchId != null)
+                            {
                                 pubgMemory[pubgAccount.PubgAccountId] = firstMatchId;
+                                Console.WriteLine($"###### Found match ID of: {firstMatchId}");
+                            }
                         }
 
                         Thread.Sleep(1000 * 15);

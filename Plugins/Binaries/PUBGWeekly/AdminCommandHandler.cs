@@ -9,6 +9,7 @@ using Discord;
 using Discord.WebSocket;
 using GlobalLogger;
 using Pubg.Net;
+using PUBGWeekly.Game;
 
 namespace PUBGWeekly
 {
@@ -95,6 +96,10 @@ namespace PUBGWeekly
                     case "list":
                     case "lp":
                         ListPlayers(sktMessage);
+                        break;
+
+                    case "get_last_match":
+                        GetLastMatchResults();
                         break;
 
                     case "assign":
@@ -202,6 +207,28 @@ namespace PUBGWeekly
             {
                 GlobalLogger.Log4NetHandler.Log("[PubgWeekly] Exception in admin handler", Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
+        }
+
+        private void GetLastMatchResults()
+        {
+            try
+            {
+                var accId = "account.7efe2abf6d7b478a933abff26889a204";
+                GameHandler.Instance.SendStatusMessage($"Attempting to get match info for account {accId}");
+                var playerService = new PubgPlayerService();
+                var playerInfo =
+                    playerService.GetPlayer(PubgPlatform.Steam, accId);
+                var firstMatchId = playerInfo.MatchIds.FirstOrDefault();
+                var matchService = new PubgMatchService();
+                var matchData = matchService.GetMatch(firstMatchId);
+
+                GameHandler.Instance.OutputGameInfo(matchData);
+            }
+            catch (Exception ex)
+            {
+                Log4NetHandler.Log("Exception in GetLastMatchResults", Log4NetHandler.LogLevel.ERROR, exception:ex);
+            }
+
         }
 
         private async void RemovePlayerFromGame(string userid, SocketMessage sktMessage)

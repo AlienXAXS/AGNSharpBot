@@ -19,6 +19,14 @@ namespace PUBGWeekly.Game
         private readonly List<Player> _players = new List<Player>();
         public bool IsLive = false;
 
+        public GameHandler()
+        {
+            Game.PubgWatcher.Instance.OnPubgGameEnded += (instance, gameData) =>
+            {
+                OutputGameInfo(gameData);
+            };
+        }
+
         public void NewPlayer(string name, ulong discordId)
         {
 
@@ -63,17 +71,11 @@ namespace PUBGWeekly.Game
             }
 
             SendStatusMessage("All players were moved (at least, they should have been!)");
-
-            Game.PubgWatcher.Instance.OnPubgGameEnded += (instance, gameData) =>
-            {
-                OutputGameInfo(gameData);
-            };
             Game.PubgWatcher.Instance.Start();
-
             SendStatusMessage("PUBG API Watcher has started for this game, Will report match stats when the API allows it.");
         }
 
-        private void OutputGameInfo(Pubg.Net.PubgMatch gameData)
+        public void OutputGameInfo(Pubg.Net.PubgMatch gameData)
         {
             TimeSpan t = TimeSpan.FromSeconds(gameData.Duration);
             string duration = t.ToString(@"\:mm\:ss\:fff");
