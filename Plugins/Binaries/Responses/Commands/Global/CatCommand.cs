@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using GlobalLogger;
 
 namespace Responses.Commands.Global
 {
@@ -12,17 +13,10 @@ namespace Responses.Commands.Global
     {
         public async Task<Stream> GetCatPictureAsync(string text, bool gif)
         {
-            try
-            {
-                var http = new HttpClient();
-                var url = gif ? "https://cataas.com/cat/gif/says/" + text : $"https://cataas.com/cat/says/" + text;
-                var resp = await http.GetAsync(url);
-                return await resp.Content.ReadAsStreamAsync();
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            var http = new HttpClient();
+            var url = gif ? "https://cataas.com/cat/gif/says/" + text : $"https://cataas.com/cat/says/" + text;
+            var resp = await http.GetAsync(url);
+            return await resp.Content.ReadAsStreamAsync();
         }
 
         [Command("cat", "Posts an image of a cat into the channel you put the command in - you can also request a GIF by saying !cat gif")]
@@ -41,7 +35,26 @@ namespace Responses.Commands.Global
             var message =
                 await sktMessage.Channel.SendMessageAsync("Obtaining a cute fluffy image for you now, please wait...");
 
-            var stream = await GetCatPictureAsync($"A Kitty For {nickname}", gif);
+
+            Stream stream;
+            try
+            {
+                 stream = await GetCatPictureAsync($"A Kitty For {nickname}", gif);
+            }
+            catch (Exception ex)
+            {
+                GlobalLogger.Log4NetHandler.Log("Cat Command Handler was unable to get a picture of a cat", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                await message.ModifyAsync(properties =>
+                    properties.Content = "I'm sorry, but Cataas seems to be offline - Maybe try again later?");
+                return;
+            }
+
+            var streamReader = new StreamReader(stream);
+            var streamContents = streamReader.ReadToEnd();
+
+            if (streamContents.Contains("504 Gateway Time-out"))
+                stream = null;
+
             if (stream == null)
                 await message.ModifyAsync(properties => properties.Content = "Unable to connect to the Cat Service, try again later");
             else
