@@ -65,7 +65,7 @@ namespace Responses.Commands.Global
             }
             catch (Exception ex)
             {
-                await sktMessage.Channel.SendMessageAsync("Unable to load doggo, It's probs Jo's fault - she killed the dog via agressive petting.");
+                await sktMessage.Channel.SendMessageAsync("Unable to load doggo, It's probs Jo's fault - she killed the dog via aggressive petting.");
             }
         }
 
