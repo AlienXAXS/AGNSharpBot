@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using Discord;
 
 namespace GameWatcher.Commands
 {
@@ -77,7 +78,7 @@ namespace GameWatcher.Commands
         private async void ScanUsers(DiscordSocketClient discordSocketClient, SocketMessage sktMessage)
         {
             await sktMessage.Channel.SendMessageAsync(
-                "Scanning this guild for users playing games that exist in the database");
+                "Scanning this guild for users playing games that exist in the database, this takes 1 second per user active in your guild.");
 
             if (sktMessage.Author is SocketGuildUser socketGuildUser)
             {
@@ -91,7 +92,11 @@ namespace GameWatcher.Commands
                 {
                     try
                     {
-                        await GameHandler.Instance.GameScan(user, user);
+                        if (user.Activity != null && user.Activity is Game)
+                        {
+                            await GameHandler.Instance.GameScan(user, user);
+                            System.Threading.Thread.Sleep(1000);
+                        }
                     }
                     catch (Exception ex)
                     {

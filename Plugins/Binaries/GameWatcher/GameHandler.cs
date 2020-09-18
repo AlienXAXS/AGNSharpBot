@@ -66,6 +66,7 @@ namespace GameWatcher
                                         {
                                             // We have none, the role should be empty, let's delete it
                                             await role.DeleteAsync();
+                                            Thread.Sleep(1000); //Force the thread to sleep for 1 second to help prevent rate limits
                                         }
                                     }
                                 }
@@ -80,10 +81,17 @@ namespace GameWatcher
                                         if (!(user.Activity is Game))
                                         {
                                             await user.RemoveRoleAsync(playingRole);
+                                            Thread.Sleep(1000); //Force the thread to sleep for 1 second to help prevent rate limits
                                         }
                                     }
 
-                                    await GameScan(user, user, true);
+                                    /*
+                                    if ((user.Activity is Game))
+                                    {
+                                        await GameScan(user, user, true);
+                                        Thread.Sleep(1000); //Force the thread to sleep for 1 second to help prevent rate limits
+                                    }
+                                    */
                                 }
                             }
                         }
@@ -106,142 +114,154 @@ namespace GameWatcher
 
         public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser, bool skipWait = false)
         {
-            var random = new Random(DateTime.Now.Millisecond);
-            var randomNumber = random.Next(1000, 10000);
-
-            try
+            var newThread = new Thread(async o =>
             {
-                if (!skipWait)
-                    await _semaphoreSlim.WaitAsync();
-
-                // Grab the guild
-                if (newGuildUser.Guild is SocketGuild socketGuild)
+                skipWait = true;
+                if (newGuildUser.IsBot) return;
+                if (newGuildUser.Activity != null)
                 {
-                    if (!(newGuildUser.Activity is Game) || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name)
+                    if (newGuildUser.Activity.Name.Equals("Custom Status"))
+                        return;
+                }
+
+                var random = new Random(DateTime.Now.Millisecond);
+                var randomNumber = random.Next(1000, 10000);
+
+                try
+                {
+                    if (!skipWait)
+                        await _semaphoreSlim.WaitAsync();
+
+                    // Grab the guild
+                    if (newGuildUser.Guild is SocketGuild socketGuild)
                     {
-                        var foundMemory = _roleMemory?.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.UserId == newGuildUser.Id && newGuildUser.Roles.Any(y => y.Id == x.RoleId));
-                        if (foundMemory == null)
-                            return;
-
-                        try
+                        if (!(newGuildUser.Activity is Game) || newGuildUser.Activity?.Name != oldGuildUser.Activity?.Name && !(oldGuildUser.Activity is SpotifyGame _spotGame))
                         {
-                            GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} had an activity of {oldGuildUser.Activity.Name} but now doesn't - attempting to find role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                            var foundMemory = _roleMemory?.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.UserId == newGuildUser.Id && newGuildUser.Roles.Any(y => y.Id == x.RoleId));
+                            if (foundMemory == null)
+                                return;
 
-                            var foundRole = socketGuild.GetRole(foundMemory.RoleId);
-
-                            if (foundRole != null)
+                            try
                             {
-                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role found, attempting to remove user from role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-                                try
-                                {
-                                    await newGuildUser.RemoveRoleAsync(foundRole);
-                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] User successfully removed from role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-                                }
-                                catch (Exception ex)
-                                {
-                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unable to remove user from role, message was: {ex.Message}\r\n{ex.StackTrace}", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-                                }
+                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} had an activity of {oldGuildUser.Activity.Name} but now doesn't - attempting to find role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
 
-                                // Cleanup the role if there is no one left in it
-                                if (!foundRole.Members.Any())
+                                var foundRole = socketGuild.GetRole(foundMemory.RoleId);
+
+                                if (foundRole != null)
                                 {
-                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role has no users left inside it, attempting to remove the role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role found, attempting to remove user from role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
                                     try
                                     {
-                                        await foundRole.DeleteAsync();
+                                        await newGuildUser.RemoveRoleAsync(foundRole);
+                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] User successfully removed from role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
                                     }
                                     catch (Exception ex)
                                     {
-                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unable to remove the role, message was: {ex.Message}\r\n{ex.StackTrace}", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unable to remove user from role, message was: {ex.Message}\r\n{ex.StackTrace}", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                    }
+
+                                    // Cleanup the role if there is no one left in it
+                                    if (!foundRole.Members.Any())
+                                    {
+                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role has no users left inside it, attempting to remove the role", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                        try
+                                        {
+                                            await foundRole.DeleteAsync();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unable to remove the role, message was: {ex.Message}\r\n{ex.StackTrace}", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                        }
                                     }
                                 }
+                                _roleMemory.Remove(foundMemory);
                             }
-                            _roleMemory.Remove(foundMemory);
+                            catch (Exception ex)
+                            {
+                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unhandled exception for this event.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
+                            }
                         }
-                        catch (Exception ex)
+                        else if (newGuildUser.Activity is Game)
                         {
-                            GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unhandled exception for this event.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
-                        }
-                    }
-                    else if (newGuildUser.Activity is Game)
-                    {
-                        if (newGuildUser.Activity is Game game)
-                        {
-                            GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-
-                            if (!DatabaseHandler.Instance.Exists(game.Name))
+                            if (newGuildUser.Activity is Game game)
                             {
-                                return;
-                            }
+                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
 
-                            GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Game is in db, processing...", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-
-                            var roles = socketGuild.Roles;
-                            var gameName = $"Playing: {game.Name}";
-
-                            GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the user is already in a role named {gameName}", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-
-                            // Check to see if this user is already part of the role, if they are ignore this.
-                            if (newGuildUser.Roles.Any(x => x.Name.Equals(gameName))) return;
-
-                            GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the role with the name of {gameName} exists within the guild", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-
-                            // Does this role exist?
-                            if (roles.Any(x => x.Name == gameName))
-                            {
-                                // Get the role, and add the user to it
-                                var foundRole = roles.First(x => x.Name.Equals(gameName));
-
-                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Found an existing role, adding the user to the role now", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-                                try
+                                if (!DatabaseHandler.Instance.Exists(game.Name))
                                 {
-                                    await newGuildUser.AddRoleAsync(foundRole);
-                                    _roleMemory.Add(new GameRoleMemory(foundRole.Id, newGuildUser.Id)); // Remember this
+                                    return;
                                 }
-                                catch (Exception ex)
+
+                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Game is in db, processing...", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+
+                                var roles = socketGuild.Roles;
+                                var gameName = $"Playing: {game.Name}";
+
+                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the user is already in a role named {gameName}", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+
+                                // Check to see if this user is already part of the role, if they are ignore this.
+                                if (newGuildUser.Roles.Any(x => x.Name.Equals(gameName))) return;
+
+                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Checking to see if the role with the name of {gameName} exists within the guild", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+
+                                // Does this role exist?
+                                if (roles.Any(x => x.Name == gameName))
                                 {
-                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Exception while attempting to add the user to a role.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                                    // Get the role, and add the user to it
+                                    var foundRole = roles.First(x => x.Name.Equals(gameName));
+
+                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Found an existing role, adding the user to the role now", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                    try
+                                    {
+                                        await newGuildUser.AddRoleAsync(foundRole);
+                                        _roleMemory.Add(new GameRoleMemory(foundRole.Id, newGuildUser.Id)); // Remember this
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Exception while attempting to add the user to a role.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role not found, will attempt to create it", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
-
-                                // Create the new role, and add the user to it
-                                try
+                                else
                                 {
-                                    var newRole = await socketGuild.CreateRoleAsync(gameName, isHoisted: true, color: Color.Red, isMentionable: false);
+                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role not found, will attempt to create it", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
 
-                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role created, attempting to modify its position", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                    // Create the new role, and add the user to it
+                                    try
+                                    {
+                                        var newRole = await socketGuild.CreateRoleAsync(gameName, isHoisted: true, color: Color.Red, isMentionable: false);
 
-                                    var botUser = newGuildUser.Guild.CurrentUser;
-                                    var botRoles = botUser.Roles.OrderByDescending(x => x.Position);
+                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Role created, attempting to modify its position", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
 
-                                    await newRole.ModifyAsync(properties => properties.Position = botRoles.First().Position - 1);
+                                        var botUser = newGuildUser.Guild.CurrentUser;
+                                        var botRoles = botUser.Roles.OrderByDescending(x => x.Position);
 
-                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Position modified successfully, adding user to the role and saving memory.", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+                                        await newRole.ModifyAsync(properties => properties.Position = botRoles.First().Position - 1);
 
-                                    await newGuildUser.AddRoleAsync(newRole);
-                                    _roleMemory.Add(new GameRoleMemory(newRole.Id, newGuildUser.Id));
-                                }
-                                catch (Exception ex)
-                                {
-                                    GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unable to create or modify role.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Position modified successfully, adding user to the role and saving memory.", GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
+
+                                        await newGuildUser.AddRoleAsync(newRole);
+                                        _roleMemory.Add(new GameRoleMemory(newRole.Id, newGuildUser.Id));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        GlobalLogger.Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Unable to create or modify role.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                GlobalLogger.Log4NetHandler.Log("Game2Role Unhandled Exception", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
-            }
-            finally
-            {
-                if (!skipWait)
-                    _semaphoreSlim.Release();
-            }
+                catch (Exception ex)
+                {
+                    GlobalLogger.Log4NetHandler.Log("Game2Role Unhandled Exception", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
+                }
+                finally
+                {
+                    if (!skipWait)
+                        _semaphoreSlim.Release();
+                }
+            });
+            newThread.Start();
         }
     }
 }

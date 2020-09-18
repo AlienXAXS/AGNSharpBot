@@ -134,14 +134,7 @@ namespace HomeLabReporting.SNMP
                         {
                             if (message.Contains("debug"))
                             {
-                                if (oidEntry.Expression == null)
-                                {
-                                    builder.AddField($"{oidEntry.ReadableName} | OID: {oidEntry.Oid} |", oidEntry.GetFormattedValue());
-                                }
-                                else
-                                {
-                                    builder.AddField($"{oidEntry.ReadableName} | Expression: {oidEntry.Expression} |", oidEntry.GetFormattedValue());
-                                }
+                                builder.AddField(oidEntry.Expression == null ? $"{oidEntry.ReadableName} | OID: {oidEntry.Oid} |" : $"{oidEntry.ReadableName} | Expression: {oidEntry.Expression} |", oidEntry.GetFormattedValue());
                             }
                             else
                             {

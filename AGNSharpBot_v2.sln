@@ -56,6 +56,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PUBGWeekly", "Plugins\Binar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "pubg-dotnet", "pubg-dotnet\pubg-dotnet.csproj", "{843F8B0B-31F6-445C-925F-EBA56C8043C4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Commands", "..\Discord.Net\src\Discord.Net.Commands\Discord.Net.Commands.csproj", "{41E01A57-E9EA-4808-8A86-03DB827E9B99}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Rest", "..\Discord.Net\src\Discord.Net.Rest\Discord.Net.Rest.csproj", "{ED4CFDAA-E93F-45BE-8935-321D3FF4C81B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Webhook", "..\Discord.Net\src\Discord.Net.Webhook\Discord.Net.Webhook.csproj", "{005A6742-93BB-444E-B657-DC22476CE024}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.Core", "..\Discord.Net\src\Discord.Net.Core\Discord.Net.Core.csproj", "{2976E625-9C9C-4DB4-A45A-8882729F8495}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Net.WebSocket", "..\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj", "{B9591B92-5C62-405E-8340-20F12CE0223E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,6 +136,26 @@ Global
 		{843F8B0B-31F6-445C-925F-EBA56C8043C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{843F8B0B-31F6-445C-925F-EBA56C8043C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{843F8B0B-31F6-445C-925F-EBA56C8043C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41E01A57-E9EA-4808-8A86-03DB827E9B99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41E01A57-E9EA-4808-8A86-03DB827E9B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41E01A57-E9EA-4808-8A86-03DB827E9B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41E01A57-E9EA-4808-8A86-03DB827E9B99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED4CFDAA-E93F-45BE-8935-321D3FF4C81B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED4CFDAA-E93F-45BE-8935-321D3FF4C81B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED4CFDAA-E93F-45BE-8935-321D3FF4C81B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED4CFDAA-E93F-45BE-8935-321D3FF4C81B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{005A6742-93BB-444E-B657-DC22476CE024}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{005A6742-93BB-444E-B657-DC22476CE024}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{005A6742-93BB-444E-B657-DC22476CE024}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{005A6742-93BB-444E-B657-DC22476CE024}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2976E625-9C9C-4DB4-A45A-8882729F8495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2976E625-9C9C-4DB4-A45A-8882729F8495}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2976E625-9C9C-4DB4-A45A-8882729F8495}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2976E625-9C9C-4DB4-A45A-8882729F8495}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9591B92-5C62-405E-8340-20F12CE0223E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9591B92-5C62-405E-8340-20F12CE0223E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9591B92-5C62-405E-8340-20F12CE0223E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9591B92-5C62-405E-8340-20F12CE0223E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

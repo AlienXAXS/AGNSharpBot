@@ -87,6 +87,7 @@ namespace CommandHandler
                 var methodHelpers = new List<MethodInfoHelper>();
                 foreach (var handler in _registeredHandlers)
                 {
+                    
                     foreach (var method in handler.Type.GetMethods())
                     {
                         var cmdString = (Command)method.GetCustomAttributes(typeof(Command), true).FirstOrDefault();

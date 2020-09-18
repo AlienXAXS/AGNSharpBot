@@ -460,6 +460,111 @@ namespace PluginManager
         {
             _discordSocketClient = dsc;
 
+            dsc.RecipientRemoved += user =>
+            {
+                if (RecipientRemovedEvent.HasSubscribers)
+                    foreach (var sub in RecipientRemovedEvent.Subscriptions)
+                        sub.Invoke(user);
+
+                return Task.CompletedTask;
+            };
+
+            dsc.RecipientAdded += user =>
+            {
+                if (RecipientAddedEvent.HasSubscribers)
+                    foreach (var sub in RecipientAddedEvent.Subscriptions)
+                        sub.Invoke(user);
+
+                return Task.CompletedTask;
+            };
+
+            dsc.UserIsTyping += (user, channel) =>
+            {
+                if (UserIsTypingEvent.HasSubscribers)
+                {
+                    if (channel is SocketGuildChannel socketChannel)
+                    {
+                        var guildId = socketChannel.Guild.Id;
+                        foreach (var sub in UserIsTypingEvent.Subscriptions)
+                        {
+                            var moduleName = sub.Method.Module.Name;
+                            if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
+                                sub.Invoke(user, channel);
+                        }
+                    }
+                }
+
+                return Task.CompletedTask;
+            };
+
+            dsc.CurrentUserUpdated += (user, selfUser) =>
+            {
+                if (SelfUpdatedEvent.HasSubscribers)
+                    foreach (var sub in SelfUpdatedEvent.Subscriptions)
+                        sub.Invoke(user, selfUser);
+
+                return Task.CompletedTask;
+            };
+
+            dsc.VoiceServerUpdated += server =>
+            {
+                if (VoiceServerUpdatedEvent.HasSubscribers)
+                    foreach (var sub in VoiceServerUpdatedEvent.Subscriptions)
+                        sub.Invoke(server);
+
+                return Task.CompletedTask;
+            };
+
+            dsc.UserUpdated += (user, socketUser) =>
+            {
+                if (UserUpdatedEvent.HasSubscribers)
+                {
+                    if (user is SocketGuildUser socketGuildUser)
+                    {
+                        ulong guildId = socketGuildUser.Guild.Id;
+
+                        foreach (var sub in UserUpdatedEvent.Subscriptions)
+                        {
+                            var moduleName = sub.Method.Module.Name;
+                            if (PluginHandler.Instance.ShouldExecutePlugin(pluginName: moduleName, guildId: guildId))
+                                sub.Invoke(user, socketUser);
+                        }
+                    }
+                }
+
+                return Task.CompletedTask;
+            }; 
+
+            /*
+            dsc.UserUnbanned += (user, guild) => { };
+
+            dsc.UserBanned += (user, guild) => { };
+
+            dsc.GuildUpdated += (guild, socketGuild) => { };
+
+            dsc.GuildMembersDownloaded += guild => { };
+
+            dsc.GuildUnavailable += guild => { };
+
+            dsc.GuildAvailable += guild => { };
+
+            dsc.LeftGuild += guild => { };
+
+            dsc.JoinedGuild += guild => { };
+
+            dsc.RoleUpdated += (role, socketRole) => { };
+
+            dsc.RoleDeleted += role => { };
+
+            dsc.RoleCreated += role => { };
+
+            dsc.ReactionAdded += (cacheable, channel, arg3) => { };
+
+            dsc.ReactionRemoved += (cacheable, channel, arg3) => { };
+
+            dsc.ReactionsCleared += (cacheable, channel) => { };
+            */
+
             dsc.UserVoiceStateUpdated += (user, sktVoiceStateOld, sktVoiceStateNew) =>
             {
                 if (UserVoiceStateUpdatedEvent.HasSubscribers)
@@ -509,6 +614,25 @@ namespace PluginManager
                             var moduleName = sub.Method.Module.Name;
                             if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
                                 sub.Invoke(message);
+                        }
+                    }
+                }
+
+                return Task.CompletedTask;
+            };
+
+            dsc.MessageDeleted += (cacheable, channel) =>
+            {
+                if (MessageDeletedEvent.HasSubscribers)
+                {
+                    if (channel is SocketGuildChannel socketChannel)
+                    {
+                        var guildId = socketChannel.Guild.Id;
+                        foreach (var sub in MessageDeletedEvent.Subscriptions)
+                        {
+                            var moduleName = sub.Method.Module.Name;
+                            if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
+                                sub.Invoke(cacheable, channel);
                         }
                     }
                 }

@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
+using Discord.Commands;
 
 namespace AGNSharpBot.DiscordHandler
 {
@@ -19,7 +20,7 @@ namespace AGNSharpBot.DiscordHandler
         {
             _services = services;
 
-            var _config = new DiscordSocketConfig { MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true, LogLevel = LogSeverity.Info };
+            var _config = new DiscordSocketConfig { MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true, LogLevel = LogSeverity.Verbose };
             _discordSocket = new DiscordSocketClient(_config);
             _discordSocket.Log += message =>
             {
@@ -27,6 +28,13 @@ namespace AGNSharpBot.DiscordHandler
                     GlobalLogger.Log4NetHandler.Log($"Discord.NET Message: {message.Message}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:message.Exception);
                 else
                     GlobalLogger.Log4NetHandler.Log($"Discord.NET Message: {message.Message}", GlobalLogger.Log4NetHandler.LogLevel.INFO);
+
+                return Task.CompletedTask;
+            };
+            _discordSocket.Rest.Log += message =>
+            {
+                GlobalLogger.Log4NetHandler.Log($"Discord.NET Rest Message: {message.Message}",
+                    GlobalLogger.Log4NetHandler.LogLevel.DEBUG);
 
                 return Task.CompletedTask;
             };

@@ -129,7 +129,7 @@ namespace PluginManager
 #if !DEBUG
                         plugin.ExecutePlugin();
 #else
-                        if (plugin.Name == "PUBGWeekly")
+                        if (plugin.Name == "GameWatcher")
                         {
                             plugin.ExecutePlugin();
                         }
