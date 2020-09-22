@@ -25,6 +25,7 @@ namespace GameWatcher
                 _discordClient = EventRouter.GetDiscordSocketClient();
                 GameHandler.Instance.DiscordSocketClient = _discordClient;
                 GameHandler.Instance.PluginRouter = PluginRouter;
+                GameHandler.Instance.StartGameWatcherTimer();
 
                 CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Control>();
                 EventRouter.GuildMemberUpdated += DiscordClientOnGuildMemberUpdatedEvent;
@@ -43,7 +44,7 @@ namespace GameWatcher
 
         public void Dispose()
         {
-            GameHandler.Instance.Dispose();
+            
         }
     }
 }

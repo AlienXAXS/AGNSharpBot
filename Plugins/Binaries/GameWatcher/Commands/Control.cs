@@ -94,7 +94,7 @@ namespace GameWatcher.Commands
                     {
                         if (user.Activity != null && user.Activity is Game)
                         {
-                            await GameHandler.Instance.GameScan(user, user);
+                            await GameHandler.Instance.GameScan(null, user);
                             System.Threading.Thread.Sleep(1000);
                         }
                     }

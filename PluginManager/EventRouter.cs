@@ -15,15 +15,15 @@ namespace PluginManager
 
         public DiscordSocketClient GetDiscordSocketClient()
         {
-            var assembly = Assembly.GetCallingAssembly();
-            if (_socketClientAllowedBinaries.Contains(assembly.ManifestModule.ScopeName))
-            {
+            //var assembly = Assembly.GetCallingAssembly();
+            //if (_socketClientAllowedBinaries.Contains(assembly.ManifestModule.ScopeName))
+            //{
                 return _discordSocketClient;
-            }
-            else
-            {
-                throw new Exception("Plugin is not allowed to get this interface");
-            }
+            //}
+            //else
+            //{
+            //    throw new Exception("Plugin is not allowed to get this interface");
+            //}
         }
 
         public event Func<SocketChannel, Task> ChannelCreated
