@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using GlobalLogger;
 
@@ -62,7 +63,23 @@ namespace Responses.Commands.Global
                 try
                 {
                     await message.DeleteAsync();
-                    await sktMessage.Channel.SendFileAsync(stream, (gif ? "cat.gif" : "cat.png"));
+
+                    if (!System.IO.Directory.Exists(".\\temp"))
+                        System.IO.Directory.CreateDirectory(".\\temp");
+
+                    var randomNumberGenerator = new Random();
+                    var rng = randomNumberGenerator.Next(10000, 50000);
+                    var fileName = $".\\temp\\{rng}." + (gif ? "cat.gif" : "cat.png");
+
+                    var fs = File.Create(fileName);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    stream.CopyTo(fs);
+                    fs.Close();
+
+                    await sktMessage.Channel.SendFileAsync(fileName);
+                    //await sktMessage.Channel.SendFileAsync(stream, (gif ? "cat.gif" : "cat.png"));
+
+                    System.IO.File.Delete(fileName);
                 }
                 catch (Exception ex)
                 {

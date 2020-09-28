@@ -129,7 +129,7 @@ namespace PluginManager
 #if !DEBUG
                         plugin.ExecutePlugin();
 #else
-                        if (plugin.Name == "GameWatcher")
+                        if (plugin.Name == "AdminUtilities")
                         {
                             plugin.ExecutePlugin();
                         }
