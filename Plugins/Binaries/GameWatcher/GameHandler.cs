@@ -5,11 +5,13 @@ using PluginManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameWatcher
 {
-    internal class GameHandler
+    internal class GameHandler : IDisposable
     {
         private class GameRoleMemory
         {
@@ -31,6 +33,8 @@ namespace GameWatcher
         public DiscordSocketClient DiscordSocketClient { get; set; }
         public PluginRouter PluginRouter { get; set; }
         public bool RolesReady;
+
+        private bool _runScanThread = true;
         
         public async void StartGameWatcherTimer()
         {
@@ -48,10 +52,85 @@ namespace GameWatcher
                 }
 
                 RolesReady = true;
+                PeriodicScan();
             }
             catch (Exception ex)
             {
                 GlobalLogger.Log4NetHandler.Log("Game2Role Unhandled Exception", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
+            }
+        }
+
+        private async void PeriodicScan()
+        {
+            try
+            {
+                var scanThread = new Thread(async o =>
+                {
+                    while (_runScanThread)
+                    {
+                        try
+                        {
+                            foreach (var guild in DiscordSocketClient.Guilds)
+                            {
+                                if (!PluginRouter.IsPluginExecutableOnGuild(guild.Id)) continue;
+
+                                foreach (var role in guild.Roles.Where(x => x.Name.StartsWith("Playing:")))
+                                {
+                                    var gameName = role.Name.Substring("Playing:".Length + 1);
+                                    foreach (var user in role.Members)
+                                    {
+                                        if (user.Activity != null)
+                                        {
+                                            // If we have a game, let's check to see if we should remove it
+                                            if (user.Activity is Game game)
+                                            {
+                                                // If the game does not equal what we're currently playing, then their role should be destroyed
+                                                if (!game.Name.Equals(gameName, StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    GlobalLogger.Log4NetHandler.Log(
+                                                        $"[GameWatcher-Scanner] User {user.Username} was found in the role {role.Name} but they have a mismatched activity ({game.Name} != {gameName}), removing the role and starting a rescan.",
+                                                        GlobalLogger.Log4NetHandler.LogLevel.ERROR);
+                                                    await user.RemoveRoleAsync(role,
+                                                        new RequestOptions() {RetryMode = RetryMode.AlwaysFail});
+                                                    // Rescan the user as they are playing something
+                                                    await GameScan(null, user);
+                                                }
+                                            }
+                                            else if (user.Activity == null)
+                                            {
+                                                GlobalLogger.Log4NetHandler.Log(
+                                                    $"[GameWatcher-Scanner] User {user.Username} was found in the role {role.Name} but they have no activity, removing them from the role.",
+                                                    GlobalLogger.Log4NetHandler.LogLevel.ERROR);
+                                                // If their activity is null, they should not be in the role at all.
+                                                await user.RemoveRoleAsync(role,
+                                                    new RequestOptions() {RetryMode = RetryMode.AlwaysFail});
+                                            }
+                                        }
+                                    }
+
+                                    // If this role is now empty, delete it.
+                                    if (role.Members.Count().Equals(0))
+                                    {
+                                        await role.DeleteAsync();
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            GlobalLogger.Log4NetHandler.Log("Game2Role Unhandled Exception",
+                                GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
+                        }
+
+                        Thread.Sleep(((60 * 5) * 1000));
+                    }
+                }) {IsBackground = true};
+
+                scanThread.Start();
+            }
+            catch (Exception ex)
+            {
+                GlobalLogger.Log4NetHandler.Log("Game2Role Unhandled Exception while trying to start a new thread.", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
             }
         }
         
@@ -203,6 +282,11 @@ namespace GameWatcher
             {
                 GlobalLogger.Log4NetHandler.Log("Game2Role Unhandled Exception", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
             }
+        }
+
+        public void Dispose()
+        { 
+            _runScanThread = false;
         }
     }
 }
