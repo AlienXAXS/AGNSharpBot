@@ -5,7 +5,6 @@ using PluginManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -122,7 +121,7 @@ namespace GameWatcher
                                 GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception: ex);
                         }
 
-                        Thread.Sleep(((60 * 5) * 1000));
+                        Thread.Sleep(((60 * 2) * 1000));
                     }
                 }) {IsBackground = true};
 
