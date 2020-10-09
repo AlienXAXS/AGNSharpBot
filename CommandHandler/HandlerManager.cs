@@ -114,6 +114,9 @@ namespace CommandHandler
                     if (parameters.Length == 1)
                     {
                         await socketMessage.Channel.SendMessageAsync($"This command controls plugins, you can enable / disable them.  Use !plugins help for commands.");
+                        try
+                        { await socketMessage.DeleteAsync(new RequestOptions() { RetryMode = RetryMode.AlwaysFail }); }
+                        catch { }
                         return;
                     }
 
@@ -130,11 +133,13 @@ namespace CommandHandler
                             break;
 
                         case "list":
+                            embed.Author = new EmbedAuthorBuilder() {Name = "AGN Sharp Bot | Plugins"};
+                            embed.Color = Color.Green;
+                            embed.Description = "AGN Sharp Bot Plugin Configuration\n```Use !plugin enable/disable \"NAME\" to enable or disable a plugin```";
 
                             foreach (var plugin in plugins)
                             {
                                 var isEnabled = PluginManager.PluginHandler.Instance.ShouldExecutePlugin(plugin.GetType().Module.Name, sktGuildUser.Guild.Id) ? "Enabled" : "Disabled";
-                                embed.Title = "AGN Sharp Bot Plugins";
                                 embed.AddField($"{plugin.Name} (Status: {isEnabled})", plugin.Description);
                             }
 
@@ -150,6 +155,14 @@ namespace CommandHandler
                             await SetPluginState(parameters, socketMessage, false);
                             break;
                     }
+
+                    // Discords API is wank, why does it error 404 here sometimes randomly AFTER it's deleted the message...
+                    // Simple try catch to ignore the error discord sends us...
+                    try
+                    { await socketMessage.DeleteAsync(new RequestOptions() {RetryMode = RetryMode.AlwaysFail}); }
+                    catch { }
+
+                    return;
                 }
 
                 if (paramCommand.Equals("help", StringComparison.OrdinalIgnoreCase))
@@ -161,6 +174,11 @@ namespace CommandHandler
 
                     foreach (var thisMethod in methodHelpers)
                     {
+                        // No longer should the bot respond with commands to a guild where the guild has not got the plugin enabled.
+                        var isEnabled = PluginManager.PluginHandler.Instance.ShouldExecutePlugin(thisMethod.MethodInfo.Module.Name, sktGuildUser.Guild.Id);
+
+                        if (!isEnabled) continue;
+
                         if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
                             Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author,
                                 $"{thisMethod.MethodInfo.ReflectedType?.FullName}.{thisMethod.MethodInfo.Name}"))
@@ -171,6 +189,9 @@ namespace CommandHandler
                     }
 
                     await socketMessage.Channel.SendMessageAsync(null, false, discordEmbedBuilder.Build());
+                    try
+                    { await socketMessage.DeleteAsync(new RequestOptions() { RetryMode = RetryMode.AlwaysFail }); }
+                    catch { }
                     return;
                 }
 
@@ -191,7 +212,8 @@ namespace CommandHandler
                         bool hasExplicitPermission = false;
                         if (socketMessage.Author is SocketGuildUser messageAuthor)
                         {
-                            hasExplicitPermission = Permission.Instance.CheckPermission(messageAuthor, $"{thisMethod.Type}.{thisMethod.MethodInfo.Name}");
+                            hasExplicitPermission = Permission.Instance.CheckPermission(messageAuthor,
+                                $"{thisMethod.Type}.{thisMethod.MethodInfo.Name}");
 
                             if (PluginManager.PluginHandler.Instance.ShouldExecutePlugin(
                                 thisMethod.MethodInfo.Module.Name,
@@ -201,7 +223,7 @@ namespace CommandHandler
                                     hasExplicitPermission)
                                 {
                                     // Execute the method
-                                    var paramArray = new object[] { parameters, socketMessage, _discordSocketClient };
+                                    var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
                                     var activator = Activator.CreateInstance(thisMethod.Type);
                                     thisMethod.MethodInfo.Invoke(activator, paramArray);
                                 }
@@ -242,6 +264,12 @@ namespace CommandHandler
 
                 try
                 {
+                    if (pluginName == "GameGiveaway" && !socketGuildUser.Guild.Id.Equals(398471304162050049))
+                    {
+                        await socketMessage.Channel.SendMessageAsync($"This guild does not quality for this plugin.");
+                        return;
+                    }
+
                     PluginManager.PluginHandler.Instance.SetPluginState(pluginName, socketGuildUser.Guild.Id, status);
                     if (status)
                         await socketMessage.Channel.SendMessageAsync($"The plugin was successfully enabled.");
