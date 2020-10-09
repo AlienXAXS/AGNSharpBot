@@ -188,6 +188,10 @@
       <Link>x86\SQLite.Interop.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Plugins\Binaries\ASCIIArt\bin\Debug\ASCIIArt.dll">
+      <Link>Plugins\ASCIIArt.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Plugins\Binaries\Auditor\bin\Debug\Auditor.dll">
       <Link>Plugins\Auditor.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -198,6 +202,14 @@
     </Content>
     <Content Include="..\Plugins\Binaries\Auditor\bin\Debug\Nancy.Hosting.Self.dll">
       <Link>Nancy.Hosting.Self.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Plugins\Binaries\CatDog\bin\Debug\CatDog.dll">
+      <Link>Plugins\CatDog.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Plugins\Binaries\GameGiveaway\bin\Debug\GameGiveaway.dll">
+      <Link>Plugins\GameGiveaway.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Plugins\Binaries\GameWatcher\bin\Debug\GameWatcher.dll">
