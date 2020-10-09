@@ -1,14 +1,13 @@
-﻿using CommandHandler;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using CommandHandler;
+using Discord.WebSocket;
 using GlobalLogger;
 
-namespace Responses.Commands.Global
+namespace CatDog.Commands
 {
     internal class CatCommand
     {
