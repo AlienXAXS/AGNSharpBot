@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.Composition;
+using CatDog.Commands;
+using CommandHandler;
 using Interface;
 using PluginManager;
 
@@ -17,20 +14,17 @@ namespace CatDog
 
         string IPlugin.Name => "CatDog";
 
-        string IPlugin.Description => "Allows the use of the !cat and !dog commands which show random fluffy images of cats and dogs upon request.";
+        string IPlugin.Description =>
+            "Allows the use of the !cat and !dog commands which show random fluffy images of cats and dogs upon request.";
 
         void IPlugin.ExecutePlugin()
         {
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.CatCommand>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.DogCommand>();
+            HandlerManager.Instance.RegisterHandler<CatCommand>();
+            HandlerManager.Instance.RegisterHandler<DogCommand>();
         }
 
         void IPlugin.Dispose()
         {
-            
         }
-
-        
     }
 }
-

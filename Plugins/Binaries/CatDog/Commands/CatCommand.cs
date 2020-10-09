@@ -14,17 +14,18 @@ namespace CatDog.Commands
         public async Task<Stream> GetCatPictureAsync(string text, bool gif)
         {
             var http = new HttpClient();
-            var url = gif ? "https://cataas.com/cat/gif/says/" + text : $"https://cataas.com/cat/says/" + text;
+            var url = gif ? "https://cataas.com/cat/gif/says/" + text : "https://cataas.com/cat/says/" + text;
             var resp = await http.GetAsync(url);
             return await resp.Content.ReadAsStreamAsync();
         }
 
-        [Command("cat", "Posts an image of a cat into the channel you put the command in - you can also request a GIF by saying !cat gif")]
+        [Command("cat",
+            "Posts an image of a cat into the channel you put the command in - you can also request a GIF by saying !cat gif")]
         [Alias("kitty", "pussy", "meow")]
         [Permissions(Permissions.PermissionTypes.Guest)]
         public async void Cat(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
-            var sktGuildUser = ((SocketGuildUser)sktMessage.Author);
+            var sktGuildUser = (SocketGuildUser) sktMessage.Author;
             var nickname = sktGuildUser.Nickname ?? sktGuildUser.Username;
 
             if (ContainsUnicodeCharacter(nickname))
@@ -39,11 +40,12 @@ namespace CatDog.Commands
             Stream stream;
             try
             {
-                 stream = await GetCatPictureAsync($"A Kitty For {nickname}", gif);
+                stream = await GetCatPictureAsync($"A Kitty For {nickname}", gif);
             }
             catch (Exception ex)
             {
-                GlobalLogger.Log4NetHandler.Log("Cat Command Handler was unable to get a picture of a cat", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                Log4NetHandler.Log("Cat Command Handler was unable to get a picture of a cat",
+                    Log4NetHandler.LogLevel.ERROR, exception: ex);
                 await message.ModifyAsync(properties =>
                     properties.Content = "I'm sorry, but Cataas seems to be offline - Maybe try again later?");
                 return;
@@ -56,15 +58,15 @@ namespace CatDog.Commands
                 stream = null;
 
             if (stream == null)
-                await message.ModifyAsync(properties => properties.Content = "Unable to connect to the Cat Service, try again later");
+                await message.ModifyAsync(properties =>
+                    properties.Content = "Unable to connect to the Cat Service, try again later");
             else
-            {
                 try
                 {
                     await message.DeleteAsync();
 
-                    if (!System.IO.Directory.Exists(".\\temp"))
-                        System.IO.Directory.CreateDirectory(".\\temp");
+                    if (!Directory.Exists(".\\temp"))
+                        Directory.CreateDirectory(".\\temp");
 
                     var randomNumberGenerator = new Random();
                     var rng = randomNumberGenerator.Next(10000, 50000);
@@ -78,7 +80,7 @@ namespace CatDog.Commands
                     await sktMessage.Channel.SendFileAsync(fileName);
                     //await sktMessage.Channel.SendFileAsync(stream, (gif ? "cat.gif" : "cat.png"));
 
-                    System.IO.File.Delete(fileName);
+                    File.Delete(fileName);
                 }
                 catch (Exception ex)
                 {
@@ -86,7 +88,6 @@ namespace CatDog.Commands
                         properties.Content =
                             $"Unable to get the image for you, perhaps the cat sat on the network cable... Error is:\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
                 }
-            }
         }
 
         public bool ContainsUnicodeCharacter(string input)
