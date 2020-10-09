@@ -1,10 +1,10 @@
-﻿using CommandHandler;
+﻿using System.Collections.Generic;
+using CommandHandler;
 using Discord;
 using Discord.WebSocket;
 using Figgle;
-using System.Collections.Generic;
 
-namespace Responses.Commands.Global
+namespace ASCIIArt.Commands
 {
     internal class ASCIIArt
     {
@@ -27,7 +27,7 @@ namespace Responses.Commands.Global
                     await sktMessage.Channel.SendMessageAsync("\r\n`ASCII Art Help`\r\n" +
                                                               "`!asciiart help` - This help\r\n" +
                                                               "`!asciiart fonts` - PM's you a list of fonts that can be used\r\n" +
-                                                              "`!asciiart render FontName TEXT` - Renders the supplied text in ASCII Art, uses Standard font if you did not supply one (example: !asciiart render 1row \"Hello World!\")");
+                                                              "`!asciiart render [FontName] TEXT` - Renders the supplied text in ASCII Art, uses Standard font if you did not supply one (example: !asciiart render 1row \"Hello World!\")");
                     break;
 
                 case "fonts":
@@ -74,7 +74,7 @@ namespace Responses.Commands.Global
             var i = 0;
             while (i != fontList.Count)
             {
-                compiledFontList += $"{i} - {fontList[i]}\r\n";
+                compiledFontList += $"{fontList[i]}, ";
 
                 if (compiledFontList.Length > 1500)
                 {
