@@ -47,6 +47,10 @@ namespace PluginManager
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Scans plugins from the Plugins directory, and reports on any plugin DLL's that are not correctly exporting the interface.
+        /// </summary>
+        /// <returns></returns>
         public bool LoadPlugins()
         {
             Log4NetHandler.Log("Plugin Manager Loading", Log4NetHandler.LogLevel.INFO);
@@ -74,6 +78,8 @@ namespace PluginManager
                         Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
 
+                // Here we check to see if the amount of DLL's in the plugins directory matches the amount of composed DLL's (ones that match the interface, and export it)
+                // This is a new method, which easily alerts what DLL's are missing interfaces or are slightly wrong in terms of their implementation or exports.
                 if (container.Catalog.Parts.Count() != catalog.LoadedFiles.Count)
                 {
                     Log4NetHandler.Log(
