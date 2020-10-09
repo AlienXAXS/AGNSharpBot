@@ -51,6 +51,32 @@ namespace AGNSharpBot.DiscordHandler
 
                 return Task.CompletedTask;
             };
+
+            _discordSocket.Ready += () =>
+            {
+                foreach (var guild in _discordSocket.Guilds)
+                {
+                    Log4NetHandler.Log($"Guild {guild.Name} ({guild.Id}) is connected.", Log4NetHandler.LogLevel.INFO);
+                }
+
+                return Task.CompletedTask;
+            };
+
+            _discordSocket.GuildAvailable += guild =>
+            {
+                Log4NetHandler.Log($"The guild {guild.Name} ({guild.Id}) is now available",
+                    Log4NetHandler.LogLevel.DEBUG);
+
+                return Task.CompletedTask;
+            };
+
+            _discordSocket.GuildUnavailable += guild =>
+            {
+                Log4NetHandler.Log($"The guild {guild.Name} ({guild.Id}) is now unavailable",
+                    Log4NetHandler.LogLevel.DEBUG);
+
+                return Task.CompletedTask;
+            };
         }
 
         internal async Task Connect()
