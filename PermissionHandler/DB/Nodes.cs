@@ -19,8 +19,8 @@ namespace PermissionHandler.DB
     public class SubNode
     {
         public ulong Owner; // Who owns this permission
-        public NodePermission Permission; // The permission the owner has
         public OwnerType OwnerType;
+        public NodePermission Permission; // The permission the owner has
 
         public SubNode(ulong owner, NodePermission permission, OwnerType ownerType)
         {

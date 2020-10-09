@@ -1,12 +1,11 @@
-﻿using SQLite;
-using System;
+﻿using System;
+using SQLite;
 
 namespace SpotifyStats.SQLite.Tables
 {
     public class Listener
     {
-        [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey] [AutoIncrement] public int Id { get; set; }
 
         public long DiscordId { get; set; }
         public int SongId { get; set; }

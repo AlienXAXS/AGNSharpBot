@@ -1,6 +1,11 @@
-﻿using Interface;
+﻿using System.ComponentModel.Composition;
+using CommandHandler;
+using Interface;
+using InternalDatabase;
 using PluginManager;
-using System.ComponentModel.Composition;
+using SpotifyStats.Commands;
+using SpotifyStats.Spotify;
+using SpotifyStats.SQLite.Tables;
 
 namespace SpotifyStats
 {
@@ -14,13 +19,13 @@ namespace SpotifyStats
         public void ExecutePlugin()
         {
             // Register our tables with the SQLHandler
-            var dbConn = InternalDatabase.Handler.Instance.NewConnection();
-            dbConn.RegisterTable<SQLite.Tables.Listener>();
-            dbConn.RegisterTable<SQLite.Tables.Song>();
+            var dbConn = Handler.Instance.NewConnection();
+            dbConn.RegisterTable<Listener>();
+            dbConn.RegisterTable<Song>();
 
             // Setup our discordclient link to spotifystats
-            Spotify.SpotifyHandler.Instance.SetupDiscordInstance(EventRouter);
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.SpotifyCommandHandler>();
+            SpotifyHandler.Instance.SetupDiscordInstance(EventRouter);
+            HandlerManager.Instance.RegisterHandler<SpotifyCommandHandler>();
         }
 
         public void Dispose()

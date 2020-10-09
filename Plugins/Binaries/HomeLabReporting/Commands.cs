@@ -1,5 +1,6 @@
 ﻿using CommandHandler;
 using Discord.WebSocket;
+using HomeLabReporting.SNMP;
 
 namespace HomeLabReporting
 {
@@ -9,7 +10,7 @@ namespace HomeLabReporting
         public async void HomeCommand(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
-            await SNMP.SnmpCommunication.Instance.CommandExecute(parameters, sktMessage);
+            await SnmpCommunication.Instance.CommandExecute(parameters, sktMessage);
         }
     }
 }

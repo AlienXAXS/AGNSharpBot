@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CommandHandler;
 using Discord.WebSocket;
+using InternalDatabase;
+using Responses.Commands.GameGiveaway.SQL;
 
 namespace GameGiveaway.Commands
 {
@@ -15,7 +17,7 @@ namespace GameGiveaway.Commands
             var gamesAdded = new List<string>();
             var gamesErrored = new List<string>();
 
-            var allGamesDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<Responses.Commands.GameGiveaway.SQL.GameGiveawayGameDb>();
+            var allGamesDb = Handler.Instance.GetConnection().DbConnection.Table<GameGiveawayGameDb>();
 
             if (parameters.Length == 1)
             {
@@ -43,8 +45,7 @@ namespace GameGiveaway.Commands
                         continue;
                     }
 
-                    var newGame = new Responses.Commands.GameGiveaway.SQL.GameGiveawayGameDb()
-                    { Key = gameKey, Name = gameName };
+                    var newGame = new GameGiveawayGameDb {Key = gameKey, Name = gameName};
 
                     try
                     {
@@ -59,8 +60,9 @@ namespace GameGiveaway.Commands
             }
 
             await sktMessage.Channel.SendMessageAsync(
-                $"" + $"Games Added: {(gamesAdded.Count > 0 ? gamesAdded.Aggregate((x, y) => x + Environment.NewLine + y) : "None")}\r\n" +
-                $"Games Errored: { (gamesErrored.Count > 0 ? gamesErrored.Aggregate((x, y) => x + Environment.NewLine + y) : "None")}");
+                "" +
+                $"Games Added: {(gamesAdded.Count > 0 ? gamesAdded.Aggregate((x, y) => x + Environment.NewLine + y) : "None")}\r\n" +
+                $"Games Errored: {(gamesErrored.Count > 0 ? gamesErrored.Aggregate((x, y) => x + Environment.NewLine + y) : "None")}");
         }
     }
 }

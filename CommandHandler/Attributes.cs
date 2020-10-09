@@ -4,20 +4,18 @@ namespace CommandHandler
 {
     public class Command : Attribute
     {
-        public string Value { get; set; }
-        public string Description { get; set; }
-
         public Command(string commandString, string Description)
         {
             Value = commandString;
             this.Description = Description;
         }
+
+        public string Value { get; set; }
+        public string Description { get; set; }
     }
 
     public class Permissions : Attribute
     {
-        public PermissionTypes Value { get; set; }
-
         public enum PermissionTypes
         {
             Guest
@@ -27,15 +25,17 @@ namespace CommandHandler
         {
             Value = permissions;
         }
+
+        public PermissionTypes Value { get; set; }
     }
 
     public class Alias : Attribute
     {
-        public string[] Value { get; set; }
-
         public Alias(params string[] aliases)
         {
             Value = aliases;
         }
+
+        public string[] Value { get; set; }
     }
 }

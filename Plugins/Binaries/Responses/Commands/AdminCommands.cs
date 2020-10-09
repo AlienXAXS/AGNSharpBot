@@ -1,20 +1,20 @@
-﻿using CommandHandler;
+﻿using System;
+using System.Linq;
+using CommandHandler;
 using Discord;
 using Discord.WebSocket;
-using System;
-using System.Linq;
 
 namespace Responses.Commands
 {
     internal class AdminCommands
     {
-        [Command("svr", "Switches the voice server to a random one, and back to the original one again to reconnect everyone in voice channels")]
+        [Command("svr",
+            "Switches the voice server to a random one, and back to the original one again to reconnect everyone in voice channels")]
         [Alias("switchvoiceregion")]
         public async void SwitchVoiceServer(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
             if (sktMessage.Channel is SocketGuildChannel _socketGuildChannel)
-            {
                 try
                 {
                     var voiceRegions = await _socketGuildChannel.Guild.GetVoiceRegionsAsync();
@@ -29,7 +29,8 @@ namespace Responses.Commands
                     await sktMessage.Channel.SendMessageAsync("Switching to a random Voice Region, please wait...");
 
                     var rand = new Random(DateTime.Now.Millisecond);
-                    var newVoiceRegion = voiceRegionsWithoutCurrent.ElementAt(rand.Next(voiceRegionsWithoutCurrent.Count()));
+                    var newVoiceRegion =
+                        voiceRegionsWithoutCurrent.ElementAt(rand.Next(voiceRegionsWithoutCurrent.Count()));
 
                     await _socketGuildChannel.Guild.ModifyAsync(properties =>
                         properties.Region = newVoiceRegion);
@@ -47,21 +48,21 @@ namespace Responses.Commands
                     await sktMessage.Channel.SendMessageAsync(
                         $"Unable to switch the voice region, the error is as follows:\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
                 }
-            }
         }
 
-        [Command("userinfo", "Get's otherwise invisible information about a user that the discord client cannot retrieve. USAGE: userinfo <userid>")]
+        [Command("userinfo",
+            "Get's otherwise invisible information about a user that the discord client cannot retrieve. USAGE: userinfo <userid>")]
         public async void GetUserInfo(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
             if (parameters.Length == 1)
             {
-                await sktMessage.Channel.SendMessageAsync($"{sktMessage.Author.Username} - Invalid use of userinfo, try !help");
+                await sktMessage.Channel.SendMessageAsync(
+                    $"{sktMessage.Author.Username} - Invalid use of userinfo, try !help");
                 return;
             }
 
             if (sktMessage.Channel is SocketGuildChannel _socketGuild)
-            {
                 if (ulong.TryParse(parameters[1], out var userId))
                 {
                     // UID based search
@@ -75,13 +76,12 @@ namespace Responses.Commands
 
                     var embedBuilder = new EmbedBuilder();
                     embedBuilder.Title = $"User information for {user.Username}";
-                    embedBuilder.AddField("Created", $"{user.CreatedAt.Date} ({(DateTime.Now - user.CreatedAt.Date).Days} days ago)");
+                    embedBuilder.AddField("Created",
+                        $"{user.CreatedAt.Date} ({(DateTime.Now - user.CreatedAt.Date).Days} days ago)");
 
                     if (user.JoinedAt != null)
-                    {
                         embedBuilder.AddField("Joined This Guild",
                             $"{user.JoinedAt.Value.Date} ({(DateTime.Now - user.JoinedAt.Value.Date).Days} days ago)");
-                    }
 
                     embedBuilder.AddField("Current Nickname", user.Nickname ?? "None");
                     embedBuilder.AddField("Avatar Identifier", user.AvatarId);
@@ -92,24 +92,18 @@ namespace Responses.Commands
 
                     await sktMessage.Channel.SendMessageAsync("", false, embedBuilder.Build());
                 }
-                else
-                {
-                    //todo
-                }
-            }
         }
 
-        [Command("channelinfo", "Gets the channels info, as well as the current Guild ID that the channel belongs to - execute within the channel you wish to get the info for.")]
+        [Command("channelinfo",
+            "Gets the channels info, as well as the current Guild ID that the channel belongs to - execute within the channel you wish to get the info for.")]
         public async void GetChannelInfo(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
             var _guildID = "UNKNOWN";
-            if (sktMessage.Channel is SocketGuildChannel _socketGuild)
-            {
-                _guildID = _socketGuild.Guild.Id.ToString();
-            }
+            if (sktMessage.Channel is SocketGuildChannel _socketGuild) _guildID = _socketGuild.Guild.Id.ToString();
 
-            await sktMessage.Channel.SendMessageAsync($"Channel ID is {sktMessage.Channel.Id} which is in the guild {_guildID}");
+            await sktMessage.Channel.SendMessageAsync(
+                $"Channel ID is {sktMessage.Channel.Id} which is in the guild {_guildID}");
         }
 
         /*

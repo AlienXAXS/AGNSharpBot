@@ -1,7 +1,11 @@
-﻿using Interface;
+﻿using System.ComponentModel.Composition;
+using CommandHandler;
+using Interface;
+using InternalDatabase;
 using PluginManager;
+using Responses.Commands;
+using Responses.Informational;
 using Responses.SQLTables;
-using System.ComponentModel.Composition;
 
 namespace Responses
 {
@@ -17,18 +21,18 @@ namespace Responses
         {
             // SQL Database Setup
             // Last Online
-            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<LastOnlineTable>();
-            
+            Handler.Instance.NewConnection().RegisterTable<LastOnlineTable>();
 
-            var lastOnlineHandler = new Informational.LastOnlineDbHandler();
+
+            var lastOnlineHandler = new LastOnlineDbHandler();
             lastOnlineHandler.StartOnlineScanner(EventRouter);
 
             // Register our commands with the handler
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminCommands>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Informational.LastOnline>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AuthorisedCommands>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminPermissions>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.ModerateUser>();
+            HandlerManager.Instance.RegisterHandler<AdminCommands>();
+            HandlerManager.Instance.RegisterHandler<LastOnline>();
+            HandlerManager.Instance.RegisterHandler<AuthorisedCommands>();
+            HandlerManager.Instance.RegisterHandler<AdminPermissions>();
+            HandlerManager.Instance.RegisterHandler<ModerateUser>();
         }
 
         void IPlugin.Dispose()

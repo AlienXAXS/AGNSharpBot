@@ -4,11 +4,9 @@ namespace GameWatcher.DB.Tables
 {
     internal class GameMemory
     {
-        [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey] [AutoIncrement] public int Id { get; set; }
 
-        [Indexed]
-        public string Name { get; set; }
+        [Indexed] public string Name { get; set; }
 
         public long GuildId { get; set; }
     }

@@ -1,34 +1,35 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.IO;
 using System.Net;
+using GlobalLogger;
+using Newtonsoft.Json;
 
 namespace Auditor.WebServer.Configuration
 {
     internal class StartupConfig
     {
-        public bool Enabled { get; set; }
-
         private IPAddress _ipAddress;
+
+        private int _port;
+
+        private string _uri;
+        public bool Enabled { get; set; }
 
         public IPAddress IpAddress
         {
-            get { return _ipAddress ?? new IPAddress(new byte[4] { 0, 0, 0, 0 }); }
+            get { return _ipAddress ?? new IPAddress(new byte[4] {0, 0, 0, 0}); }
             set => _ipAddress = value;
         }
 
-        private int _port = 0;
-
         public int Port
         {
-            get { return _port == 0 ? 8080 : _port; }
+            get => _port == 0 ? 8080 : _port;
             set => _port = value;
         }
 
-        private string _uri;
-
         public string URI
         {
-            get { return _uri ?? "http://localhost.example.com"; }
+            get => _uri ?? "http://localhost.example.com";
             set => _uri = value;
         }
     }
@@ -37,7 +38,7 @@ namespace Auditor.WebServer.Configuration
     {
         public override bool CanConvert(Type objectType)
         {
-            return (objectType == typeof(IPAddress));
+            return objectType == typeof(IPAddress);
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
@@ -45,20 +46,20 @@ namespace Auditor.WebServer.Configuration
             writer.WriteValue(value.ToString());
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
+            JsonSerializer serializer)
         {
-            return IPAddress.Parse((string)reader.Value);
+            return IPAddress.Parse((string) reader.Value);
         }
     }
 
     internal class ConfigHandler
     {
+        private const string ConfigFilePath = @"Plugins\Config\Auditor-WebServer.json";
         private static readonly ConfigHandler _instance;
         public static ConfigHandler Instance = _instance ?? (_instance = new ConfigHandler());
 
         public StartupConfig Configuration = new StartupConfig();
-
-        private const string ConfigFilePath = @"Plugins\Config\Auditor-WebServer.json";
 
         public ConfigHandler()
         {
@@ -69,27 +70,27 @@ namespace Auditor.WebServer.Configuration
             try
             {
                 // deal with the file not existing yet
-                if (!System.IO.File.Exists(ConfigFilePath))
-                {
-                    System.IO.File.WriteAllText(ConfigFilePath,
+                if (!File.Exists(ConfigFilePath))
+                    File.WriteAllText(ConfigFilePath,
                         JsonConvert.SerializeObject(Configuration, Formatting.Indented, settings));
-                }
                 else
-                {
                     try
                     {
                         Configuration =
-                            JsonConvert.DeserializeObject<StartupConfig>(System.IO.File.ReadAllText(ConfigFilePath), settings);
+                            JsonConvert.DeserializeObject<StartupConfig>(File.ReadAllText(ConfigFilePath), settings);
                     }
                     catch (Exception ex)
                     {
-                        GlobalLogger.Log4NetHandler.Log($"Error while attempting to load config file for Auditor from {ConfigFilePath}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                        Log4NetHandler.Log(
+                            $"Error while attempting to load config file for Auditor from {ConfigFilePath}",
+                            Log4NetHandler.LogLevel.ERROR, exception: ex);
                     }
-                }
             }
             catch (Exception ex)
             {
-                GlobalLogger.Log4NetHandler.Log($"Error while attempting to save default config file for Auditor to {ConfigFilePath}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                Log4NetHandler.Log(
+                    $"Error while attempting to save default config file for Auditor to {ConfigFilePath}",
+                    Log4NetHandler.LogLevel.ERROR, exception: ex);
             }
         }
     }

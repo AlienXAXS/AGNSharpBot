@@ -1,29 +1,34 @@
-﻿using CommandHandler;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using CommandHandler;
 using Discord;
 using Discord.WebSocket;
 using DiscordMenu;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Responses.Commands
 {
     internal class ModerateUserSession : IDisposable
     {
+        public delegate void SessionPreDispose();
+
         private MenuHandler _menuHandler;
+
+        private bool IsFinished;
         public DiscordSocketClient DiscordSocketClient { get; set; }
         public SocketMessage SocketMessage { get; set; }
         public SocketGuildUser Victim { get; set; }
 
-        public delegate void SessionPreDispose();
+        public void Dispose()
+        {
+            _menuHandler?.Dispose();
+        }
 
         public event SessionPreDispose OnSessionPreDispose;
 
-        private bool IsFinished;
-
         public void Start()
         {
-            _menuHandler = new MenuHandler()
+            _menuHandler = new MenuHandler
             {
                 DiscordSocketClient = DiscordSocketClient,
                 MenuTitle = $"Moderation Menu for user {Victim.Username}",
@@ -83,14 +88,10 @@ namespace Responses.Commands
                 case 5:
                 case 6:
                 case 7:
-                    _menuHandler?.Dispose($"{SocketMessage.Author.Username} picked a menu option which is not finished yet - Coming Soon!");
+                    _menuHandler?.Dispose(
+                        $"{SocketMessage.Author.Username} picked a menu option which is not finished yet - Coming Soon!");
                     break;
             }
-        }
-
-        public void Dispose()
-        {
-            _menuHandler?.Dispose();
         }
     }
 
@@ -102,12 +103,12 @@ namespace Responses.Commands
         {
             if (parameters.Length == 1)
             {
-                await sktMessage.Channel.SendMessageAsync($"{sktMessage.Author.Username} - Invalid use of userinfo, try !help");
+                await sktMessage.Channel.SendMessageAsync(
+                    $"{sktMessage.Author.Username} - Invalid use of userinfo, try !help");
                 return;
             }
 
             if (sktMessage.Channel is SocketGuildChannel _socketGuild)
-            {
                 if (ulong.TryParse(parameters[1], out var userId))
                 {
                     // UID based search
@@ -123,7 +124,7 @@ namespace Responses.Commands
                     {
                         var sessionExpired = false;
 
-                        using (var session = new ModerateUserSession()
+                        using (var session = new ModerateUserSession
                         {
                             DiscordSocketClient = discordSocketClient,
                             SocketMessage = sktMessage,
@@ -134,15 +135,11 @@ namespace Responses.Commands
 
                             session.OnSessionPreDispose += () => { sessionExpired = true; };
 
-                            while (!sessionExpired)
-                            {
-                                await Task.Delay(1000);
-                            }
+                            while (!sessionExpired) await Task.Delay(1000);
                         }
                     });
                     _myTask.Start();
                 }
-            }
         }
     }
 }

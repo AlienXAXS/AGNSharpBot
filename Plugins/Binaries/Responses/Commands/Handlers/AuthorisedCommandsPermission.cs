@@ -1,10 +1,11 @@
-﻿using Discord.WebSocket;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.WebSocket;
 using GlobalLogger;
+using Newtonsoft.Json;
 
 namespace Responses.Commands.Handlers
 {
@@ -44,7 +45,8 @@ namespace Responses.Commands.Handlers
 
             // Return if the user has any permissions within the list of allowed roles
             if (permissionRoleNode != null)
-                return author.Roles.Any(roleNode => permissionRoleNode.PermissionRoleNames.Any(x => x.ToLower().Equals(roleNode.Name.ToLower())));
+                return author.Roles.Any(roleNode =>
+                    permissionRoleNode.PermissionRoleNames.Any(x => x.ToLower().Equals(roleNode.Name.ToLower())));
 
             throw new Exception($"Unable to find a matching permission node for command {command}");
         }
@@ -53,23 +55,20 @@ namespace Responses.Commands.Handlers
         {
             _commandPermissions.Clear();
 
-            if (System.IO.File.Exists(ConfigurationPath))
-            {
+            if (File.Exists(ConfigurationPath))
                 try
                 {
                     _commandPermissions =
                         JsonConvert.DeserializeObject<List<CommandPermission>>(
-                            System.IO.File.ReadAllText(ConfigurationPath));
+                            File.ReadAllText(ConfigurationPath));
                 }
                 catch (Exception ex)
                 {
-                    Log4NetHandler.Log($"Unable to parse SpotifySongs.json", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                    Log4NetHandler.Log("Unable to parse SpotifySongs.json", Log4NetHandler.LogLevel.ERROR,
+                        exception: ex);
                 }
-            }
             else
-            {
                 InitConfiguration();
-            }
         }
 
         private void InitConfiguration()
@@ -78,16 +77,17 @@ namespace Responses.Commands.Handlers
             {
                 var tmpList = new List<CommandPermission>
                 {
-                    new CommandPermission("move", new List<string>() {"AGN Member", "Staff", "Something Else"})
+                    new CommandPermission("move", new List<string> {"AGN Member", "Staff", "Something Else"})
                 };
 
-                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(ConfigurationPath));
-                System.IO.File.WriteAllText(ConfigurationPath,
+                Directory.CreateDirectory(Path.GetDirectoryName(ConfigurationPath));
+                File.WriteAllText(ConfigurationPath,
                     JsonConvert.SerializeObject(tmpList, Formatting.Indented));
             }
             catch (Exception ex)
             {
-                Log4NetHandler.Log($"Unable to init config for AuthorisedCommandsPermission", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                Log4NetHandler.Log("Unable to init config for AuthorisedCommandsPermission",
+                    Log4NetHandler.LogLevel.ERROR, exception: ex);
             }
         }
     }

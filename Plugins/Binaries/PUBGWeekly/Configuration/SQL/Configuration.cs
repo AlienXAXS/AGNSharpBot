@@ -1,16 +1,10 @@
 ﻿using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PUBGWeekly.Configuration.SQL
 {
     public class Configuration
     {
-        [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey] [AutoIncrement] public int Id { get; set; }
 
         public long RootCategoryId { get; set; }
         public long LobbyId { get; set; }
@@ -24,16 +18,16 @@ namespace PUBGWeekly.Configuration.SQL
 
     public class TeamChannels
     {
-        [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey] [AutoIncrement] public int Id { get; set; }
+
         public int TeamNumber { get; set; }
         public long ChannelId { get; set; }
     }
 
     public class PubgAccountLink
     {
-        [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey] [AutoIncrement] public int Id { get; set; }
+
         public string PubgAccountId { get; set; }
         public long DiscordId { get; set; }
     }

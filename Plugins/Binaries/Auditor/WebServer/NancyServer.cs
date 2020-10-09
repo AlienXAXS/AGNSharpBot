@@ -1,4 +1,8 @@
-﻿using Discord.WebSocket;
+﻿using System;
+using System.Threading;
+using Auditor.WebServer.Configuration;
+using Discord.WebSocket;
+using GlobalLogger;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Configuration;
@@ -6,8 +10,6 @@ using Nancy.Conventions;
 using Nancy.Hosting.Self;
 using Nancy.Session;
 using Nancy.TinyIoc;
-using System;
-using System.Threading;
 
 namespace Auditor.WebServer
 {
@@ -15,11 +17,11 @@ namespace Auditor.WebServer
     {
         private static readonly NancyServer _instance;
         public static NancyServer Instance = _instance ?? (_instance = new NancyServer());
+        private bool _serverRunning;
+
+        private bool _stopRequested;
 
         public DiscordSocketClient DiscordSocketClient { get; set; }
-
-        private bool _stopRequested = false;
-        private bool _serverRunning = false;
 
         public bool GetServerRunning()
         {
@@ -46,36 +48,37 @@ namespace Auditor.WebServer
             {
                 var newThread = new Thread(() =>
                 {
-                    var config = Configuration.ConfigHandler.Instance.Configuration;
+                    var config = ConfigHandler.Instance.Configuration;
 
                     if (!config.Enabled && !calledFromDiscord)
                     {
-                        GlobalLogger.Log4NetHandler.Log("NancyServer not starting as it's not enabled - skipping init.", GlobalLogger.Log4NetHandler.LogLevel.INFO);
+                        Log4NetHandler.Log("NancyServer not starting as it's not enabled - skipping init.",
+                            Log4NetHandler.LogLevel.INFO);
                         return;
                     }
 
                     var hostConfigs = new HostConfiguration
                     {
-                        UrlReservations = new UrlReservations() { CreateAutomatically = true }
+                        UrlReservations = new UrlReservations {CreateAutomatically = true}
                     };
 
-                    using (var nancyHost = new NancyHost(new CustomBootstrapper(), hostConfigs, new Uri($"http://localhost:{config.Port}")))
+                    using (var nancyHost = new NancyHost(new CustomBootstrapper(), hostConfigs,
+                        new Uri($"http://localhost:{config.Port}")))
                     {
                         try
                         {
                             nancyHost.Start();
                             _serverRunning = true;
-                            GlobalLogger.Log4NetHandler.Log($"NancyServer started, listening for connections on port {config.Port}", GlobalLogger.Log4NetHandler.LogLevel.INFO);
+                            Log4NetHandler.Log($"NancyServer started, listening for connections on port {config.Port}",
+                                Log4NetHandler.LogLevel.INFO);
 
                             // Maybe a better way of doing this, but whatever.
-                            while (!_stopRequested)
-                            {
-                                Thread.Sleep(1000);
-                            }
+                            while (!_stopRequested) Thread.Sleep(1000);
                         }
                         catch (Exception ex)
                         {
-                            GlobalLogger.Log4NetHandler.Log($"Unable to start NancyServer: {ex.Message}\r\n\r\n{ex.StackTrace}", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                            Log4NetHandler.Log($"Unable to start NancyServer: {ex.Message}\r\n\r\n{ex.StackTrace}",
+                                Log4NetHandler.LogLevel.ERROR, exception: ex);
                         }
                     }
 
@@ -86,7 +89,8 @@ namespace Auditor.WebServer
             }
             catch (Exception ex)
             {
-                GlobalLogger.Log4NetHandler.Log($"NancyServer Start Error - unable to start Nancy", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                Log4NetHandler.Log("NancyServer Start Error - unable to start Nancy", Log4NetHandler.LogLevel.ERROR,
+                    exception: ex);
             }
         }
 
@@ -106,6 +110,8 @@ namespace Auditor.WebServer
 
     public class CustomBootstrapper : DefaultNancyBootstrapper
     {
+        protected override IRootPathProvider RootPathProvider => new CustomRootPathProvider();
+
         protected override void ConfigureConventions(NancyConventions conventions)
         {
             base.ConfigureConventions(conventions);
@@ -122,7 +128,5 @@ namespace Auditor.WebServer
             base.Configure(environment);
             environment.Views(runtimeViewUpdates: true);
         }
-
-        protected override IRootPathProvider RootPathProvider => new CustomRootPathProvider();
     }
 }

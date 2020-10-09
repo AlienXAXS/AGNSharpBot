@@ -1,16 +1,23 @@
-﻿using AGNSharpBot.DiscordHandler;
-using CommandHandler;
-using System;
+﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
+using AGNSharpBot.Configuration;
+using AGNSharpBot.DiscordHandler;
+using CommandHandler;
 using GlobalLogger;
-using log4net;
+using PluginManager;
 
 namespace AGNSharpBot
 {
     internal class Program
     {
+        private static EventHandler _handler;
+        private static bool _running = true;
+
+        private readonly Client _discordClient = Client.Instance;
+
         [DllImport("Kernel32")]
         private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
 
@@ -22,24 +29,8 @@ namespace AGNSharpBot
             }
             catch (Exception ex)
             {
-                Log4NetHandler.Log($"Fatal Error", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                Log4NetHandler.Log("Fatal Error", Log4NetHandler.LogLevel.ERROR, exception: ex);
             }
-        }
-
-        private readonly Client _discordClient = Client.Instance;
-
-        private delegate bool EventHandler(CtrlType sig);
-
-        private static EventHandler _handler;
-        private static bool _running = true;
-
-        private enum CtrlType
-        {
-            CTRL_C_EVENT = 0,
-            CTRL_BREAK_EVENT = 1,
-            CTRL_CLOSE_EVENT = 2,
-            CTRL_LOGOFF_EVENT = 5,
-            CTRL_SHUTDOWN_EVENT = 6
         }
 
         private static bool Handler(CtrlType sig)
@@ -51,9 +42,9 @@ namespace AGNSharpBot
                 case CtrlType.CTRL_SHUTDOWN_EVENT:
                 case CtrlType.CTRL_CLOSE_EVENT:
                     Client.Instance.Dispose();
-                    PluginManager.PluginHandler.Instance.Dispose();
+                    PluginHandler.Instance.Dispose();
                     Log4NetHandler.Log("Shutting down application...", Log4NetHandler.LogLevel.INFO);
-                    System.Threading.Thread.Sleep(1500);
+                    Thread.Sleep(1500);
                     _running = false;
                     return true;
 
@@ -73,7 +64,8 @@ namespace AGNSharpBot
             // Setup our unhandled exception events
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
             {
-                Log4NetHandler.Log($"Unhandled Exception in sender: {sender}", Log4NetHandler.LogLevel.ERROR, exception: (Exception)e.ExceptionObject);
+                Log4NetHandler.Log($"Unhandled Exception in sender: {sender}", Log4NetHandler.LogLevel.ERROR,
+                    exception: (Exception) e.ExceptionObject);
             };
 
             try
@@ -89,8 +81,8 @@ namespace AGNSharpBot
                 HandlerManager.Instance.RegisterDiscord(Client.Instance.GetDiscordSocket());
 
                 // Load plugins
-                PluginManager.PluginHandler.Instance.DiscordSocketClient = _discordClient.GetDiscordSocket();
-                if (PluginManager.PluginHandler.Instance.LoadPlugins())
+                PluginHandler.Instance.DiscordSocketClient = _discordClient.GetDiscordSocket();
+                if (PluginHandler.Instance.LoadPlugins())
                 {
                     Log4NetHandler.Log("Connecting to Discord", Log4NetHandler.LogLevel.INFO);
                     await _discordClient.Connect();
@@ -98,23 +90,26 @@ namespace AGNSharpBot
                 }
                 else
                 {
-                    Log4NetHandler.Log("An error was found during bot startup, check the log for details\r\nHalting operations.", Log4NetHandler.LogLevel.ERROR);
+                    Log4NetHandler.Log(
+                        "An error was found during bot startup, check the log for details\r\nHalting operations.",
+                        Log4NetHandler.LogLevel.ERROR);
                     Console.ReadLine();
                 }
             }
-            catch (Configuration.Exceptions.MissingConfigurationFile)
+            catch (Exceptions.MissingConfigurationFile)
             {
-                Log4NetHandler.Log("\r\n\r\nYou must provide a config.json file, rename the config.json.example to config.json before loading this application", Log4NetHandler.LogLevel.ERROR);
+                Log4NetHandler.Log(
+                    "\r\n\r\nYou must provide a config.json file, rename the config.json.example to config.json before loading this application",
+                    Log4NetHandler.LogLevel.ERROR);
                 Console.WriteLine("Press <ENTER> to exit");
                 Console.ReadKey();
-                return;
             }
-            catch (Configuration.Exceptions.InvalidConfigurationFile)
+            catch (Exceptions.InvalidConfigurationFile)
             {
-                Log4NetHandler.Log("\r\n\r\nThe provided config.json is invalid, unable to load.", Log4NetHandler.LogLevel.ERROR);
+                Log4NetHandler.Log("\r\n\r\nThe provided config.json is invalid, unable to load.",
+                    Log4NetHandler.LogLevel.ERROR);
                 Console.WriteLine("Press <ENTER> to exit");
                 Console.ReadKey();
-                return;
             }
         }
 
@@ -132,14 +127,27 @@ namespace AGNSharpBot
 
                     var totalUsers = discordClient.Guilds.Sum(guild => guild.MemberCount);
 
-                    Console.Title = $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginManager.PluginHandler.Instance.GetPlugins().Count()}";
+                    Console.Title =
+                        $"AGNSharpBot Connected - Guilds:{discordClient.Guilds.Count} - Users:{totalUsers} - Plugins:{PluginHandler.Instance.GetPlugins().Count()}";
 
-                    await discordClient.SetGameAsync($"Serving {totalUsers} users over {discordClient.Guilds.Count} servers.");
+                    await discordClient.SetGameAsync(
+                        $"Serving {totalUsers} users over {discordClient.Guilds.Count} servers.");
                 }
                 catch (Exception)
                 {
                 }
             }
+        }
+
+        private delegate bool EventHandler(CtrlType sig);
+
+        private enum CtrlType
+        {
+            CTRL_C_EVENT = 0,
+            CTRL_BREAK_EVENT = 1,
+            CTRL_CLOSE_EVENT = 2,
+            CTRL_LOGOFF_EVENT = 5,
+            CTRL_SHUTDOWN_EVENT = 6
         }
     }
 }

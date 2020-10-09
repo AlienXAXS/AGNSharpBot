@@ -1,9 +1,9 @@
-﻿using CommandHandler;
+﻿using System;
+using System.Linq;
+using CommandHandler;
 using Discord.WebSocket;
 using PermissionHandler;
 using PermissionHandler.DB;
-using System;
-using System.Linq;
 
 namespace Responses.Commands
 {
@@ -50,7 +50,7 @@ namespace Responses.Commands
         {
             // Integrity check against length of params, expecting at least 4
             // will do deny check using last param, check if boolean.
-            if (parameters.Length < 4 || (sktMessage.MentionedRoles.Count == 0 && sktMessage.MentionedUsers.Count == 0))
+            if (parameters.Length < 4 || sktMessage.MentionedRoles.Count == 0 && sktMessage.MentionedUsers.Count == 0)
             {
                 SendMessage("Invalid use of add - Expected parameters !perm remove @member/@role", sktMessage);
                 return;
@@ -60,11 +60,11 @@ namespace Responses.Commands
 
             try
             {
-                Permission.Instance.Remove(path, (sktMessage.MentionedUsers.Count == 0
+                Permission.Instance.Remove(path, sktMessage.MentionedUsers.Count == 0
                     ? sktMessage.MentionedRoles.First().Id
-                    : sktMessage.MentionedUsers.First().Id));
+                    : sktMessage.MentionedUsers.First().Id);
 
-                SendMessage($"Permission has been set successfully", sktMessage);
+                SendMessage("Permission has been set successfully", sktMessage);
             }
             catch (Exception ex)
             {
@@ -75,22 +75,19 @@ namespace Responses.Commands
         private void Help(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
             SendMessage("\r\n`Permissions System Help`\r\n" +
-                      "AGN Sharp Bot has a new Permission system, it's in Alpha stage and could be buggy, below is how to use it - please note that any Discord role that has the Administrator permission automatically has access to every permission.\r\n\r\n" +
-                      "`!perm help`\r\nThis help\r\n\r\n" +
-                      "`!perm add PATH @member/@role [deny]`\r\nAdds the mentioned member or role to the permission path, alternatively specify a deny tag at the end if you want to explicitly deny access to this permission\r\n\r\n" +
-                      "`!perm adduid PATH userid [deny]`\r\nAdds the given member id to the permission path, alternatively specify a deny tag at the end if you want to explicitly deny access to this permission\r\n\r\n" +
-                      "`!perm addrid PATH roleid [deny]`\r\nAdds the given role id to the permission path, alternatively specify a deny tag at the end if you want to explicitly deny access to this permission\r\n\r\n" +
-                      "`!perm remove PATH @member/@role`\r\nRemoves the mentioned member or role permission from the database\r\n\r\n" +
-                      "`!perm listpaths`\r\nLists the current registered permission path nodes", sktMessage);
+                        "AGN Sharp Bot has a new Permission system, it's in Alpha stage and could be buggy, below is how to use it - please note that any Discord role that has the Administrator permission automatically has access to every permission.\r\n\r\n" +
+                        "`!perm help`\r\nThis help\r\n\r\n" +
+                        "`!perm add PATH @member/@role [deny]`\r\nAdds the mentioned member or role to the permission path, alternatively specify a deny tag at the end if you want to explicitly deny access to this permission\r\n\r\n" +
+                        "`!perm adduid PATH userid [deny]`\r\nAdds the given member id to the permission path, alternatively specify a deny tag at the end if you want to explicitly deny access to this permission\r\n\r\n" +
+                        "`!perm addrid PATH roleid [deny]`\r\nAdds the given role id to the permission path, alternatively specify a deny tag at the end if you want to explicitly deny access to this permission\r\n\r\n" +
+                        "`!perm remove PATH @member/@role`\r\nRemoves the mentioned member or role permission from the database\r\n\r\n" +
+                        "`!perm listpaths`\r\nLists the current registered permission path nodes", sktMessage);
         }
 
         private void ListPaths(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
         {
             var output = "`Current registered permission paths`\r\n";
-            foreach (var path in Permission.Instance.GetRegisteredPermissionPaths())
-            {
-                output += $"{path}\r\n";
-            }
+            foreach (var path in Permission.Instance.GetRegisteredPermissionPaths()) output += $"{path}\r\n";
 
             SendMessage(output, sktMessage);
         }
@@ -99,7 +96,7 @@ namespace Responses.Commands
         {
             // Integrity check against length of params, expecting at least 4
             // will do deny check using last param, check if boolean.
-            if (parameters.Length < 4 || (sktMessage.MentionedRoles.Count == 0 && sktMessage.MentionedUsers.Count == 0))
+            if (parameters.Length < 4 || sktMessage.MentionedRoles.Count == 0 && sktMessage.MentionedUsers.Count == 0)
             {
                 SendMessage("Invalid use of add - Expected parameters !perm add @member/@role [deny]", sktMessage);
                 return;
@@ -115,14 +112,14 @@ namespace Responses.Commands
             try
             {
                 Permission.Instance.Add(path,
-                    (sktMessage.MentionedUsers.Count == 0
+                    sktMessage.MentionedUsers.Count == 0
                         ? sktMessage.MentionedRoles.First().Id
-                        : sktMessage.MentionedUsers.First().Id),
-                    (explicitDeny
+                        : sktMessage.MentionedUsers.First().Id,
+                    explicitDeny
                         ? NodePermission.Deny
-                        : NodePermission.Allow),
-                    (sktMessage.MentionedUsers.Count == 0 ? OwnerType.Role : OwnerType.User));
-                SendMessage($"Permission has been set successfully", sktMessage);
+                        : NodePermission.Allow,
+                    sktMessage.MentionedUsers.Count == 0 ? OwnerType.Role : OwnerType.User);
+                SendMessage("Permission has been set successfully", sktMessage);
             }
             catch (Exception ex)
             {
@@ -142,8 +139,8 @@ namespace Responses.Commands
             var mentionedRole = sktMessage.MentionedRoles.First();
 
             SendMessage("Role Information:\r\n" +
-                $"Role Name: {mentionedRole.Name}\r\n" +
-                $"Role ID: {mentionedRole.Id}", sktMessage);
+                        $"Role Name: {mentionedRole.Name}\r\n" +
+                        $"Role ID: {mentionedRole.Id}", sktMessage);
         }
 
         private void NotReadyCommand(string[] parameters, SocketMessage sktMessage,

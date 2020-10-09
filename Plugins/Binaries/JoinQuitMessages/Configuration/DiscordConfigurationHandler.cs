@@ -1,7 +1,7 @@
-﻿using CommandHandler;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using CommandHandler;
+using Discord.WebSocket;
 
 namespace JoinQuitMessages.Configuration
 {
@@ -33,7 +33,8 @@ namespace JoinQuitMessages.Configuration
             }
         }
 
-        private async Task HandleAssign(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
+        private async Task HandleAssign(string[] parameters, SocketMessage sktMessage,
+            DiscordSocketClient discordSocketClient)
         {
             if (sktMessage.Channel is SocketGuildChannel sktGuildChannel)
             {

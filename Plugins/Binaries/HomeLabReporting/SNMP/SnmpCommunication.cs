@@ -1,17 +1,19 @@
-﻿using Discord;
-using Discord.WebSocket;
-using Newtonsoft.Json;
-using SnmpSharpNet;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
+using GlobalLogger;
+using Newtonsoft.Json;
+using SnmpSharpNet;
 
 namespace HomeLabReporting.SNMP
 {
     internal class SnmpCommunication
     {
-        private static SnmpCommunication _instance;
+        private static readonly SnmpCommunication _instance;
         public static SnmpCommunication Instance = _instance ?? (_instance = new SnmpCommunication());
 
         private readonly List<SnmpHost> _snmpHosts = new List<SnmpHost>();
@@ -21,7 +23,9 @@ namespace HomeLabReporting.SNMP
         public SnmpCommunication()
         {
             // Load the config file
-            var config = JsonConvert.DeserializeObject<List<SnmpHost>>(System.IO.File.ReadAllText("Plugins\\Config\\HomeLabReporting.json"));
+            var config =
+                JsonConvert.DeserializeObject<List<SnmpHost>>(
+                    File.ReadAllText("Plugins\\Config\\HomeLabReporting.json"));
             _snmpHosts = config;
             TrapReceiver.Instance.OnTrapReceived += RaisedOnTrapReceived;
         }
@@ -29,7 +33,9 @@ namespace HomeLabReporting.SNMP
         private async void RaisedOnTrapReceived(object sender, IpAddress ipAddress, VbCollection snmpVbCollection)
         {
             var snmpHost = _snmpHosts.FirstOrDefault(x => x.IpAddress ==
-                (ipAddress.ToString().Contains(":") ? ipAddress.ToString().Split(':')[0] : ipAddress.ToString()));
+                                                          (ipAddress.ToString().Contains(":")
+                                                              ? ipAddress.ToString().Split(':')[0]
+                                                              : ipAddress.ToString()));
 
             if (snmpHost == null)
             {
@@ -37,25 +43,23 @@ namespace HomeLabReporting.SNMP
                 foreach (var x in snmpVbCollection)
                     oidStrings += $"{x.Oid} = {x.Value}\r\n";
 
-                GlobalLogger.Log4NetHandler.Log($"[SNMP TRAP] Received snmp trap from an unknown source\r\nIP Address:{ipAddress}\r\n{oidStrings}", GlobalLogger.Log4NetHandler.LogLevel.WARN);
+                Log4NetHandler.Log(
+                    $"[SNMP TRAP] Received snmp trap from an unknown source\r\nIP Address:{ipAddress}\r\n{oidStrings}",
+                    Log4NetHandler.LogLevel.WARN);
 
                 return;
             }
 
             var foundTrap = false;
             foreach (var snmpVb in snmpVbCollection)
-            {
-                foreach (var trapDefinition in snmpHost.SnmpHostTraps)
+            foreach (var trapDefinition in snmpHost.SnmpHostTraps)
+                // Do we have a match?
+                if (snmpVb.Oid.ToString().Equals(trapDefinition.Oid))
                 {
-                    // Do we have a match?
-                    if (snmpVb.Oid.ToString().Equals(trapDefinition.Oid))
-                    {
-                        trapDefinition.LastValue = new SnmpHostValueDefinition(snmpVb.Value.ToString());
-                        //await Logger.Instance.Log($"[SNMP TRAP] From {snmpHost.Name} -['{trapDefinition.ReadableName}' has a value of '{trapDefinition.LastValue.Value}']-", Logger.LoggerType.ConsoleAndDiscord, Logger.Instance.NewDiscordMention(trapDefinition.MentionSettings.UserId, trapDefinition.MentionSettings.GuildId, trapDefinition.MentionSettings.ChannelId));
-                        foundTrap = true;
-                    }
+                    trapDefinition.LastValue = new SnmpHostValueDefinition(snmpVb.Value.ToString());
+                    //await Logger.Instance.Log($"[SNMP TRAP] From {snmpHost.Name} -['{trapDefinition.ReadableName}' has a value of '{trapDefinition.LastValue.Value}']-", Logger.LoggerType.ConsoleAndDiscord, Logger.Instance.NewDiscordMention(trapDefinition.MentionSettings.UserId, trapDefinition.MentionSettings.GuildId, trapDefinition.MentionSettings.ChannelId));
+                    foundTrap = true;
                 }
-            }
 
             if (!foundTrap)
             {
@@ -63,7 +67,9 @@ namespace HomeLabReporting.SNMP
                 foreach (var x in snmpVbCollection)
                     oidStrings += $"{x.Oid} = {x.Value}\r\n";
 
-                GlobalLogger.Log4NetHandler.Log($"[SNMP TRAP] Received snmp trap from {snmpHost.Name}, but the OID was not known\r\nIP Address:{ipAddress}\r\n{oidStrings}", GlobalLogger.Log4NetHandler.LogLevel.WARN);
+                Log4NetHandler.Log(
+                    $"[SNMP TRAP] Received snmp trap from {snmpHost.Name}, but the OID was not known\r\nIP Address:{ipAddress}\r\n{oidStrings}",
+                    Log4NetHandler.LogLevel.WARN);
             }
         }
 
@@ -99,10 +105,7 @@ namespace HomeLabReporting.SNMP
         public List<string> GetCommandList()
         {
             var list = new List<string>();
-            foreach (var entry in _snmpHosts)
-            {
-                list.Add(entry.Command);
-            }
+            foreach (var entry in _snmpHosts) list.Add(entry.Command);
 
             return list;
         }
@@ -113,14 +116,13 @@ namespace HomeLabReporting.SNMP
 
             if (parameters.Length != 2)
             {
-                await sktMessage.Channel.SendMessageAsync($"Error: Parameters are wrong");
+                await sktMessage.Channel.SendMessageAsync("Error: Parameters are wrong");
                 return;
             }
 
             var command = parameters[1];
 
             foreach (var entry in _snmpHosts)
-            {
                 if (entry.Command.ToLower().Equals(command.ToLower()))
                 {
                     // If we have any record to speak of
@@ -131,16 +133,14 @@ namespace HomeLabReporting.SNMP
                         builder.WithTitle(message.Contains("debug") ? $"{entry.Name} [DEBUG MODE ON]" : entry.Name);
 
                         foreach (var oidEntry in entry.OidList)
-                        {
                             if (message.Contains("debug"))
-                            {
-                                builder.AddField(oidEntry.Expression == null ? $"{oidEntry.ReadableName} | OID: {oidEntry.Oid} |" : $"{oidEntry.ReadableName} | Expression: {oidEntry.Expression} |", oidEntry.GetFormattedValue());
-                            }
+                                builder.AddField(
+                                    oidEntry.Expression == null
+                                        ? $"{oidEntry.ReadableName} | OID: {oidEntry.Oid} |"
+                                        : $"{oidEntry.ReadableName} | Expression: {oidEntry.Expression} |",
+                                    oidEntry.GetFormattedValue());
                             else
-                            {
                                 builder.AddField(oidEntry.ReadableName, oidEntry.GetFormattedValue());
-                            }
-                        }
 
                         var timespan = DateTime.Now - entry.LastContacted;
                         var timespanString = "";
@@ -159,10 +159,9 @@ namespace HomeLabReporting.SNMP
                     else
                     {
                         await sktMessage.Channel.SendMessageAsync(
-                            $"Sorry, I do not yet have any data for {entry.Name}, please try again later - I poll this device every {(entry.PollInterval / 1000)} seconds");
+                            $"Sorry, I do not yet have any data for {entry.Name}, please try again later - I poll this device every {entry.PollInterval / 1000} seconds");
                     }
                 }
-            }
         }
     }
 

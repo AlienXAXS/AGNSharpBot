@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.Composition;
+using CommandHandler;
 using Interface;
 using PluginManager;
 
@@ -20,12 +16,11 @@ namespace ASCIIArt
 
         public void ExecutePlugin()
         {
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.ASCIIArt>();
+            HandlerManager.Instance.RegisterHandler<Commands.ASCIIArt>();
         }
 
         public void Dispose()
         {
-
         }
     }
 }

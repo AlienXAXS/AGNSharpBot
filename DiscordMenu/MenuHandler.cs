@@ -1,18 +1,18 @@
-﻿using Discord;
-using Discord.Rest;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Rest;
+using Discord.WebSocket;
 
 namespace DiscordMenu
 {
     public class MenuOption
     {
-        public int Id;
         public string Caption;
         public Emoji Emoji;
+        public int Id;
         public string Metadata;
 
         public MenuOption(int id, string caption)
@@ -32,15 +32,14 @@ namespace DiscordMenu
 
     public class MenuHandler
     {
+        public delegate void MenuOptionSelected(object sender, MenuOption menuOption);
+
+        private readonly List<MenuOption> MenuOptions = new List<MenuOption>();
+        private RestUserMessage Message;
         public string MenuTitle { get; set; }
         public DiscordSocketClient DiscordSocketClient { get; set; }
         public ISocketMessageChannel DiscordSocketGuildChannel { get; set; }
         public SocketUser Author { get; set; }
-
-        private readonly List<MenuOption> MenuOptions = new List<MenuOption>();
-        private RestUserMessage Message = null;
-
-        public delegate void MenuOptionSelected(object sender, MenuOption menuOption);
 
         public event MenuOptionSelected OnMenuOptionSelected;
 
@@ -78,7 +77,7 @@ namespace DiscordMenu
 
             DiscordSocketGuildChannel = guildChannel;
 
-            var thisEmbed = new EmbedBuilder { };
+            var thisEmbed = new EmbedBuilder();
             thisEmbed.Color = new Color(rnd.Next(256), rnd.Next(256), rnd.Next(256));
 
             var queryMessage = $"{MenuTitle}{Environment.NewLine}{Environment.NewLine}";
@@ -97,12 +96,14 @@ namespace DiscordMenu
             DiscordSocketClient.ReactionAdded += DiscordSocketClientOnReactionAdded;
         }
 
-        private Task DiscordSocketClientOnReactionAdded(Cacheable<IUserMessage, ulong> cacheable, ISocketMessageChannel socketMessageChannel, SocketReaction reaction)
+        private Task DiscordSocketClientOnReactionAdded(Cacheable<IUserMessage, ulong> cacheable,
+            ISocketMessageChannel socketMessageChannel, SocketReaction reaction)
         {
             // Ensure that the person clicking reactions is the person who started this
             if (reaction.UserId != Author.Id) return Task.CompletedTask;
 
-            var foundMenuOption = MenuOptions.Where(x => IdToEmote(x.Id, getEmoji: true).Equals(reaction.Emote.Name)).DefaultIfEmpty(null).FirstOrDefault();
+            var foundMenuOption = MenuOptions.Where(x => IdToEmote(x.Id, getEmoji: true).Equals(reaction.Emote.Name))
+                .DefaultIfEmpty(null).FirstOrDefault();
             if (foundMenuOption == null)
                 throw new Exception("Unable to find matching emote for clicked reaction - tell the developer");
 
@@ -121,7 +122,9 @@ namespace DiscordMenu
             if (disposeMessage != "")
             {
                 await Message.DeleteAsync();
-                await DiscordSocketGuildChannel.SendMessageAsync(disposeMessage == "" ? "Execution complete" : disposeMessage);
+                await DiscordSocketGuildChannel.SendMessageAsync(disposeMessage == ""
+                    ? "Execution complete"
+                    : disposeMessage);
             }
 
             DiscordSocketClient.ReactionAdded -= DiscordSocketClientOnReactionAdded;

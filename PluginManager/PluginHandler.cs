@@ -1,6 +1,4 @@
-﻿using Discord.WebSocket;
-using Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
@@ -9,24 +7,28 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord.WebSocket;
 using GlobalLogger;
-using ImportManyAttribute = System.ComponentModel.Composition.ImportManyAttribute;
+using Interface;
+using InternalDatabase;
 
 namespace PluginManager
 {
     public class PluginHandler
     {
-        [ImportMany] // This is a signal to the MEF framework to load all matching exported assemblies.
-        private IEnumerable<IPlugin> Plugins { get; set; }
-
         private static readonly PluginHandler _instance;
         public static PluginHandler Instance = _instance ?? (_instance = new PluginHandler());
+
+        private DiscordSocketClient _discordSocketClient;
+
+        private bool _hasExecutedPlugins;
 
         public EventRouter EventRouter = new EventRouter();
 
         public PluginRouter PluginRouter = new PluginRouter();
 
-        private DiscordSocketClient _discordSocketClient;
+        [ImportMany] // This is a signal to the MEF framework to load all matching exported assemblies.
+        private IEnumerable<IPlugin> Plugins { get; set; }
 
         public DiscordSocketClient DiscordSocketClient
         {
@@ -45,13 +47,11 @@ namespace PluginManager
             return Task.CompletedTask;
         }
 
-        private bool _hasExecutedPlugins = false;
-
         public bool LoadPlugins()
         {
             Log4NetHandler.Log("Plugin Manager Loading", Log4NetHandler.LogLevel.INFO);
 
-            InternalDatabase.Handler.Instance.NewConnection().RegisterTable<SQL.PluginManager>();
+            Handler.Instance.NewConnection().RegisterTable<SQL.PluginManager>();
 
             var catalog = new DirectoryCatalog("Plugins");
             using (var container = new CompositionContainer(catalog))
@@ -65,30 +65,36 @@ namespace PluginManager
                     Log4NetHandler.Log("Unable to load one or more plugins", Log4NetHandler.LogLevel.ERROR);
 
                     foreach (var x in ex.LoaderExceptions)
-                        Log4NetHandler.Log($"Plugin failed to load: {x.Message}", Log4NetHandler.LogLevel.ERROR, exception:x);
+                        Log4NetHandler.Log($"Plugin failed to load: {x.Message}", Log4NetHandler.LogLevel.ERROR,
+                            exception: x);
                 }
                 catch (Exception ex)
                 {
-                    Log4NetHandler.Log("Fatal error while attempting to compose plugin parts", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                    Log4NetHandler.Log("Fatal error while attempting to compose plugin parts",
+                        Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
 
                 if (container.Catalog.Parts.Count() != catalog.LoadedFiles.Count)
                 {
-                    Log4NetHandler.Log($"Fatal Error: We have {catalog.LoadedFiles.Count} plugin binaries, but only {Plugins.Count()} plugins could locate their injection point.\r\n---\r\nInvalid plugins are listed below:", Log4NetHandler.LogLevel.ERROR);
+                    Log4NetHandler.Log(
+                        $"Fatal Error: We have {catalog.LoadedFiles.Count} plugin binaries, but only {Plugins.Count()} plugins could locate their injection point.\r\n---\r\nInvalid plugins are listed below:",
+                        Log4NetHandler.LogLevel.ERROR);
 
                     foreach (var item in catalog.LoadedFiles)
                     {
-                        var dllName = System.IO.Path.GetFileNameWithoutExtension(item).ToLower();
-                        var loaded = container.Catalog.Parts.Any(x => x != null && x.ToString().ToLower().Contains(dllName));
-                        if ( !loaded )
-                            Log4NetHandler.Log($"{item.ToString()} Loaded: {loaded}", Log4NetHandler.LogLevel.ERROR);
+                        var dllName = Path.GetFileNameWithoutExtension(item).ToLower();
+                        var loaded =
+                            container.Catalog.Parts.Any(x => x != null && x.ToString().ToLower().Contains(dllName));
+                        if (!loaded)
+                            Log4NetHandler.Log($"{item} Loaded: {loaded}", Log4NetHandler.LogLevel.ERROR);
                     }
 
                     return false;
                 }
             }
 
-            Log4NetHandler.Log("Plugin Manager finished loading plugins, will execute them when Discord is ready", Log4NetHandler.LogLevel.INFO);
+            Log4NetHandler.Log("Plugin Manager finished loading plugins, will execute them when Discord is ready",
+                Log4NetHandler.LogLevel.INFO);
             return true;
         }
 
@@ -96,7 +102,7 @@ namespace PluginManager
         {
             var pluginName = assembly.ManifestModule.ScopeName;
 
-            var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
+            var db = Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
 
             var foundEntry = db.DefaultIfEmpty(null).FirstOrDefault(manager =>
                 manager != null && manager.PluginName == pluginName && manager.GuildId == Convert.ToInt64(guildId));
@@ -108,9 +114,11 @@ namespace PluginManager
 
         public bool ShouldExecutePlugin(string pluginName, ulong guildId)
         {
-            var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
+            var db = Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
 
-            var foundEntry = db.DefaultIfEmpty(null).FirstOrDefault(manager => manager != null && manager.PluginName.Equals(pluginName, StringComparison.OrdinalIgnoreCase) && manager.GuildId == Convert.ToInt64(guildId));
+            var foundEntry = db.DefaultIfEmpty(null).FirstOrDefault(manager =>
+                manager != null && manager.PluginName.Equals(pluginName, StringComparison.OrdinalIgnoreCase) &&
+                manager.GuildId == Convert.ToInt64(guildId));
 
             if (foundEntry == null) return false;
 
@@ -137,10 +145,7 @@ namespace PluginManager
                 // Set the event router
                 plugin.EventRouter = EventRouter;
 
-                if (plugin is IPluginWithRouter pluginWithRouter)
-                {
-                    pluginWithRouter.PluginRouter = PluginRouter;
-                }
+                if (plugin is IPluginWithRouter pluginWithRouter) pluginWithRouter.PluginRouter = PluginRouter;
 
                 try
                 {
@@ -159,10 +164,10 @@ namespace PluginManager
                 Log4NetHandler.Log($"Plugin {plugin.Name} ExecutePlugin called successfully",
                     Log4NetHandler.LogLevel.INFO);
                 pluginNameList += $"{plugin.Name}, ";
-
             }
 
-            Log4NetHandler.Log($"{Plugins.Count()} plugins have been loaded: {pluginNameList}", Log4NetHandler.LogLevel.INFO);
+            Log4NetHandler.Log($"{Plugins.Count()} plugins have been loaded: {pluginNameList}",
+                Log4NetHandler.LogLevel.INFO);
         }
 
         public IEnumerable<IPlugin> GetPlugins()
@@ -178,26 +183,31 @@ namespace PluginManager
                 try
                 {
                     plugin.Dispose();
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
-                    Log4NetHandler.Log($"Disposing plugin {plugin.Name} failed with an error", Log4NetHandler.LogLevel.ERROR, exception: ex);
+                    Log4NetHandler.Log($"Disposing plugin {plugin.Name} failed with an error",
+                        Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
             }
         }
 
         public void SetPluginState(string pluginName, ulong guildId, bool status)
         {
-            var foundPlugin = Plugins.DefaultIfEmpty(null).FirstOrDefault(x => x.Name.Equals(pluginName, StringComparison.OrdinalIgnoreCase));
+            var foundPlugin = Plugins.DefaultIfEmpty(null)
+                .FirstOrDefault(x => x.Name.Equals(pluginName, StringComparison.OrdinalIgnoreCase));
             if (foundPlugin != null)
             {
                 var moduleName = foundPlugin.GetType().Assembly.ManifestModule.Name;
 
-                var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
-                var pluginEntry = db.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.PluginName.Equals(moduleName, StringComparison.OrdinalIgnoreCase) && x.GuildId.Equals(Convert.ToInt64(guildId)));
+                var db = Handler.Instance.GetConnection().DbConnection.Table<SQL.PluginManager>();
+                var pluginEntry = db.DefaultIfEmpty(null).FirstOrDefault(x =>
+                    x != null && x.PluginName.Equals(moduleName, StringComparison.OrdinalIgnoreCase) &&
+                    x.GuildId.Equals(Convert.ToInt64(guildId)));
 
                 if (pluginEntry == null)
                 {
-                    pluginEntry = new SQL.PluginManager()
+                    pluginEntry = new SQL.PluginManager
                     {
                         Enabled = status,
                         GuildId = Convert.ToInt64(guildId),
@@ -212,7 +222,9 @@ namespace PluginManager
                 }
             }
             else
+            {
                 throw new Exception($"The plugin {pluginName} cannot be found, use !plugins list.");
+            }
         }
     }
 }

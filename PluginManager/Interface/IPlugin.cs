@@ -7,11 +7,11 @@ namespace Interface
         string Name { get; }
         string Description { get; }
 
+        EventRouter EventRouter { get; set; }
+
         void ExecutePlugin();
 
         void Dispose();
-
-        EventRouter EventRouter { get; set; }
     }
 
     public interface IPluginWithRouter : IPlugin

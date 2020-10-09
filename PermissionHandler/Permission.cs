@@ -1,17 +1,18 @@
-﻿using Discord.WebSocket;
-using PermissionHandler.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using Discord.WebSocket;
 using GlobalLogger;
+using PermissionHandler.DB;
 
 namespace PermissionHandler
 {
     public class Permission
     {
         // Instance
-        private static Permission _instance;
+        private static readonly Permission _instance;
 
         public static Permission Instance = _instance ?? (_instance = new Permission());
 
@@ -37,7 +38,8 @@ namespace PermissionHandler
                 _registeredPermissionPaths.Add(pathName);
                 _database.AddPermission(pathName);
 
-                Log4NetHandler.Log($"Dynamically registered a new permission path node: {pathName}", Log4NetHandler.LogLevel.INFO);
+                Log4NetHandler.Log($"Dynamically registered a new permission path node: {pathName}",
+                    Log4NetHandler.LogLevel.INFO);
             }
         }
 
@@ -53,7 +55,8 @@ namespace PermissionHandler
                 throw new Exception("The supplied path is invalid");
 
             if (foundPath.Permissions.Any(x => x.Owner == owner))
-                throw new Exception("The supplied user is already a member of this permission path, either modify them or remove them");
+                throw new Exception(
+                    "The supplied user is already a member of this permission path, either modify them or remove them");
 
             return _database.AddPermission(path, owner, permission, ownerType);
         }
@@ -71,8 +74,7 @@ namespace PermissionHandler
         }
 
         public bool CheckPermission(SocketGuildUser sktUser,
-            [System.Runtime.CompilerServices.CallerMemberName]
-            string path = "")
+            [CallerMemberName] string path = "")
         {
             if (sktUser.Roles.Any(x => x.Permissions.Administrator))
                 return true;

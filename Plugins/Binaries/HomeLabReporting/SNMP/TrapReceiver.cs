@@ -7,77 +7,85 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+using GlobalLogger;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
+using SnmpSharpNet;
 
 namespace HomeLabReporting.SNMP
 {
-    using SnmpSharpNet;
-    using System;
-    using System.Net;
-    using System.Net.Sockets;
-    using System.Threading;
-
     internal class TrapReceiverConfiguration
     {
         public int Port { get; set; } = 162;
     }
 
     /// <summary>
-    /// The trap receiver.
+    ///     The trap receiver.
     /// </summary>
     public class TrapReceiver : IDisposable
     {
-        private static TrapReceiver _instance;
-        public static TrapReceiver Instance = _instance ?? (_instance = new TrapReceiver());
-
-        private TrapReceiverConfiguration _trapReceiverConfiguration;
-
         public delegate void EventRaiser(object sender, IpAddress ipAddress, VbCollection snmpVbCollection);
 
-        public event EventRaiser OnTrapReceived;
-
         private const string ConfigurationPath = "Plugins\\Config\\Snmp.json";
+        private static readonly TrapReceiver _instance;
+        public static TrapReceiver Instance = _instance ?? (_instance = new TrapReceiver());
 
         private readonly Thread _trapReceiverThread;
+
+        private TrapReceiverConfiguration _trapReceiverConfiguration;
 
         private Socket socket;
 
         public TrapReceiver()
         {
-            if (System.IO.File.Exists(ConfigurationPath))
-            {
+            if (File.Exists(ConfigurationPath))
                 try
                 {
                     _trapReceiverConfiguration =
                         JsonConvert.DeserializeObject<TrapReceiverConfiguration>(
-                            System.IO.File.ReadAllText(ConfigurationPath));
+                            File.ReadAllText(ConfigurationPath));
                 }
                 catch (Exception ex)
                 {
-                    GlobalLogger.Log4NetHandler.Log($"Unable to deserialize snmp.json", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                    Log4NetHandler.Log("Unable to deserialize snmp.json", Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
-            }
             else
-            {
                 try
                 {
-                    System.IO.File.WriteAllText(ConfigurationPath, JsonConvert.SerializeObject(
+                    File.WriteAllText(ConfigurationPath, JsonConvert.SerializeObject(
                         new TrapReceiverConfiguration(),
                         Formatting.Indented));
                 }
                 catch (Exception ex)
                 {
-                    GlobalLogger.Log4NetHandler.Log($"Exception while attempting to write to snmp.json", GlobalLogger.Log4NetHandler.LogLevel.ERROR, exception:ex);
+                    Log4NetHandler.Log("Exception while attempting to write to snmp.json",
+                        Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
-            }
 
-            _trapReceiverThread = new Thread(new ThreadStart(StartTrapReceiver)) { Name = "SNMPTrapSocketListener" };
+            _trapReceiverThread = new Thread(StartTrapReceiver) {Name = "SNMPTrapSocketListener"};
             _trapReceiverThread.Start();
         }
 
+        public void Dispose()
+        {
+            if (socket != null)
+            {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+                socket.Dispose();
+            }
+
+            _trapReceiverThread?.Abort();
+        }
+
+        public event EventRaiser OnTrapReceived;
+
         /// <summary>
-        /// The thing.
+        ///     The thing.
         /// </summary>
         private void StartTrapReceiver()
         {
@@ -119,7 +127,7 @@ namespace HomeLabReporting.SNMP
                 {
                     // Check protocol version int
                     var ver = SnmpPacket.GetProtocolVersion(inData, inLength);
-                    if (ver == (int)SnmpVersion.Ver1)
+                    if (ver == (int) SnmpVersion.Ver1)
                     {
                         // Parse SNMP Version 1 TRAP packet
                         var pkt = new SnmpV1TrapPacket();
@@ -129,18 +137,6 @@ namespace HomeLabReporting.SNMP
                     }
                 }
             }
-        }
-
-        public void Dispose()
-        {
-            if (socket != null)
-            {
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
-                socket.Dispose();
-            }
-
-            _trapReceiverThread?.Abort();
         }
     }
 }

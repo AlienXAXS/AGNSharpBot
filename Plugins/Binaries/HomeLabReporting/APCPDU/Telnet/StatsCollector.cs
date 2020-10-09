@@ -1,8 +1,8 @@
-﻿using Discord;
-using SimpleTCP;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Discord;
+using SimpleTCP;
 
 namespace HomeLabReporting.APCPDU.Telnet
 {
@@ -38,10 +38,7 @@ namespace HomeLabReporting.APCPDU.Telnet
                     {
                         var regex = new Regex("Up Time   :[ \t]*([^\n\r]*)Stat");
                         var match = regex.Match(tcpClientResponse.MessageString);
-                        if (match.Success && match.Groups.Count == 1)
-                        {
-                            apcUptime = match.Groups[1].Value.Trim();
-                        }
+                        if (match.Success && match.Groups.Count == 1) apcUptime = match.Groups[1].Value.Trim();
                     }
 
                     // Total Output Current
@@ -49,10 +46,7 @@ namespace HomeLabReporting.APCPDU.Telnet
                     {
                         var regex = new Regex("\\bTotal Output Current\\s+:\\s+(.*)");
                         var match = regex.Match(tcpClientResponse.MessageString);
-                        if (match.Success && match.Groups.Count == 1)
-                        {
-                            apcOutputCurrent = match.Groups[1].Value.Trim();
-                        }
+                        if (match.Success && match.Groups.Count == 1) apcOutputCurrent = match.Groups[1].Value.Trim();
                     }
 
                     // Total watts
@@ -60,10 +54,7 @@ namespace HomeLabReporting.APCPDU.Telnet
                     {
                         var regex = new Regex("\\bTotal Power\\s +:\\s + (.*)");
                         var match = regex.Match(tcpClientResponse.MessageString);
-                        if (match.Success && match.Groups.Count == 1)
-                        {
-                            apcTotalPower = match.Groups[1].Value.Trim();
-                        }
+                        if (match.Success && match.Groups.Count == 1) apcTotalPower = match.Groups[1].Value.Trim();
 
                         var embedBuilder = new EmbedBuilder();
                         embedBuilder.Title = "AGN Gaming Home APC PDU Stats";
@@ -75,7 +66,7 @@ namespace HomeLabReporting.APCPDU.Telnet
                         var wattage = int.Parse(apcTotalPower.Substring(0,
                             apcTotalPower.IndexOf(" ", StringComparison.Ordinal)));
 
-                        var apcTotalCost = ((double)wattage / 1000) * 24 * 0.13;
+                        var apcTotalCost = (double) wattage / 1000 * 24 * 0.13;
                         embedBuilder.AddField("Total Cost Per Day / Month", $"£{apcTotalCost} / £{apcTotalCost * 30}",
                             true);
 
@@ -104,7 +95,8 @@ namespace HomeLabReporting.APCPDU.Telnet
                 }
 
                 // USERNAME PROMPT
-                if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(tcpClientResponse.MessageString, "User Name", CompareOptions.IgnoreCase) >= 0)
+                if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(tcpClientResponse.MessageString, "User Name",
+                    CompareOptions.IgnoreCase) >= 0)
                 {
                     tcpClientResponse.Reply("apc\r\n");
                     return;
@@ -112,7 +104,7 @@ namespace HomeLabReporting.APCPDU.Telnet
 
                 // PASSWORD PROMPT
                 if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(tcpClientResponse.MessageString, "Password",
-                        CompareOptions.IgnoreCase) >= 0)
+                    CompareOptions.IgnoreCase) >= 0)
                 {
                     tcpClientResponse.Reply("apc\r\n");
                     return;
@@ -120,7 +112,7 @@ namespace HomeLabReporting.APCPDU.Telnet
 
                 // LOGGED IN
                 if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(tcpClientResponse.MessageString,
-                        "American Power Conversion", CompareOptions.IgnoreCase) >= 0)
+                    "American Power Conversion", CompareOptions.IgnoreCase) >= 0)
                 {
                     tcpClientResponse.Reply("1\r\n"); // devman
                     tcpClientResponse.Reply("6\r\n"); // measure

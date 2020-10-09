@@ -1,43 +1,29 @@
-﻿using Discord;
-using Discord.WebSocket;
-using PermissionHandler;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
 using GlobalLogger;
+using PermissionHandler;
+using PluginManager;
 
 namespace CommandHandler
 {
     public class HandlerManager
     {
-        private class HandlerType
-        {
-            public Assembly Assembly;
-            public Type Type;
-        }
-
-        private class MethodInfoHelper
-        {
-            public MethodInfo MethodInfo { get; set; }
-            public Command Command { get; set; }
-            public Alias Alias { get; set; }
-            public Permissions Permissions { get; set; }
-            public Type Type { get; set; }
-        }
-
-        private static HandlerManager _instance;
+        private static readonly HandlerManager _instance;
         public static HandlerManager Instance = _instance ?? (_instance = new HandlerManager());
 
-        private DiscordSocketClient _discordSocketClient;
-
         private readonly List<HandlerType> _registeredHandlers = new List<HandlerType>();
+
+        private DiscordSocketClient _discordSocketClient;
 
         public void RegisterHandler<T>()
         {
             // Register our handler
-            _registeredHandlers.Add(new HandlerType() { Assembly = Assembly.GetCallingAssembly(), Type = typeof(T) });
+            _registeredHandlers.Add(new HandlerType {Assembly = Assembly.GetCallingAssembly(), Type = typeof(T)});
 
             // Register it with the permission system
             Permission.Instance.RegisterPermission<T>(Assembly.GetCallingAssembly());
@@ -57,10 +43,7 @@ namespace CommandHandler
 
             var commandArray = SplitArguments(socketMessage.Content);
 
-            if (message.Content.Equals(""))
-            {
-                return Task.CompletedTask;
-            }
+            if (message.Content.Equals("")) return Task.CompletedTask;
 
             Parse(commandArray, socketMessage);
 
@@ -86,37 +69,41 @@ namespace CommandHandler
                 // Compile a list of methods we can use
                 var methodHelpers = new List<MethodInfoHelper>();
                 foreach (var handler in _registeredHandlers)
+                foreach (var method in handler.Type.GetMethods())
                 {
-                    
-                    foreach (var method in handler.Type.GetMethods())
-                    {
-                        var cmdString = (Command)method.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
-                        var cmdAliases = (Alias)method.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
-                        var cmdPermissions =
-                            (Permissions)method.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
+                    var cmdString = (Command) method.GetCustomAttributes(typeof(Command), true).FirstOrDefault();
+                    var cmdAliases = (Alias) method.GetCustomAttributes(typeof(Alias), true).FirstOrDefault();
+                    var cmdPermissions =
+                        (Permissions) method.GetCustomAttributes(typeof(Permissions), true).FirstOrDefault();
 
-                        if (cmdString != null)
-                            methodHelpers.Add(new MethodInfoHelper()
-                            {
-                                Alias = cmdAliases,
-                                Command = cmdString,
-                                MethodInfo = method,
-                                Permissions = cmdPermissions,
-                                Type = handler.Type
-                            });
-                    }
+                    if (cmdString != null)
+                        methodHelpers.Add(new MethodInfoHelper
+                        {
+                            Alias = cmdAliases,
+                            Command = cmdString,
+                            MethodInfo = method,
+                            Permissions = cmdPermissions,
+                            Type = handler.Type
+                        });
                 }
 
-                if (paramCommand.Equals("plugins", StringComparison.OrdinalIgnoreCase) || paramCommand.Equals("plugin", StringComparison.OrdinalIgnoreCase))
+                if (paramCommand.Equals("plugins", StringComparison.OrdinalIgnoreCase) ||
+                    paramCommand.Equals("plugin", StringComparison.OrdinalIgnoreCase))
                 {
                     var embed = new EmbedBuilder();
-                    var plugins = PluginManager.PluginHandler.Instance.GetPlugins();
+                    var plugins = PluginHandler.Instance.GetPlugins();
                     if (parameters.Length == 1)
                     {
-                        await socketMessage.Channel.SendMessageAsync($"This command controls plugins, you can enable / disable them.  Use !plugins help for commands.");
+                        await socketMessage.Channel.SendMessageAsync(
+                            "This command controls plugins, you can enable / disable them.  Use !plugins help for commands.");
                         try
-                        { await socketMessage.DeleteAsync(new RequestOptions() { RetryMode = RetryMode.AlwaysFail }); }
-                        catch { }
+                        {
+                            await socketMessage.DeleteAsync(new RequestOptions {RetryMode = RetryMode.AlwaysFail});
+                        }
+                        catch
+                        {
+                        }
+
                         return;
                     }
 
@@ -133,13 +120,18 @@ namespace CommandHandler
                             break;
 
                         case "list":
-                            embed.Author = new EmbedAuthorBuilder() {Name = "AGN Sharp Bot | Plugins"};
+                            embed.Author = new EmbedAuthorBuilder {Name = "AGN Sharp Bot | Plugins"};
                             embed.Color = Color.Green;
-                            embed.Description = "AGN Sharp Bot Plugin Configuration\n```Use !plugin enable/disable \"NAME\" to enable or disable a plugin```";
+                            embed.Description =
+                                "AGN Sharp Bot Plugin Configuration\n```Use !plugin enable/disable \"NAME\" to enable or disable a plugin```";
 
                             foreach (var plugin in plugins)
                             {
-                                var isEnabled = PluginManager.PluginHandler.Instance.ShouldExecutePlugin(plugin.GetType().Module.Name, sktGuildUser.Guild.Id) ? "Enabled" : "Disabled";
+                                var isEnabled =
+                                    PluginHandler.Instance.ShouldExecutePlugin(plugin.GetType().Module.Name,
+                                        sktGuildUser.Guild.Id)
+                                        ? "Enabled"
+                                        : "Disabled";
                                 embed.AddField($"{plugin.Name} (Status: {isEnabled})", plugin.Description);
                             }
 
@@ -159,8 +151,12 @@ namespace CommandHandler
                     // Discords API is wank, why does it error 404 here sometimes randomly AFTER it's deleted the message...
                     // Simple try catch to ignore the error discord sends us...
                     try
-                    { await socketMessage.DeleteAsync(new RequestOptions() {RetryMode = RetryMode.AlwaysFail}); }
-                    catch { }
+                    {
+                        await socketMessage.DeleteAsync(new RequestOptions {RetryMode = RetryMode.AlwaysFail});
+                    }
+                    catch
+                    {
+                    }
 
                     return;
                 }
@@ -175,23 +171,27 @@ namespace CommandHandler
                     foreach (var thisMethod in methodHelpers)
                     {
                         // No longer should the bot respond with commands to a guild where the guild has not got the plugin enabled.
-                        var isEnabled = PluginManager.PluginHandler.Instance.ShouldExecutePlugin(thisMethod.MethodInfo.Module.Name, sktGuildUser.Guild.Id);
+                        var isEnabled = PluginHandler.Instance.ShouldExecutePlugin(thisMethod.MethodInfo.Module.Name,
+                            sktGuildUser.Guild.Id);
 
                         if (!isEnabled) continue;
 
                         if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
-                            Permission.Instance.CheckPermission((SocketGuildUser)socketMessage.Author,
+                            Permission.Instance.CheckPermission((SocketGuildUser) socketMessage.Author,
                                 $"{thisMethod.MethodInfo.ReflectedType?.FullName}.{thisMethod.MethodInfo.Name}"))
-                        {
                             discordEmbedBuilder.AddField($"!{thisMethod.Command.Value}",
                                 $"{thisMethod.Command.Description}\r\n\r\n");
-                        }
                     }
 
                     await socketMessage.Channel.SendMessageAsync(null, false, discordEmbedBuilder.Build());
                     try
-                    { await socketMessage.DeleteAsync(new RequestOptions() { RetryMode = RetryMode.AlwaysFail }); }
-                    catch { }
+                    {
+                        await socketMessage.DeleteAsync(new RequestOptions {RetryMode = RetryMode.AlwaysFail});
+                    }
+                    catch
+                    {
+                    }
+
                     return;
                 }
 
@@ -209,13 +209,13 @@ namespace CommandHandler
                         //NRE Check
                         if (!cmdMatch) continue;
 
-                        bool hasExplicitPermission = false;
+                        var hasExplicitPermission = false;
                         if (socketMessage.Author is SocketGuildUser messageAuthor)
                         {
                             hasExplicitPermission = Permission.Instance.CheckPermission(messageAuthor,
                                 $"{thisMethod.Type}.{thisMethod.MethodInfo.Name}");
 
-                            if (PluginManager.PluginHandler.Instance.ShouldExecutePlugin(
+                            if (PluginHandler.Instance.ShouldExecutePlugin(
                                 thisMethod.MethodInfo.Module.Name,
                                 messageAuthor.Guild.Id))
                             {
@@ -244,7 +244,8 @@ namespace CommandHandler
             }
             else
             {
-                await socketMessage.Author.SendMessageAsync("Hey, thanks so much for sending me a private message - but AGNSharpBot just does not want to talk to you, go away now.... Shoo!");
+                await socketMessage.Author.SendMessageAsync(
+                    "Hey, thanks so much for sending me a private message - but AGNSharpBot just does not want to talk to you, go away now.... Shoo!");
             }
         }
 
@@ -252,11 +253,11 @@ namespace CommandHandler
         {
             if (parameters.Length != 3)
             {
-                await socketMessage.Channel.SendMessageAsync($"Invalid parameters provided.");
+                await socketMessage.Channel.SendMessageAsync("Invalid parameters provided.");
                 return;
             }
 
-            var plugins = PluginManager.PluginHandler.Instance.GetPlugins();
+            var plugins = PluginHandler.Instance.GetPlugins();
 
             if (socketMessage.Author is SocketGuildUser socketGuildUser)
             {
@@ -266,15 +267,15 @@ namespace CommandHandler
                 {
                     if (pluginName == "GameGiveaway" && !socketGuildUser.Guild.Id.Equals(398471304162050049))
                     {
-                        await socketMessage.Channel.SendMessageAsync($"This guild does not quality for this plugin.");
+                        await socketMessage.Channel.SendMessageAsync("This guild does not quality for this plugin.");
                         return;
                     }
 
-                    PluginManager.PluginHandler.Instance.SetPluginState(pluginName, socketGuildUser.Guild.Id, status);
+                    PluginHandler.Instance.SetPluginState(pluginName, socketGuildUser.Guild.Id, status);
                     if (status)
-                        await socketMessage.Channel.SendMessageAsync($"The plugin was successfully enabled.");
+                        await socketMessage.Channel.SendMessageAsync("The plugin was successfully enabled.");
                     else
-                        await socketMessage.Channel.SendMessageAsync($"The plugin was successfully disabled.");
+                        await socketMessage.Channel.SendMessageAsync("The plugin was successfully disabled.");
                 }
                 catch (Exception ex)
                 {
@@ -295,15 +296,33 @@ namespace CommandHandler
                     inDoubleQuote = !inDoubleQuote;
                     parmChars[index] = '\n';
                 }
+
                 if (parmChars[index] == '\'' && !inDoubleQuote)
                 {
                     inSingleQuote = !inSingleQuote;
                     parmChars[index] = '\n';
                 }
+
                 if (!inSingleQuote && !inDoubleQuote && parmChars[index] == ' ')
                     parmChars[index] = '\n';
             }
-            return (new string(parmChars)).Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            return new string(parmChars).Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        private class HandlerType
+        {
+            public Assembly Assembly;
+            public Type Type;
+        }
+
+        private class MethodInfoHelper
+        {
+            public MethodInfo MethodInfo { get; set; }
+            public Command Command { get; set; }
+            public Alias Alias { get; set; }
+            public Permissions Permissions { get; set; }
+            public Type Type { get; set; }
         }
     }
 }

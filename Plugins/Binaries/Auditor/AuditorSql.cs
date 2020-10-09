@@ -1,5 +1,5 @@
-﻿using SQLite;
-using System;
+﻿using System;
+using SQLite;
 
 namespace Auditor
 {
@@ -22,8 +22,7 @@ namespace Auditor
                 NICKNAME_DELETED
             }
 
-            [PrimaryKey, AutoIncrement]
-            public long Id { get; set; }
+            [PrimaryKey] [AutoIncrement] public long Id { get; set; }
 
             public AuditType Type { get; set; }
             public DateTime Timestamp { get; set; }
@@ -42,8 +41,7 @@ namespace Auditor
 
         public class AuditorNancyLoginSession
         {
-            [PrimaryKey, AutoIncrement]
-            public int Id { get; set; }
+            [PrimaryKey] [AutoIncrement] public int Id { get; set; }
 
             public long UserId { get; set; }
             public string AuthKey { get; set; }

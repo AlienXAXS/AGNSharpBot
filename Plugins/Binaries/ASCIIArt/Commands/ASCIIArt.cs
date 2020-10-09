@@ -17,7 +17,7 @@ namespace ASCIIArt.Commands
         {
             if (parameters.Length < 2)
             {
-                await sktMessage.Channel.SendMessageAsync($"Too few parameters");
+                await sktMessage.Channel.SendMessageAsync("Too few parameters");
                 return;
             }
 
@@ -44,31 +44,52 @@ namespace ASCIIArt.Commands
         {
             var fontList = new List<string>
             {
-                "1row", "3 - d", "3d_diagonal", "3x5", "4max", "5lineoblique", "acrobatic", "alligator", "alligator2", "alligator3", "alpha", "alphabet",
-                "amc3line", "amc3liv1", "amcaaa01", "amcneko", "amcrazo2", "amcrazor", "amcslash", "amcslder", "amcthin", "amctubes", "amcun1", "arrows",
-                "ascii_new_roman",  "avatar", "B1FF", "banner", "banner3", "banner3 - D", "banner4", "barbwire", "basic", "bear", "bell", "benjamin",
-                "big", "bigchief", "bigfig", "binary", "block", "blocks", "bolger", "braced", "bright", "broadway", "broadway_kb", "bubble", "bulbhead",
-                "calgphy2", "caligraphy", "cards", "catwalk", "chiseled", "chunky", "coinstak",  "cola", "colossal", "computer", "contessa", "contrast",
-                "cosmic", "cosmike", "crawford", "crazy", "cricket", "cursive", "cyberlarge", "cybermedium", "cybersmall", "cygnet", "DANC4", "dancingfont",
-                "decimal", "defleppard", "diamond", "dietcola", "digital", "doh", "doom", "dosrebel", "dotmatrix", "double", "doubleshorts", "drpepper",
-                "dwhistled", "eftichess", "eftifont", "eftipiti", "eftirobot", "eftitalic", "eftiwall", "eftiwater", "epic", "fender", "filter", "fire_font - k",
-                "fire_font - s", "flipped", "flowerpower", "fourtops", "fraktur", "funface", "funfaces", "fuzzy", "georgi16", "Georgia11", "ghost", "ghoulish",
-                "glenyn",  "goofy", "gothic", "graceful", "gradient", "graffiti", "greek",  "heart_left", "heart_right", "henry3d", "hex", "hieroglyphs",
-                "hollywood", "horizontalleft", "horizontalright", "ICL - 1900", "impossible", "invita", "isometric1", "isometric2", "isometric3", "isometric4",
-                "italic", "ivrit", "jacky", "jazmine", "jerusalem", "katakana", "kban", "keyboard", "knob", "konto", "kontoslant", "larry3d", "lcd", "lean",
-                "letters", "lildevil", "lineblocks", "linux", "lockergnome", "madrid", "marquee", "maxfour", "merlin1", "merlin2", "mike", "mini", "mirror",
-                "mnemonic", "modular", "morse", "morse2", "moscow", "mshebrew210", "muzzle", "nancyj", "nancyj - fancy", "nancyj - improved", "nancyj - underlined",
-                "nipples", "nscript", "ntgreek", "nvscript", "o8", "octal", "ogre", "oldbanner", "os2", "pawp", "peaks", "peaksslant", "pebbles", "pepper",
-                "poison", "puffy", "puzzle", "pyramid", "rammstein", "rectangles", "red_phoenix", "relief", "relief2", "rev", "reverse", "roman", "rot13",
-                "rotated", "rounded", "rowancap", "rozzo", "runic", "runyc", "santaclara", "sblood", "script", "slscript", "serifcap", "shadow", "shimrod",
-                "short", "slant", "slide", "small", "smallcaps", "smisome1", "smkeyboard", "smpoison", "smscript", "smshadow", "smslant", "smtengwar", "soft",
-                "speed", "spliff", "s - relief", "stacey", "stampate", "stampatello", "standard", "starstrips", "starwars", "stellar", "stforek", "stop",
-                "straight", "sub - zero", "swampland", "swan", "sweet",  "tanja", "tengwar", "term", "test1", "thick", "thin", "threepoint", "ticks",
-                "ticksslant", "tiles", "tinker - toy", "tombstone", "train", "trek", "tsalagi", "tubular", "twisted", "twopoint", "univers","usaflag",
-                "varsity",  "wavy", "weird", "wetletter", "whimsy", "wow"
+                "1row", "3 - d", "3d_diagonal", "3x5", "4max", "5lineoblique", "acrobatic", "alligator", "alligator2",
+                "alligator3", "alpha", "alphabet",
+                "amc3line", "amc3liv1", "amcaaa01", "amcneko", "amcrazo2", "amcrazor", "amcslash", "amcslder",
+                "amcthin", "amctubes", "amcun1", "arrows",
+                "ascii_new_roman", "avatar", "B1FF", "banner", "banner3", "banner3 - D", "banner4", "barbwire", "basic",
+                "bear", "bell", "benjamin",
+                "big", "bigchief", "bigfig", "binary", "block", "blocks", "bolger", "braced", "bright", "broadway",
+                "broadway_kb", "bubble", "bulbhead",
+                "calgphy2", "caligraphy", "cards", "catwalk", "chiseled", "chunky", "coinstak", "cola", "colossal",
+                "computer", "contessa", "contrast",
+                "cosmic", "cosmike", "crawford", "crazy", "cricket", "cursive", "cyberlarge", "cybermedium",
+                "cybersmall", "cygnet", "DANC4", "dancingfont",
+                "decimal", "defleppard", "diamond", "dietcola", "digital", "doh", "doom", "dosrebel", "dotmatrix",
+                "double", "doubleshorts", "drpepper",
+                "dwhistled", "eftichess", "eftifont", "eftipiti", "eftirobot", "eftitalic", "eftiwall", "eftiwater",
+                "epic", "fender", "filter", "fire_font - k",
+                "fire_font - s", "flipped", "flowerpower", "fourtops", "fraktur", "funface", "funfaces", "fuzzy",
+                "georgi16", "Georgia11", "ghost", "ghoulish",
+                "glenyn", "goofy", "gothic", "graceful", "gradient", "graffiti", "greek", "heart_left", "heart_right",
+                "henry3d", "hex", "hieroglyphs",
+                "hollywood", "horizontalleft", "horizontalright", "ICL - 1900", "impossible", "invita", "isometric1",
+                "isometric2", "isometric3", "isometric4",
+                "italic", "ivrit", "jacky", "jazmine", "jerusalem", "katakana", "kban", "keyboard", "knob", "konto",
+                "kontoslant", "larry3d", "lcd", "lean",
+                "letters", "lildevil", "lineblocks", "linux", "lockergnome", "madrid", "marquee", "maxfour", "merlin1",
+                "merlin2", "mike", "mini", "mirror",
+                "mnemonic", "modular", "morse", "morse2", "moscow", "mshebrew210", "muzzle", "nancyj", "nancyj - fancy",
+                "nancyj - improved", "nancyj - underlined",
+                "nipples", "nscript", "ntgreek", "nvscript", "o8", "octal", "ogre", "oldbanner", "os2", "pawp", "peaks",
+                "peaksslant", "pebbles", "pepper",
+                "poison", "puffy", "puzzle", "pyramid", "rammstein", "rectangles", "red_phoenix", "relief", "relief2",
+                "rev", "reverse", "roman", "rot13",
+                "rotated", "rounded", "rowancap", "rozzo", "runic", "runyc", "santaclara", "sblood", "script",
+                "slscript", "serifcap", "shadow", "shimrod",
+                "short", "slant", "slide", "small", "smallcaps", "smisome1", "smkeyboard", "smpoison", "smscript",
+                "smshadow", "smslant", "smtengwar", "soft",
+                "speed", "spliff", "s - relief", "stacey", "stampate", "stampatello", "standard", "starstrips",
+                "starwars", "stellar", "stforek", "stop",
+                "straight", "sub - zero", "swampland", "swan", "sweet", "tanja", "tengwar", "term", "test1", "thick",
+                "thin", "threepoint", "ticks",
+                "ticksslant", "tiles", "tinker - toy", "tombstone", "train", "trek", "tsalagi", "tubular", "twisted",
+                "twopoint", "univers", "usaflag",
+                "varsity", "wavy", "weird", "wetletter", "whimsy", "wow"
             };
 
-            string compiledFontList = "";
+            var compiledFontList = "";
             await sktMessage.Author.SendMessageAsync("`Font List will be posted below.`");
 
             var i = 0;
@@ -107,7 +128,7 @@ namespace ASCIIArt.Commands
                 return;
             }
 
-            string pickedFont = "standard";
+            var pickedFont = "standard";
             string message = null;
 
             // If we're 4 - then we have a font defined
@@ -117,7 +138,9 @@ namespace ASCIIArt.Commands
                 message = parameters[3];
             }
             else
+            {
                 message = parameters[2];
+            }
 
             string renderedMessage = null;
             switch (pickedFont)
@@ -1192,7 +1215,8 @@ namespace ASCIIArt.Commands
             {
                 var msg = DiscordRenderedText(renderedMessage);
                 if (msg.Length > 1950)
-                    await sktMessage.Channel.SendMessageAsync("Sorry, I cannot send this as it's over 2000 characters, and Discord is bad");
+                    await sktMessage.Channel.SendMessageAsync(
+                        "Sorry, I cannot send this as it's over 2000 characters, and Discord is bad");
                 else
                     await sktMessage.Channel.SendMessageAsync(msg);
             }

@@ -1,32 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using GlobalLogger;
 using Pubg.Net;
+using PUBGWeekly.Configuration;
+using PUBGWeekly.Configuration.JSON;
 
 namespace PUBGWeekly.Game
 {
-    class PubgWatcher
+    internal class PubgWatcher
     {
+        public delegate void OnPubgGameEndedHandler(PubgWatcher instance, PubgMatch gameData);
+
         public static PubgWatcher Instance = _instance ?? (_instance = new PubgWatcher());
         private static readonly PubgWatcher _instance;
-
-        public delegate void OnPubgGameEndedHandler(PubgWatcher instance, PubgMatch gameData);
-        public event OnPubgGameEndedHandler OnPubgGameEnded;
 
         private Thread _thread;
         private bool _threadRunning = true;
 
         public PubgWatcher()
         {
-            PubgApiConfiguration.Configure(x => x.ApiKey = Configuration.JSON.PubgAPIConfigHandler.Instance.GetApiKey());
+            PubgApiConfiguration.Configure(x => x.ApiKey = PubgAPIConfigHandler.Instance.GetApiKey());
         }
+
+        public event OnPubgGameEndedHandler OnPubgGameEnded;
 
         public void Start()
         {
-            _thread = new Thread(ThreadExecute) { IsBackground = true };
+            _thread = new Thread(ThreadExecute) {IsBackground = true};
             _threadRunning = true;
             _thread.Start();
         }
@@ -40,13 +42,13 @@ namespace PUBGWeekly.Game
         {
             try
             {
-                string gameJson = "";
+                var gameJson = "";
 
-                Dictionary<string, string> pubgMemory = new Dictionary<string, string>();
+                var pubgMemory = new Dictionary<string, string>();
 
                 while (_threadRunning)
                 {
-                    foreach (var pubgAccount in Configuration.PubgToDiscordManager.Instance.PubgAccountLinks)
+                    foreach (var pubgAccount in PubgToDiscordManager.Instance.PubgAccountLinks)
                     {
                         var playerService = new PubgPlayerService();
                         var playerInfo = playerService.GetPlayer(PubgPlatform.Steam, pubgAccount.PubgAccountId);
@@ -59,7 +61,6 @@ namespace PUBGWeekly.Game
                             Console.WriteLine($"###### Current Key {key}, new key: {firstMatchId}");
                             if (key != firstMatchId)
                             {
-
                                 var matchService = new PubgMatchService();
                                 var matchData = matchService.GetMatch(firstMatchId);
 
@@ -87,7 +88,8 @@ namespace PUBGWeekly.Game
             }
             catch (Exception ex)
             {
-                GlobalLogger.Log4NetHandler.Log($"[PubgWeekly-ThreadExecute] Exception when handing pubg api", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                Log4NetHandler.Log("[PubgWeekly-ThreadExecute] Exception when handing pubg api",
+                    Log4NetHandler.LogLevel.ERROR, exception: ex);
             }
         }
     }

@@ -1,19 +1,21 @@
-﻿using Newtonsoft.Json;
-using PermissionHandler.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using GlobalLogger;
+using Newtonsoft.Json;
+using PermissionHandler.DB;
 
 namespace PermissionHandler
 {
     internal class Database
     {
-        // The db in memory
-        private List<Node> _nodes = new List<Node>();
-
         // where the db is stored
         private const string StorageLocation = "db.json";
+
+        // The db in memory
+        private List<Node> _nodes = new List<Node>();
 
         public Database()
         {
@@ -21,7 +23,7 @@ namespace PermissionHandler
         }
 
         /// <summary>
-        /// Adds a new permission node, but only the path
+        ///     Adds a new permission node, but only the path
         /// </summary>
         /// <param name="path">The path string (Assembly.Namespace.Class.MethodName)</param>
         /// <returns>The created node</returns>
@@ -99,15 +101,16 @@ namespace PermissionHandler
             {
                 try
                 {
-                    if (!System.IO.File.Exists(StorageLocation))
+                    if (!File.Exists(StorageLocation))
                         throw new Exception(
                             "Unable to load permissions database as the database has yet to be used, this error should go away once you use it");
-                    _nodes = JsonConvert.DeserializeObject<List<Node>>(System.IO.File.ReadAllText(StorageLocation));
+                    _nodes = JsonConvert.DeserializeObject<List<Node>>(File.ReadAllText(StorageLocation));
                 }
                 catch (Exception ex)
                 {
-                    Log4NetHandler.Log($"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to load permission database",
-                        Log4NetHandler.LogLevel.ERROR, exception:ex);
+                    Log4NetHandler.Log(
+                        $"[THREAD {Thread.CurrentThread.ManagedThreadId}] Unable to load permission database",
+                        Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
             }
         }
@@ -118,13 +121,13 @@ namespace PermissionHandler
             {
                 try
                 {
-                    System.IO.File.WriteAllText(StorageLocation,
+                    File.WriteAllText(StorageLocation,
                         JsonConvert.SerializeObject(_nodes, Formatting.Indented));
                 }
                 catch (Exception ex)
                 {
                     Log4NetHandler.Log(
-                        $"[THREAD {System.Threading.Thread.CurrentThread.ManagedThreadId}] Unable to save permission database",
+                        $"[THREAD {Thread.CurrentThread.ManagedThreadId}] Unable to save permission database",
                         Log4NetHandler.LogLevel.ERROR, exception: ex);
                 }
             }

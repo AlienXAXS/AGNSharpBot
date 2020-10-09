@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.Composition;
+using CommandHandler;
 using GameGiveaway.Commands;
 using Interface;
+using InternalDatabase;
 using PluginManager;
+using Responses.Commands.GameGiveaway.SQL;
 
 namespace GameGiveaway
 {
@@ -17,16 +15,16 @@ namespace GameGiveaway
         public EventRouter EventRouter { get; set; }
 
         string IPlugin.Description => "Some useful admin utilities and commands.";
-        
+
         void IPlugin.ExecutePlugin()
         {
             // SQL Database Setup
-            InternalDatabase.Handler.Instance.GetConnection().RegisterTable<Responses.Commands.GameGiveaway.SQL.GameGiveawayGameDb>();
-            InternalDatabase.Handler.Instance.GetConnection().RegisterTable<Responses.Commands.GameGiveaway.SQL.GameGiveawayUserDb>();
+            Handler.Instance.GetConnection().RegisterTable<GameGiveawayGameDb>();
+            Handler.Instance.GetConnection().RegisterTable<GameGiveawayUserDb>();
 
             // Register our commands with the handler
-            CommandHandler.HandlerManager.Instance.RegisterHandler<GameGiveawayAdmin>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<GameGiveawayPublic>();
+            HandlerManager.Instance.RegisterHandler<GameGiveawayAdmin>();
+            HandlerManager.Instance.RegisterHandler<GameGiveawayPublic>();
         }
 
         void IPlugin.Dispose()

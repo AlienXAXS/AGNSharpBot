@@ -1,26 +1,16 @@
-﻿using CommandHandler;
-using Discord;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Auditor.WebServer.Configuration;
+using CommandHandler;
+using Discord;
+using Discord.WebSocket;
+using InternalDatabase;
 
 namespace Auditor.WebServer
 {
     internal class ControllerCommands
     {
-        private class ReturnValue
-        {
-            public bool Failure { get; set; }
-            public string Message { get; set; }
-
-            public ReturnValue(bool failure, string message)
-            {
-                Failure = failure;
-                Message = message;
-            }
-        }
-
         [Command("auditor", "Controls the Auditor plugin.")]
         public async void AuditorPublicCmd(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
@@ -42,28 +32,29 @@ namespace Auditor.WebServer
             if (parameters[1].Equals("login"))
             {
                 var random = new Random(DateTime.Now.Millisecond);
-                var authKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 16).Select(s => s[random.Next(s.Length)]).ToArray());
-                var wsConfig = Configuration.ConfigHandler.Instance.Configuration;
-                var authDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection
+                var authKey = new string(Enumerable
+                    .Repeat("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 16)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+                var wsConfig = ConfigHandler.Instance.Configuration;
+                var authDb = Handler.Instance.GetConnection().DbConnection
                     .Table<AuditorSql.AuditorNancyLoginSession>();
 
                 if (sktMessage.Channel is SocketGuildChannel socketGuildChannel)
                 {
                     // Remove all old known keys that this user once had
                     foreach (var result in authDb.ToArray())
-                    {
-                        if (result.UserId == (long)sktMessage.Author.Id)
+                        if (result.UserId == (long) sktMessage.Author.Id)
                             authDb.Connection.Delete(result);
-                    }
 
-                    authDb.Connection.Insert(new AuditorSql.AuditorNancyLoginSession()
+                    authDb.Connection.Insert(new AuditorSql.AuditorNancyLoginSession
                     {
                         AuthKey = authKey,
-                        GuildId = (long)socketGuildChannel.Guild.Id,
-                        UserId = (long)sktMessage.Author.Id
+                        GuildId = (long) socketGuildChannel.Guild.Id,
+                        UserId = (long) sktMessage.Author.Id
                     });
 
-                    await sktMessage.Author.SendMessageAsync($"AGNSharpBot Web Login Token: {wsConfig.URI}/login?key={authKey}");
+                    await sktMessage.Author.SendMessageAsync(
+                        $"AGNSharpBot Web Login Token: {wsConfig.URI}/login?key={authKey}");
                 }
             }
         }
@@ -74,16 +65,16 @@ namespace Auditor.WebServer
         {
             if (parameters.Length < 2)
             {
-                await sktMessage.Channel.SendMessageAsync($"Invalid use of command, try !auditoradmin help");
+                await sktMessage.Channel.SendMessageAsync("Invalid use of command, try !auditoradmin help");
                 return;
             }
 
             switch (parameters[1])
             {
                 case "help":
-                    await sktMessage.Channel.SendMessageAsync($"`Auditor Admin Help`\r\n" +
-                                                              $"`!auditoradmin help` - This help\r\n" +
-                                                              $"`!auditoradmin webserver help` - web server control");
+                    await sktMessage.Channel.SendMessageAsync("`Auditor Admin Help`\r\n" +
+                                                              "`!auditoradmin help` - This help\r\n" +
+                                                              "`!auditoradmin webserver help` - web server control");
                     break;
 
                 case "webserver":
@@ -104,6 +95,7 @@ namespace Auditor.WebServer
                     {
                         await sktMessage.Channel.SendMessageAsync(ex.Message);
                     }
+
                     break;
             }
         }
@@ -126,7 +118,8 @@ namespace Auditor.WebServer
                     try
                     {
                         NancyServer.Instance.Start(true);
-                        return new ReturnValue(false, $"NancyServer started successfully, you can access it via {Configuration.ConfigHandler.Instance.Configuration.URI}");
+                        return new ReturnValue(false,
+                            $"NancyServer started successfully, you can access it via {ConfigHandler.Instance.Configuration.URI}");
                     }
                     catch (Exception ex)
                     {
@@ -137,7 +130,7 @@ namespace Auditor.WebServer
                     try
                     {
                         NancyServer.Instance.Stop();
-                        return new ReturnValue(false, $"NancyServer stopped successfully");
+                        return new ReturnValue(false, "NancyServer stopped successfully");
                     }
                     catch (Exception ex)
                     {
@@ -149,6 +142,18 @@ namespace Auditor.WebServer
             }
 
             return null;
+        }
+
+        private class ReturnValue
+        {
+            public ReturnValue(bool failure, string message)
+            {
+                Failure = failure;
+                Message = message;
+            }
+
+            public bool Failure { get; }
+            public string Message { get; }
         }
     }
 }

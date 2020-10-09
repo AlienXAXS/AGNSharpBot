@@ -1,9 +1,11 @@
-﻿using Discord.WebSocket;
-using Interface;
-using PluginManager;
-using System;
-using System.ComponentModel.Composition;
+﻿using System.ComponentModel.Composition;
 using System.Threading.Tasks;
+using CommandHandler;
+using Discord.WebSocket;
+using Interface;
+using InternalDatabase;
+using JoinQuitMessages.Configuration;
+using PluginManager;
 
 namespace JoinQuitMessages
 {
@@ -16,49 +18,46 @@ namespace JoinQuitMessages
         public void ExecutePlugin()
         {
             // Register our connection, and our table.
-            InternalDatabase.Handler.Instance.NewConnection()?.RegisterTable<SQLTables.Configuration>();
+            Handler.Instance.NewConnection()?.RegisterTable<SQLTables.Configuration>();
 
             // Add our commands to the cmdhandler
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Configuration.DiscordConfigurationHandler>();
+            HandlerManager.Instance.RegisterHandler<DiscordConfigurationHandler>();
 
             // Setup our event router
             EventRouter.UserJoined += EventRouterOnUserJoined;
             EventRouter.UserLeft += EventRouterOnUserLeft;
         }
 
+        public void Dispose()
+        {
+            Handler.Instance.GetConnection().DbConnection.Close();
+        }
+
+        public EventRouter EventRouter { get; set; }
+
         private Task EventRouterOnUserLeft(SocketGuildUser user)
         {
-            var foundConfiguration = Configuration.ConfigurationHandler.Instance.GetConfiguration(user.Guild.Id);
+            var foundConfiguration = ConfigurationHandler.Instance.GetConfiguration(user.Guild.Id);
             if (foundConfiguration == null) return Task.CompletedTask;
 
-            var foundChannel = user.Guild.GetChannel((ulong)foundConfiguration.ChannelId);
+            var foundChannel = user.Guild.GetChannel((ulong) foundConfiguration.ChannelId);
             if (foundChannel is ISocketMessageChannel sktChannel)
-            {
-                sktChannel.SendMessageAsync($"User {user.Username} has left the guild, they were a member since {user.JoinedAt}.");
-            }
+                sktChannel.SendMessageAsync(
+                    $"User {user.Username} has left the guild, they were a member since {user.JoinedAt}.");
 
             return Task.CompletedTask;
         }
 
         private Task EventRouterOnUserJoined(SocketGuildUser user)
         {
-            var foundConfiguration = Configuration.ConfigurationHandler.Instance.GetConfiguration(user.Guild.Id);
+            var foundConfiguration = ConfigurationHandler.Instance.GetConfiguration(user.Guild.Id);
             if (foundConfiguration == null) return Task.CompletedTask;
 
-            var foundChannel = user.Guild.GetChannel((ulong)foundConfiguration.ChannelId);
+            var foundChannel = user.Guild.GetChannel((ulong) foundConfiguration.ChannelId);
             if (foundChannel is ISocketMessageChannel sktChannel)
-            {
                 sktChannel.SendMessageAsync($"User {user.Username} has joined the guild");
-            }
 
             return Task.CompletedTask;
         }
-
-        public void Dispose()
-        {
-            InternalDatabase.Handler.Instance.GetConnection().DbConnection.Close();
-        }
-
-        public EventRouter EventRouter { get; set; }
     }
 }

@@ -1,8 +1,11 @@
-﻿using CommandHandler;
+﻿using System;
+using System.Linq;
+using CommandHandler;
 using Discord;
 using Discord.WebSocket;
-using System;
-using System.Linq;
+using InternalDatabase;
+using Responses.SQLTables;
+using Responses.Util;
 
 namespace Responses.Informational
 {
@@ -15,28 +18,29 @@ namespace Responses.Informational
         public async void CheckLastOnline(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
-            var sqlDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection
-                .Table<SQLTables.LastOnlineTable>();
+            var sqlDb = Handler.Instance.GetConnection().DbConnection
+                .Table<LastOnlineTable>();
 
             // We have a mention, use that ID
             if (sktMessage.MentionedUsers.Count > 0)
             {
                 var outputMessage = "";
                 foreach (var user in sktMessage.MentionedUsers)
-                {
                     switch (user.Status)
                     {
                         case UserStatus.Offline:
                             var foundUser = sqlDb.DefaultIfEmpty(null)
-                                .FirstOrDefault(x => x != null && x.DiscordId.Equals((long)user.Id));
+                                .FirstOrDefault(x => x != null && x.DiscordId.Equals((long) user.Id));
                             if (foundUser == null)
+                            {
                                 outputMessage +=
                                     $"User {user.Username} cannot be found in my database, I've just not seen them online yet\r\n";
+                            }
                             else
                             {
                                 var timeElapsed = DateTime.Now - foundUser.DateTime;
                                 outputMessage +=
-                                    $"User {user.Username} was last seen online at {foundUser.DateTime} ({Util.ReadableTimespan.GetReadableTimespan(timeElapsed)} ago)\r\n";
+                                    $"User {user.Username} was last seen online at {foundUser.DateTime} ({ReadableTimespan.GetReadableTimespan(timeElapsed)} ago)\r\n";
                             }
 
                             break;
@@ -52,17 +56,14 @@ namespace Responses.Informational
                             outputMessage += $"User {user.Username} is online right now!\r\n";
                             break;
                     }
-                }
 
                 await sktMessage.Channel.SendMessageAsync(outputMessage);
             }
             else
             {
                 if (sktMessage.Content.ToLower().Contains("mccann"))
-                {
                     await sktMessage.Channel.SendMessageAsync(
                         "Fuck knows where she is, the parents probs did it though...");
-                }
                 else
                     await sktMessage.Channel.SendMessageAsync(
                         "Please mention a user to discover when they were last online, such as: !lo @Username");

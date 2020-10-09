@@ -1,8 +1,8 @@
-﻿using CommandHandler;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CommandHandler;
 using Discord.WebSocket;
 using Responses.Commands.Handlers;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Responses.Commands
 {
@@ -10,7 +10,8 @@ namespace Responses.Commands
     {
         private readonly AuthorisedCommandsPermission _authCmdsPermissonsHandler = new AuthorisedCommandsPermission();
 
-        [Command("move", "Moves a user to your voice channel, mention a user to move them - Usage: !move <username> [username] [username]...")]
+        [Command("move",
+            "Moves a user to your voice channel, mention a user to move them - Usage: !move <username> [username] [username]...")]
         public async void MoveMember(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
@@ -22,7 +23,7 @@ namespace Responses.Commands
             }
 
             var CollectedUsers = new List<SocketGuildUser>();
-            var sktAuthorUser = (SocketGuildUser)sktMessage.Author;
+            var sktAuthorUser = (SocketGuildUser) sktMessage.Author;
 
             if (sktAuthorUser.VoiceChannel == null)
             {
@@ -57,14 +58,12 @@ namespace Responses.Commands
                             $"Unable to move {sktUser.Username}, this user is not in a voice channel.  Please have them connect to a voice channel first, then retry the command");
                         return;
                     }
-                    else
+
+                    if (sktUser.VoiceChannel == sktAuthorUser.VoiceChannel)
                     {
-                        if (sktUser.VoiceChannel == sktAuthorUser.VoiceChannel)
-                        {
-                            await sktMessage.Channel.SendMessageAsync(
-                                $"Unable to move {sktUser.Username}, this user is already with you.");
-                            return;
-                        }
+                        await sktMessage.Channel.SendMessageAsync(
+                            $"Unable to move {sktUser.Username}, this user is already with you.");
+                        return;
                     }
 
                     await sktUser.ModifyAsync(properties => properties.Channel = sktAuthorUser.VoiceChannel);

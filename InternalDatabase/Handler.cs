@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GlobalLogger;
 
 namespace InternalDatabase
 {
@@ -11,7 +12,8 @@ namespace InternalDatabase
         private readonly List<Connection> _connections = new List<Connection>();
 
         /// <summary>
-        /// Gets a connection from the current calling assembly name, dynamically creates a new database file and connection if it does not exist.
+        ///     Gets a connection from the current calling assembly name, dynamically creates a new database file and connection if
+        ///     it does not exist.
         /// </summary>
         /// <returns></returns>
         public Connection GetConnection()
@@ -32,11 +34,13 @@ namespace InternalDatabase
 
         public Connection NewConnection(string connectionName)
         {
-            var foundConnection = _connections?.DefaultIfEmpty(null).FirstOrDefault(x => x?.DatabaseName == connectionName);
+            var foundConnection = _connections?.DefaultIfEmpty(null)
+                .FirstOrDefault(x => x?.DatabaseName == connectionName);
 
             if (foundConnection != null) return foundConnection;
 
-            GlobalLogger.Log4NetHandler.Log($"SQLite database instance requested from {connectionName}", GlobalLogger.Log4NetHandler.LogLevel.INFO);
+            Log4NetHandler.Log($"SQLite database instance requested from {connectionName}",
+                Log4NetHandler.LogLevel.INFO);
 
             _connections.Add(new Connection(connectionName));
             return _connections[_connections.Count - 1];

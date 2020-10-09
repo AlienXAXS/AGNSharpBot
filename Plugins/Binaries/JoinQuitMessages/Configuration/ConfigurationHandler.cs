@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using InternalDatabase;
 
 namespace JoinQuitMessages.Configuration
 {
@@ -13,11 +14,11 @@ namespace JoinQuitMessages.Configuration
         {
             var guildConfiguration = GetConfiguration(GuildId) ?? new SQLTables.Configuration();
 
-            guildConfiguration.GuildId = (long)GuildId;
-            guildConfiguration.ChannelId = (long)ChannelId;
+            guildConfiguration.GuildId = (long) GuildId;
+            guildConfiguration.ChannelId = (long) ChannelId;
 
             // Grab our database session
-            var database = InternalDatabase.Handler.Instance.GetConnection();
+            var database = Handler.Instance.GetConnection();
 
             // Insert the new row into the database.
             database.DbConnection.Table<SQLTables.Configuration>().Connection.Insert(guildConfiguration);
@@ -25,8 +26,9 @@ namespace JoinQuitMessages.Configuration
 
         public SQLTables.Configuration GetConfiguration(ulong GuildId)
         {
-            var database = InternalDatabase.Handler.Instance.GetConnection();
-            var config = database?.DbConnection.Table<SQLTables.Configuration>().DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.GuildId.Equals((long)GuildId));
+            var database = Handler.Instance.GetConnection();
+            var config = database?.DbConnection.Table<SQLTables.Configuration>().DefaultIfEmpty(null)
+                .FirstOrDefault(x => x != null && x.GuildId.Equals((long) GuildId));
             return config;
         }
     }
