@@ -11,9 +11,8 @@ namespace InternalDatabase
     {
         private static readonly Handler _instance;
         public static Handler Instance = _instance ?? (_instance = new Handler());
-        private readonly List<Connection> _connections = new List<Connection>();
-
-        private readonly Object _lockable = new Object();
+        //private readonly List<Connection> _connections = new List<Connection>();
+        private readonly SynchronizedCollection<Connection> _connections = new SynchronizedCollection<Connection>();
 
         /// <summary>
         ///     Gets a connection from the current calling assembly name, dynamically creates a new database file and connection if
@@ -28,10 +27,7 @@ namespace InternalDatabase
 
         public Connection GetConnection(string connectionName)
         {
-            lock (_lockable)
-            {
-                return _connections.DefaultIfEmpty(null).FirstOrDefault(x => x.DatabaseName.Equals(connectionName));
-            }
+            return _connections.DefaultIfEmpty(null).FirstOrDefault(x => x.DatabaseName.Equals(connectionName));
         }
 
         public Connection NewConnection()
@@ -49,11 +45,8 @@ namespace InternalDatabase
             Log4NetHandler.Log($"SQLite database instance requested from {connectionName}",
                 Log4NetHandler.LogLevel.INFO);
 
-            lock (_lockable)
-            {
-                _connections.Add(new Connection(connectionName));
-                return _connections[_connections.Count - 1];
-            }
+            _connections.Add(new Connection(connectionName));
+            return _connections[_connections.Count - 1];
         }
     }
 }
