@@ -1,12 +1,12 @@
-﻿using CommandHandler;
-using Discord;
-using Discord.WebSocket;
-using DiscordMenu;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.WebSocket;
+using DiscordMenu;
+using CommandHandler;
+using Discord;
 
-namespace Responses.Commands.GameGiveaway
+namespace GameGiveaway.Commands
 {
     internal class GameGiveawayHumbleMenu
     {
@@ -18,7 +18,7 @@ namespace Responses.Commands.GameGiveaway
 
         public async void StartMenu()
         {
-            var usersDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.GameGiveawayUserDb>();
+            var usersDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<Responses.Commands.GameGiveaway.SQL.GameGiveawayUserDb>();
             var dbUser = usersDb.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.DiscordId.Equals((long)SktMessage.Author.Id));
 
             _menu.Author = SktMessage.Author;
@@ -69,9 +69,9 @@ namespace Responses.Commands.GameGiveaway
             try
             {
                 var menu = (MenuHandler)selfMenu;
-                var gamesDbConnection = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.GameGiveawayGameDb>();
+                var gamesDbConnection = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<Responses.Commands.GameGiveaway.SQL.GameGiveawayGameDb>();
                 var gamesDb = gamesDbConnection.Where(x => x.Used == false);
-                var usersDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.GameGiveawayUserDb>();
+                var usersDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<Responses.Commands.GameGiveaway.SQL.GameGiveawayUserDb>();
                 var dbUser = usersDb.DefaultIfEmpty(null).LastOrDefault(x => x != null && x.DiscordId.Equals((long)SktMessage.Author.Id));
 
                 _menu.Dispose();
@@ -83,7 +83,7 @@ namespace Responses.Commands.GameGiveaway
                 }
                 else
                 {
-                    usersDb.Connection.Insert(new SQL.GameGiveawayUserDb()
+                    usersDb.Connection.Insert(new Responses.Commands.GameGiveaway.SQL.GameGiveawayUserDb()
                     {
                         DateTime = DateTime.Now,
                         DiscordId = (long)SktMessage.Author.Id,
@@ -129,7 +129,7 @@ namespace Responses.Commands.GameGiveaway
 
                 // Insert our user into the database
                 if (dbUser == null)
-                    usersDb.Connection.Insert(new SQL.GameGiveawayUserDb() { DiscordId = (long)SktMessage.Author.Id, DateTime = DateTime.Now });
+                    usersDb.Connection.Insert(new Responses.Commands.GameGiveaway.SQL.GameGiveawayUserDb() { DiscordId = (long)SktMessage.Author.Id, DateTime = DateTime.Now });
                 else
                 {
                     dbUser.DateTime = DateTime.Now;

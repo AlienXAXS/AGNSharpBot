@@ -1,10 +1,10 @@
-﻿using CommandHandler;
-using Discord.WebSocket;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommandHandler;
+using Discord.WebSocket;
 
-namespace Responses.Commands.GameGiveaway
+namespace GameGiveaway.Commands
 {
     internal class GameGiveawayAdmin
     {
@@ -15,7 +15,7 @@ namespace Responses.Commands.GameGiveaway
             var gamesAdded = new List<string>();
             var gamesErrored = new List<string>();
 
-            var allGamesDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<SQL.GameGiveawayGameDb>();
+            var allGamesDb = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<Responses.Commands.GameGiveaway.SQL.GameGiveawayGameDb>();
 
             if (parameters.Length == 1)
             {
@@ -43,7 +43,7 @@ namespace Responses.Commands.GameGiveaway
                         continue;
                     }
 
-                    var newGame = new SQL.GameGiveawayGameDb()
+                    var newGame = new Responses.Commands.GameGiveaway.SQL.GameGiveawayGameDb()
                     { Key = gameKey, Name = gameName };
 
                     try
