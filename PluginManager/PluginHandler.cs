@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -46,7 +47,7 @@ namespace PluginManager
 
         private bool _hasExecutedPlugins = false;
 
-        public void LoadPlugins()
+        public bool LoadPlugins()
         {
             Log4NetHandler.Log("Plugin Manager Loading", Log4NetHandler.LogLevel.INFO);
 
@@ -70,9 +71,25 @@ namespace PluginManager
                 {
                     Log4NetHandler.Log("Fatal error while attempting to compose plugin parts", Log4NetHandler.LogLevel.ERROR, exception:ex);
                 }
+
+                if (container.Catalog.Parts.Count() != catalog.LoadedFiles.Count)
+                {
+                    Log4NetHandler.Log($"Fatal Error: We have {catalog.LoadedFiles.Count} plugin binaries, but only {Plugins.Count()} plugins could locate their injection point.\r\n---\r\nInvalid plugins are listed below:", Log4NetHandler.LogLevel.ERROR);
+
+                    foreach (var item in catalog.LoadedFiles)
+                    {
+                        var dllName = System.IO.Path.GetFileNameWithoutExtension(item).ToLower();
+                        var loaded = container.Catalog.Parts.Any(x => x != null && x.ToString().ToLower().Contains(dllName));
+                        if ( !loaded )
+                            Log4NetHandler.Log($"{item.ToString()} Loaded: {loaded}", Log4NetHandler.LogLevel.ERROR);
+                    }
+
+                    return false;
+                }
             }
 
             Log4NetHandler.Log("Plugin Manager finished loading plugins, will execute them when Discord is ready", Log4NetHandler.LogLevel.INFO);
+            return true;
         }
 
         public bool ShouldExecutePlugin(ulong guildId, Assembly assembly)
@@ -105,14 +122,17 @@ namespace PluginManager
             if (_hasExecutedPlugins) return;
             _hasExecutedPlugins = true;
 
-            Log4NetHandler.Log("AGNSharpBot Plugin System Init Plugins, Discord Status: Ready", Log4NetHandler.LogLevel.INFO);
+            Log4NetHandler.Log("AGNSharpBot Plugin System Init Plugins, Discord Status: Ready",
+                Log4NetHandler.LogLevel.INFO);
 
             var pluginNameList = "";
-            Log4NetHandler.Log($"{Plugins.Count()} plugins detected, attempting to load plugins.", Log4NetHandler.LogLevel.INFO);
+            Log4NetHandler.Log($"{Plugins.Count()} plugins detected, attempting to load plugins.",
+                Log4NetHandler.LogLevel.INFO);
 
             foreach (var plugin in Plugins)
             {
-                Log4NetHandler.Log($"Plugin {plugin.Name} found, attempting ExecutePlugin procedure.", Log4NetHandler.LogLevel.INFO);
+                Log4NetHandler.Log($"Plugin {plugin.Name} found, attempting ExecutePlugin procedure.",
+                    Log4NetHandler.LogLevel.INFO);
 
                 // Set the event router
                 plugin.EventRouter = EventRouter;
@@ -122,31 +142,24 @@ namespace PluginManager
                     pluginWithRouter.PluginRouter = PluginRouter;
                 }
 
-                var newThread = new Thread(() =>
+                try
                 {
-                    try
+                    var newThread = new Thread(() => { plugin.ExecutePlugin(); })
                     {
-#if !DEBUG
-                        plugin.ExecutePlugin();
-#else
-                        if (plugin.Name == "AdminUtilities")
-                        {
-                            plugin.ExecutePlugin();
-                        }
-#endif
-                        Log4NetHandler.Log($"Plugin {plugin.Name} ExecutePlugin called successfully", Log4NetHandler.LogLevel.INFO);
-                        pluginNameList += $"{plugin.Name}, ";
+                        IsBackground = true
+                    };
+                    newThread.Start();
+                }
+                catch (Exception ex)
+                {
+                    Log4NetHandler.Log($"Plugin {plugin.Name} crashed during ExecutePlugin procedure.",
+                        Log4NetHandler.LogLevel.ERROR, exception: ex);
+                }
 
-                    }
-                    catch (Exception ex)
-                    {
-                        Log4NetHandler.Log($"Plugin {plugin.Name} crashed during ExecutePlugin procedure.", Log4NetHandler.LogLevel.ERROR, exception:ex);
-                    }
-                })
-                {
-                    IsBackground = true
-                };
-                newThread.Start();
+                Log4NetHandler.Log($"Plugin {plugin.Name} ExecutePlugin called successfully",
+                    Log4NetHandler.LogLevel.INFO);
+                pluginNameList += $"{plugin.Name}, ";
+
             }
 
             Log4NetHandler.Log($"{Plugins.Count()} plugins have been loaded: {pluginNameList}", Log4NetHandler.LogLevel.INFO);
