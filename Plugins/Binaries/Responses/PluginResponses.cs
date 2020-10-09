@@ -18,8 +18,7 @@ namespace Responses
             // SQL Database Setup
             // Last Online
             InternalDatabase.Handler.Instance.NewConnection().RegisterTable<LastOnlineTable>();
-            InternalDatabase.Handler.Instance.GetConnection().RegisterTable<Commands.GameGiveaway.SQL.GameGiveawayGameDb>();
-            InternalDatabase.Handler.Instance.GetConnection().RegisterTable<Commands.GameGiveaway.SQL.GameGiveawayUserDb>();
+            
 
             var lastOnlineHandler = new Informational.LastOnlineDbHandler();
             lastOnlineHandler.StartOnlineScanner(EventRouter);
@@ -29,12 +28,7 @@ namespace Responses
             CommandHandler.HandlerManager.Instance.RegisterHandler<Informational.LastOnline>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AuthorisedCommands>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.AdminPermissions>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.CatCommand>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.DogCommand>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.Global.ASCIIArt>();
             CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.ModerateUser>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.GameGiveaway.GameGiveawayAdmin>();
-            CommandHandler.HandlerManager.Instance.RegisterHandler<Commands.GameGiveaway.GameGiveawayPublic>();
         }
 
         void IPlugin.Dispose()
