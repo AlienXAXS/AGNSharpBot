@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using Discord;
+using GlobalLogger;
 
 namespace GameWatcher.Commands
 {
@@ -110,52 +111,81 @@ namespace GameWatcher.Commands
 
         private async void ListGames(SocketMessage sktMessage)
         {
-            var message = "";
-            var _db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<DB.Tables.GameMemory>();
-            foreach (var game in _db)
-            {
-                message += $"{game.Name}\r\n";
-            }
-
-            await sktMessage.Channel.SendMessageAsync($"Games registered in the database:\r\n{message}");
-        }
-
-        private async void AddGame(string gameName, SocketMessage sktMessage)
-        {
             try
             {
-                if (DB.DatabaseHandler.Instance.Exists(gameName))
-                    await sktMessage.Channel.SendMessageAsync("Unable to add this game, it already exists");
-                else
+                if (sktMessage.Channel is SocketGuildChannel sktMessageChannel)
                 {
-                    DB.DatabaseHandler.Instance.Add(gameName);
-                    await sktMessage.Channel.SendMessageAsync($"Game {gameName} has been added to the GameWatcher");
+                    ulong guildId = sktMessageChannel.Guild.Id;
+                    var message = "";
+                    var db = InternalDatabase.Handler.Instance.GetConnection().DbConnection.Table<DB.Tables.GameMemory>();
+                    var results = db.DefaultIfEmpty(null).Where(x => x != null && x.GuildId.Equals((long) sktMessageChannel.Guild.Id));
+
+                    if (!results.Any())
+                    {
+                        await sktMessage.Channel.SendMessageAsync(
+                            "You have no games registered, use !gamewatcher add \"GAMENAME\" to add a new game to the database");
+                    }
+                    else
+                    {
+                        foreach (var game in db)
+                        {
+                            message += $"{game.Name}\r\n";
+                        }
+
+                        await sktMessage.Channel.SendMessageAsync($"Games registered in the database:\r\n{message}");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                await sktMessage.Channel.SendMessageAsync(
-                    $"Database failure.\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                await sktMessage.Channel.SendMessageAsync($"There was an exception attempting to execute your command, please contact the bot author.\r\n\r\nException Details: {ex.Message}");
+                Log4NetHandler.Log($"Exception in GameWatcher ListGames", Log4NetHandler.LogLevel.ERROR, exception:ex);
+            }
+        }
+
+        private async void AddGame(string gameName, SocketMessage sktMessage)
+        {
+            if (sktMessage.Channel is SocketGuildChannel sktMessageChannel)
+            {
+                ulong guildId = sktMessageChannel.Guild.Id;
+
+                try
+                {
+                    if (DB.DatabaseHandler.Instance.Exists(gameName, guildId))
+                        await sktMessage.Channel.SendMessageAsync("Unable to add this game, it already exists");
+                    else
+                    {
+                        DB.DatabaseHandler.Instance.Add(gameName, guildId);
+                        await sktMessage.Channel.SendMessageAsync($"Game {gameName} has been added to the GameWatcher");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await sktMessage.Channel.SendMessageAsync($"Database failure.\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                }
             }
         }
 
         private async void RemoveGame(string gameName, SocketMessage sktMessage)
         {
-            try
+            if (sktMessage.Channel is SocketGuildChannel sktMessageChannel)
             {
-                if (!DB.DatabaseHandler.Instance.Exists(gameName))
-                    await sktMessage.Channel.SendMessageAsync(
-                        $"Unable to remove the game {gameName} as it does not exist in the database");
-                else
+                ulong guildId = sktMessageChannel.Guild.Id;
+                try
                 {
-                    DB.DatabaseHandler.Instance.Remove(gameName);
-                    await sktMessage.Channel.SendMessageAsync($"Game {gameName} has been removed");
+                    if (!DB.DatabaseHandler.Instance.Exists(gameName, guildId))
+                        await sktMessage.Channel.SendMessageAsync(
+                            $"Unable to remove the game {gameName} as it does not exist in the database");
+                    else
+                    {
+                        DB.DatabaseHandler.Instance.Remove(gameName, guildId);
+                        await sktMessage.Channel.SendMessageAsync($"Game {gameName} has been removed");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                await sktMessage.Channel.SendMessageAsync(
-                    $"Database failure.\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                catch (Exception ex)
+                {
+                    await sktMessage.Channel.SendMessageAsync($"Database failure.\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                }
             }
         }
     }

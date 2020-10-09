@@ -9,5 +9,7 @@ namespace GameWatcher.DB.Tables
 
         [Indexed]
         public string Name { get; set; }
+
+        public long GuildId { get; set; }
     }
 }

@@ -15,21 +15,21 @@ namespace GameWatcher.DB
             _dbConnection.RegisterTable<Tables.GameMemory>();
         }
 
-        public bool Exists(string name)
+        public bool Exists(string name, ulong guildId)
         {
-            return _dbConnection.DbConnection.Table<Tables.GameMemory>().Any(x => x.Name.Equals(name));
+            return _dbConnection.DbConnection.Table<Tables.GameMemory>().Any(x => x.Name.Equals(name) && x.GuildId.Equals((long)guildId));
         }
 
-        public void Add(string name)
+        public void Add(string name, ulong guildId)
         {
-            var newRecord = new Tables.GameMemory() { Name = name };
+            var newRecord = new Tables.GameMemory() { Name = name, GuildId = (long)guildId};
             _dbConnection.DbConnection.Insert(newRecord);
         }
 
-        public void Remove(string name)
+        public void Remove(string name, ulong guildId)
         {
             var record = _dbConnection.DbConnection.Table<Tables.GameMemory>().DefaultIfEmpty(null)
-                .FirstOrDefault(x => x.Name.Equals(name));
+                .FirstOrDefault(x => x.Name.Equals(name) && x.GuildId.Equals((long)guildId));
 
             if (record != null)
                 _dbConnection.DbConnection.Delete(record);
