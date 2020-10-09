@@ -34,13 +34,6 @@ namespace GlobalLogger
             var callingAssemblyName = Assembly.GetCallingAssembly().GetName().Name;
             message = $"[{callingAssemblyName}] | {message}";
 
-
-#if DEBUG
-
-            Console.WriteLine($"{logLevel}: {message}");
-            return;
-#endif
-
             switch (logLevel)
             {
                 case LogLevel.INFO:
