@@ -125,14 +125,15 @@ namespace GameWatcher.Commands
                     var results = db.DefaultIfEmpty(null)
                         .Where(x => x != null && x.GuildId.Equals((long) sktMessageChannel.Guild.Id));
 
-                    if (!results.Any())
+                    var gameResults = results as GameMemory[] ?? results.ToArray();
+                    if (!gameResults.Any())
                     {
                         await sktMessage.Channel.SendMessageAsync(
                             "You have no games registered, use !gamewatcher add \"GAMENAME\" to add a new game to the database");
                     }
                     else
                     {
-                        foreach (var game in db) message += $"{game.Name}\r\n";
+                        foreach (var game in gameResults) message += $"{game.Name}\r\n";
 
                         await sktMessage.Channel.SendMessageAsync($"Games registered in the database:\r\n{message}");
                     }
