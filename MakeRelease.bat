@@ -17,6 +17,15 @@ mkdir .\Release_Builder\Plugins > NUL
 
 echo Copying Plugins...
 
+echo   - ASCIIArt
+copy /Y .\Plugins\Binaries\ASCIIArt\bin\Release\ASCIIArt.dll .\Release_Builder\Plugins
+
+echo   - CatDog
+copy /Y .\Plugins\Binaries\CatDog\bin\Release\CatDog.dll .\Release_Builder\Plugins
+
+echo   - GameGiveaway
+copy /Y .\Plugins\Binaries\GameGiveaway\bin\Release\GameGiveaway.dll .\Release_Builder\Plugins
+
 echo   - GameWatcher
 copy /Y .\Plugins\Binaries\GameWatcher\bin\Release\GameWatcher.dll .\Release_Builder\Plugins
 
@@ -25,13 +34,9 @@ copy /Y .\Plugins\Binaries\Auditor\bin\Release\Auditor.dll .\Release_Builder\Plu
 
 echo   - HomeLabReporting
 copy /Y .\Plugins\Binaries\HomeLabReporting\bin\Release\HomeLabReporting.dll .\Release_Builder\Plugins
-copy /Y .\Plugins\Binaries\HomeLabReporting\bin\Release\SnmpSharpNet.dll .\Release_Builder\Plugins
 
 echo   - Responses (AdminPlugin)
 copy /Y .\Plugins\Binaries\Responses\bin\Release\Responses.dll .\Release_Builder\Plugins
-
-echo   - DiscordMenu (Plugin Reference)
-copy /Y .\DiscordMenu\bin\Release\DiscordMenu.dll .\Release_Builder\Plugins
 
 echo   - SpotifyStats
 copy /Y .\Plugins\Binaries\SpotifyStats\bin\Release\SpotifyStats.dll .\Release_Builder\Plugins
