@@ -30,7 +30,7 @@ namespace HomeLabReporting.SNMP
     {
         public delegate void EventRaiser(object sender, IpAddress ipAddress, VbCollection snmpVbCollection);
 
-        private const string ConfigurationPath = "Plugins\\Config\\Snmp.json";
+        private const string ConfigurationPath = "Plugins/Config/Snmp.json";
         private static readonly TrapReceiver _instance;
         public static TrapReceiver Instance = _instance ?? (_instance = new TrapReceiver());
 

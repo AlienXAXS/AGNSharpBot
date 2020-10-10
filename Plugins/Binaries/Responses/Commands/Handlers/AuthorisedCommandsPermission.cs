@@ -26,7 +26,7 @@ namespace Responses.Commands.Handlers
 
     internal class AuthorisedCommandsPermission
     {
-        private const string ConfigurationPath = "Plugins\\Config\\AuthCommandPermissions.json";
+        private const string ConfigurationPath = "Plugins/Config/AuthCommandPermissions.json";
         private List<CommandPermission> _commandPermissions = new List<CommandPermission>();
 
         public AuthorisedCommandsPermission()

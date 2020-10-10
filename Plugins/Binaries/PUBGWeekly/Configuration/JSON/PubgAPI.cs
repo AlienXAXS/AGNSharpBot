@@ -19,7 +19,7 @@ namespace PUBGWeekly.Configuration.JSON
 
         public bool InitJsonConfig()
         {
-            var configPath = @".\Plugins\Config\PubgWeeklyApi.json";
+            var configPath = @"./Plugins/Config/PubgWeeklyApi.json";
 
             try
             {

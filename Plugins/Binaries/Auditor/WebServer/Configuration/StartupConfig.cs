@@ -55,7 +55,7 @@ namespace Auditor.WebServer.Configuration
 
     internal class ConfigHandler
     {
-        private const string ConfigFilePath = @"Plugins\Config\Auditor-WebServer.json";
+        private const string ConfigFilePath = @"Plugins/Config/Auditor-WebServer.json";
         private static readonly ConfigHandler _instance;
         public static ConfigHandler Instance = _instance ?? (_instance = new ConfigHandler());
 
