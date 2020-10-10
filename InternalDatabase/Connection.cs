@@ -20,7 +20,7 @@ namespace InternalDatabase
 
             var dbFileName =
                 new string($"{DatabaseName}.db".Where(ch => !_invalidFileNameChars.Contains(ch)).ToArray());
-            var databasePath = $"Data\\{dbFileName}";
+            var databasePath = $"Data/{dbFileName}";
 
             try
             {

@@ -25,7 +25,7 @@ namespace HomeLabReporting.SNMP
             // Load the config file
             var config =
                 JsonConvert.DeserializeObject<List<SnmpHost>>(
-                    File.ReadAllText("Plugins\\Config\\HomeLabReporting.json"));
+                    File.ReadAllText("Plugins/Config/HomeLabReporting.json"));
             _snmpHosts = config;
             TrapReceiver.Instance.OnTrapReceived += RaisedOnTrapReceived;
         }

@@ -17,7 +17,7 @@ namespace HARATSeATSRP
     [Export(typeof(IPlugin))]
     public class HARATSeATSRPNotifier : IPluginWithRouter
     {
-        private const string srpMemoryFile = "Plugins\\Config\\SRPMemory.json";
+        private const string srpMemoryFile = "Plugins/Config/SRPMemory.json";
         private ulong _notificationChannelId = 328624738077507584;
 
         private bool _seatWatcherRequestStop;

@@ -95,7 +95,7 @@ namespace PluginManager
                             Log4NetHandler.Log($"{item} Loaded: {loaded}", Log4NetHandler.LogLevel.ERROR);
                     }
 
-                    return false;
+                    //turn false;
                 }
             }
 
@@ -183,6 +183,8 @@ namespace PluginManager
 
         public void Dispose()
         {
+            if (Plugins == null) return;
+
             foreach (var plugin in Plugins)
             {
                 Log4NetHandler.Log($"Disposing plugin {plugin.Name}.", Log4NetHandler.LogLevel.INFO);

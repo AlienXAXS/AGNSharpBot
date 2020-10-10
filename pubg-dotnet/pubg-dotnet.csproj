@@ -5,7 +5,6 @@
     <AssemblyTitle>Pubg.Net</AssemblyTitle>
     <Version>2.3.1</Version>
     <Authors>Gavin Power</Authors>
-    <TargetFramework>netstandard2.0;net45</TargetFramework>
     <AssemblyName>Pubg.Net</AssemblyName>
     <PackageId>Pubg-DotNet</PackageId>
     <PackageTags>pubg;playerunknown;battlegrounds;developer;api</PackageTags>

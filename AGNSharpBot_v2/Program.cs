@@ -18,9 +18,6 @@ namespace AGNSharpBot
 
         private readonly Client _discordClient = Client.Instance;
 
-        [DllImport("Kernel32")]
-        private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
-
         private static void Main(string[] args)
         {
             try
@@ -33,33 +30,19 @@ namespace AGNSharpBot
             }
         }
 
-        private static bool Handler(CtrlType sig)
-        {
-            switch (sig)
-            {
-                case CtrlType.CTRL_C_EVENT:
-                case CtrlType.CTRL_LOGOFF_EVENT:
-                case CtrlType.CTRL_SHUTDOWN_EVENT:
-                case CtrlType.CTRL_CLOSE_EVENT:
-                    Client.Instance.Dispose();
-                    PluginHandler.Instance.Dispose();
-                    Log4NetHandler.Log("Shutting down application...", Log4NetHandler.LogLevel.INFO);
-                    Thread.Sleep(1500);
-                    _running = false;
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-
         public async Task MainAsync()
         {
             Log4NetHandler.Log("AGNSharpBot is starting up", Log4NetHandler.LogLevel.INFO);
 
             Log4NetHandler.Log("Setting up exit handler capture", Log4NetHandler.LogLevel.INFO);
-            _handler += Handler;
-            SetConsoleCtrlHandler(_handler, true);
+            AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
+            {
+                Client.Instance.Dispose();
+                PluginHandler.Instance.Dispose();
+                Log4NetHandler.Log("Shutting down application...", Log4NetHandler.LogLevel.INFO);
+                Thread.Sleep(1500);
+                _running = false;
+            };
 
             // Setup our unhandled exception events
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
