@@ -87,6 +87,20 @@ namespace CommandHandler
                         });
                 }
 
+                if (paramCommand.Equals("sysinfo", StringComparison.OrdinalIgnoreCase))
+                {
+                    var osName = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
+                    await socketMessage.Channel.SendMessageAsync($"I am currently running on {osName}");
+                    try
+                    {
+                        await socketMessage.DeleteAsync(new RequestOptions { RetryMode = RetryMode.AlwaysFail });
+                    }
+                    catch
+                    {
+                    }
+                    return;
+                }
+
                 if (paramCommand.Equals("plugins", StringComparison.OrdinalIgnoreCase) ||
                     paramCommand.Equals("plugin", StringComparison.OrdinalIgnoreCase))
                 {
@@ -267,15 +281,15 @@ namespace CommandHandler
                 {
                     if (pluginName == "GameGiveaway" && !socketGuildUser.Guild.Id.Equals(398471304162050049))
                     {
-                        await socketMessage.Channel.SendMessageAsync("This guild does not quality for this plugin.");
+                        await socketMessage.Channel.SendMessageAsync($"This guild does not quality to enable the plugin {pluginName}.");
                         return;
                     }
 
                     PluginHandler.Instance.SetPluginState(pluginName, socketGuildUser.Guild.Id, status);
                     if (status)
-                        await socketMessage.Channel.SendMessageAsync("The plugin was successfully enabled.");
+                        await socketMessage.Channel.SendMessageAsync($"The plugin {pluginName} was successfully enabled.");
                     else
-                        await socketMessage.Channel.SendMessageAsync("The plugin was successfully disabled.");
+                        await socketMessage.Channel.SendMessageAsync($"The plugin {pluginName} was successfully disabled.");
                 }
                 catch (Exception ex)
                 {
