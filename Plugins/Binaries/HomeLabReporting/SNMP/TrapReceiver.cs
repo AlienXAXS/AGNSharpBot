@@ -79,7 +79,8 @@ namespace HomeLabReporting.SNMP
                 socket.Dispose();
             }
 
-            _trapReceiverThread?.Abort();
+            // This should abort itself when the socket above is killed.
+            //_trapReceiverThread?.Abort();
         }
 
         public event EventRaiser OnTrapReceived;
@@ -117,6 +118,10 @@ namespace HomeLabReporting.SNMP
                 try
                 {
                     inLength = socket.ReceiveFrom(inData, ref inEndPoint);
+                    
+                    // Catch the thread being disposed here
+                    if (socket == null)
+                        return;
                 }
                 catch (Exception ex)
                 {
