@@ -18,14 +18,9 @@ namespace HARATSeATSRP
     public class HARATSeATSRPNotifier : IPluginWithRouter
     {
         private const string srpMemoryFile = "Plugins/Config/SRPMemory.json";
-        private ulong _notificationChannelId = 328624738077507584;
-
         private bool _seatWatcherRequestStop;
-
         private List<SRPMemory> srpMemories;
-
         private Thread watcherThread;
-        // this is all horribly hard-coded, but it doesn't matter
 
         public string Name => "HARATSeATSRPNotifier";
         public string Description => "Notifies HARAT Discord when new SRP requests have been logged into SeAT";
