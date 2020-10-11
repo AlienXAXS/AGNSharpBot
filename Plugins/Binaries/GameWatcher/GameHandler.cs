@@ -42,7 +42,14 @@ namespace GameWatcher
                         Log4NetHandler.Log(
                             $"[GameWatcher] Found a role called {role.Name}, it will be deleted for cleanup.",
                             Log4NetHandler.LogLevel.INFO);
-                        await role.DeleteAsync();
+                        try
+                        {
+                            await role.DeleteAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log4NetHandler.Log($"Unable to remove role {role.Name} in {role.Guild.Name}", Log4NetHandler.LogLevel.ERROR, exception:ex);
+                        }
                     }
                 }
 
