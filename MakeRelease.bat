@@ -42,8 +42,6 @@ echo   - GameGiveaway
 copy /Y .\Plugins\Binaries\GameGiveaway\bin\Release\net472\GameGiveaway.dll .\Release_Builder\net472\Plugins
 copy /Y .\Plugins\Binaries\GameGiveaway\bin\Release\netstandard2.0\GameGiveaway.dll .\Release_Builder\netstandard2.0\Plugins
 copy /Y .\Plugins\Binaries\GameGiveaway\bin\Release\netstandard2.0\GameGiveaway.dll .\Release_Builder\netcoreapp3.1\Plugins
-copy /Y .\Plugins\Binaries\GameGiveaway\bin\Release\netstandard2.0\DiscordMenu.dll .\Release_Builder\netcoreapp3.1\Plugins
-
 
 echo   - GameWatcher
 copy /Y .\Plugins\Binaries\GameWatcher\bin\Release\net472\GameWatcher.dll .\Release_Builder\net472\Plugins
@@ -55,14 +53,11 @@ echo   - Auditor
 copy /Y .\Plugins\Binaries\Auditor\bin\Release\net472\Auditor.dll .\Release_Builder\net472\Plugins
 copy /Y .\Plugins\Binaries\Auditor\bin\Release\netstandard2.0\Auditor.dll .\Release_Builder\netstandard2.0\Plugins
 copy /Y .\Plugins\Binaries\Auditor\bin\Release\netstandard2.0\Auditor.dll .\Release_Builder\netcoreapp3.1\Plugins
-copy /Y .\Plugins\Binaries\Auditor\bin\Release\Nancy.Hosting.Self.dll .\Release_Builder\netcoreapp3.1\Plugins
-copy /Y .\Plugins\Binaries\Auditor\bin\Release\Nancy.dll .\Release_Builder\netcoreapp3.1\Plugins
 
 echo   - HomeLabReporting
 copy /Y .\Plugins\Binaries\HomeLabReporting\bin\Release\net472\HomeLabReporting.dll .\Release_Builder\net472\Plugins
 copy /Y .\Plugins\Binaries\HomeLabReporting\bin\Release\netstandard2.0\HomeLabReporting.dll .\Release_Builder\netstandard2.0\Plugins
 copy /Y .\Plugins\Binaries\HomeLabReporting\bin\Release\netstandard2.0\HomeLabReporting.dll .\Release_Builder\netcoreapp3.1\Plugins
-copy /Y .\Plugins\Binaries\HomeLabReporting\bin\Release\SimpleTCP.dll .\Release_Builder\netcoreapp3.1\Plugins
 
 echo   - Responses (AdminPlugin)
 copy /Y .\Plugins\Binaries\Responses\bin\Release\net472\Responses.dll .\Release_Builder\net472\Plugins
