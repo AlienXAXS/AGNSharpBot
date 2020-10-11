@@ -145,6 +145,9 @@ namespace PluginManager
 
             foreach (var plugin in Plugins)
             {
+#if DEBUG
+                if ( plugin.Name != "Spotify Stats") continue;
+#endif
                 Log4NetHandler.Log($"Plugin {plugin.Name} found, attempting ExecutePlugin procedure.",
                     Log4NetHandler.LogLevel.INFO);
 

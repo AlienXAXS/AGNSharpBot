@@ -32,14 +32,6 @@
       <Link>x86\SQLite.Interop.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Plugins\Binaries\ASCIIArt\bin\Debug\ASCIIArt.dll">
-      <Link>Plugins\ASCIIArt.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Plugins\Binaries\Auditor\bin\Debug\Auditor.dll">
-      <Link>Plugins\Auditor.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Plugins\Binaries\Auditor\bin\Debug\Nancy.dll">
       <Link>Nancy.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -48,37 +40,37 @@
       <Link>Nancy.Hosting.Self.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Plugins\Binaries\CatDog\bin\Debug\CatDog.dll">
-      <Link>Plugins\CatDog.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Plugins\Binaries\GameGiveaway\bin\Debug\GameGiveaway.dll">
-      <Link>Plugins\GameGiveaway.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Plugins\Binaries\GameWatcher\bin\Debug\GameWatcher.dll">
-      <Link>Plugins\GameWatcher.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Plugins\Binaries\HARATSeATSRP\bin\Debug\HARATSeATSRP.dll">
-      <Link>Plugins\HARATSeATSRP.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Plugins\Binaries\PUBGWeekly\bin\Debug\PUBGWeekly.dll">
-      <Link>Plugins\PUBGWeekly.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Plugins\Binaries\Responses\bin\Debug\Responses.dll">
-      <Link>Plugins\Responses.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Plugins\Binaries\SpotifyStats\bin\Debug\SpotifyStats.dll">
-      <Link>Plugins\SpotifyStats.dll</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="x64\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Plugins\Binaries\ASCIIArt\bin\Debug\netstandard2.0\ASCIIArt.dll" Link="Plugins\ASCIIArt.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\Auditor\bin\Debug\netstandard2.0\Auditor.dll" Link="Plugins\Auditor.dll" />
+    <None Include="..\Plugins\Binaries\CatDog\bin\Debug\netstandard2.0\CatDog.dll" Link="Plugins\CatDog.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\GameGiveaway\bin\Debug\netstandard2.0\GameGiveaway.dll" Link="Plugins\GameGiveaway.dll" />
+    <None Include="..\Plugins\Binaries\GameWatcher\bin\Debug\netstandard2.0\GameWatcher.dll" Link="Plugins\GameWatcher.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\HARATSeATSRP\bin\Debug\netstandard2.0\HARATSeATSRP.dll" Link="Plugins\HARATSeATSRP.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\HomeLabReporting\bin\Debug\netstandard2.0\HomeLabReporting.dll" Link="Plugins\HomeLabReporting.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\PUBGWeekly\bin\Debug\netstandard2.0\PUBGWeekly.dll" Link="Plugins\PUBGWeekly.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\Responses\bin\Debug\netstandard2.0\Responses.dll" Link="Plugins\Responses.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\SpotifyStats\bin\Debug\netstandard2.0\SpotifyStats.dll" Link="Plugins\SpotifyStats.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Figgle" Version="0.4.0" />
