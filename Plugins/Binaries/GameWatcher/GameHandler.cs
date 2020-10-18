@@ -91,20 +91,37 @@ namespace GameWatcher
                                                     Log4NetHandler.Log(
                                                         $"[GameWatcher-Scanner] User {user.Username} was found in the role {role.Name} but they have a mismatched activity ({game.Name} != {gameName}), removing the role and starting a rescan.",
                                                         Log4NetHandler.LogLevel.ERROR);
-                                                    await user.RemoveRoleAsync(role,
-                                                        new RequestOptions {RetryMode = RetryMode.AlwaysFail});
+                                                    try
+                                                    {
+                                                        await user.RemoveRoleAsync(role,
+                                                            new RequestOptions {RetryMode = RetryMode.AlwaysFail});
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        Log4NetHandler.Log($"Unable to remove {user.Username} from role {role.Name} - Error was: {ex.Message}",
+                                                            Log4NetHandler.LogLevel.ERROR, exception: ex);
+                                                    }
+
                                                     // Rescan the user as they are playing something
                                                     await GameScan(null, user);
                                                 }
                                             }
-                                            else if (user.Activity == null)
+                                        }
+                                        else
+                                        {
+                                            Log4NetHandler.Log(
+                                                $"[GameWatcher-Scanner] User {user.Username} was found in the role {role.Name} but they have no activity, removing them from the role.",
+                                                Log4NetHandler.LogLevel.ERROR);
+                                            // If their activity is null, they should not be in the role at all.
+                                            try
                                             {
-                                                Log4NetHandler.Log(
-                                                    $"[GameWatcher-Scanner] User {user.Username} was found in the role {role.Name} but they have no activity, removing them from the role.",
-                                                    Log4NetHandler.LogLevel.ERROR);
-                                                // If their activity is null, they should not be in the role at all.
                                                 await user.RemoveRoleAsync(role,
                                                     new RequestOptions {RetryMode = RetryMode.AlwaysFail});
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Log4NetHandler.Log($"Unable to remove {user.Username} from role {role.Name} - Error was: {ex.Message}",
+                                                    Log4NetHandler.LogLevel.ERROR, exception: ex);
                                             }
                                         }
 
@@ -115,7 +132,7 @@ namespace GameWatcher
                         }
                         catch (Exception ex)
                         {
-                            Log4NetHandler.Log("Game2Role Unhandled Exception",
+                            Log4NetHandler.Log("Unhandled Exception -> Thread is still alive",
                                 Log4NetHandler.LogLevel.ERROR, exception: ex);
                         }
 
