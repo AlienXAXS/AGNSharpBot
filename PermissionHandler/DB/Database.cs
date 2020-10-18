@@ -43,19 +43,19 @@ namespace PermissionHandler
             return _nodes;
         }
 
-        public Node AddPermission(string path, ulong owner, NodePermission permission, OwnerType ownerType)
+        public Node AddPermission(string path, ulong owner, ulong guildId, NodePermission permission, OwnerType ownerType)
         {
             // first check to see if this path node already exists, if so we must append to it.
             var existingPathNode = GetRootPermissionNode(path);
             if (existingPathNode != null)
             {
-                existingPathNode.AssignOwner(owner, permission, ownerType);
+                existingPathNode.AssignOwner(owner, guildId, permission, ownerType);
                 Save();
                 return existingPathNode;
             }
 
             // It's a new node path, make it and assign the user.
-            var newNode = new Node().AssignPath(path).AssignOwner(owner, permission, ownerType);
+            var newNode = new Node().AssignPath(path).AssignOwner(owner, guildId, permission, ownerType);
 
             _nodes.Add(newNode);
             Save();
@@ -63,7 +63,7 @@ namespace PermissionHandler
             return newNode;
         }
 
-        public Node UpdatePermission(string path, ulong owner, NodePermission permission, OwnerType ownerType)
+        public Node UpdatePermission(string path, ulong owner, ulong guildId, NodePermission permission, OwnerType ownerType)
         {
             // Find the root path node
             var node = GetRootPermissionNode(path);
@@ -71,20 +71,20 @@ namespace PermissionHandler
             if (node == null)
                 throw new Exception($"Unable to Update Permission for {owner}, unable to find root node called {path}");
 
-            var updatedNode = node.UpdateOwner(owner, permission, ownerType);
+            var updatedNode = node.UpdateOwner(owner, guildId, permission, ownerType);
 
             Save();
             return updatedNode;
         }
 
-        public void RemovePermission(string path, ulong owner)
+        public void RemovePermission(string path, ulong owner, ulong guildId)
         {
             // Find the root path node
             var node = GetRootPermissionNode(path);
             if (node == null)
                 throw new Exception($"Unable to Remove Permission for {owner}, unable to find root node called {path}");
 
-            node.RemoveOwner(owner);
+            node.RemoveOwner(owner, guildId);
             Save();
         }
 

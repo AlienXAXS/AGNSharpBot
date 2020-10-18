@@ -60,11 +60,14 @@ namespace Responses.Commands
 
             try
             {
-                Permission.Instance.Remove(path, sktMessage.MentionedUsers.Count == 0
-                    ? sktMessage.MentionedRoles.First().Id
-                    : sktMessage.MentionedUsers.First().Id);
+                if (sktMessage.Author is SocketGuildUser socketGuildUser)
+                {
+                    Permission.Instance.Remove(path, sktMessage.MentionedUsers.Count == 0
+                        ? sktMessage.MentionedRoles.First().Id
+                        : sktMessage.MentionedUsers.First().Id, socketGuildUser.Guild.Id);
 
-                SendMessage("Permission has been set successfully", sktMessage);
+                    SendMessage("Permission has been removed successfully", sktMessage);
+                }
             }
             catch (Exception ex)
             {
@@ -111,15 +114,19 @@ namespace Responses.Commands
             // Will catch any raised exception from the Permissions system here.
             try
             {
-                Permission.Instance.Add(path,
-                    sktMessage.MentionedUsers.Count == 0
-                        ? sktMessage.MentionedRoles.First().Id
-                        : sktMessage.MentionedUsers.First().Id,
-                    explicitDeny
-                        ? NodePermission.Deny
-                        : NodePermission.Allow,
-                    sktMessage.MentionedUsers.Count == 0 ? OwnerType.Role : OwnerType.User);
-                SendMessage("Permission has been set successfully", sktMessage);
+                if (sktMessage.Author is SocketGuildUser socketGuildUser)
+                {
+                    Permission.Instance.Add(path,
+                        sktMessage.MentionedUsers.Count == 0
+                            ? sktMessage.MentionedRoles.First().Id
+                            : sktMessage.MentionedUsers.First().Id,
+                        socketGuildUser.Guild.Id,
+                        explicitDeny
+                            ? NodePermission.Deny
+                            : NodePermission.Allow,
+                        sktMessage.MentionedUsers.Count == 0 ? OwnerType.Role : OwnerType.User);
+                    SendMessage("Permission has been set successfully", sktMessage);
+                }
             }
             catch (Exception ex)
             {

@@ -48,7 +48,7 @@ namespace PermissionHandler
             return _registeredPermissionPaths;
         }
 
-        public Node Add(string path, ulong owner, NodePermission permission, OwnerType ownerType)
+        public Node Add(string path, ulong owner, ulong guildId, NodePermission permission, OwnerType ownerType)
         {
             var foundPath = _database.GetData().DefaultIfEmpty(null).FirstOrDefault(x => x.Path.Equals(path));
             if (foundPath == null)
@@ -58,10 +58,10 @@ namespace PermissionHandler
                 throw new Exception(
                     "The supplied user is already a member of this permission path, either modify them or remove them");
 
-            return _database.AddPermission(path, owner, permission, ownerType);
+            return _database.AddPermission(path, owner, guildId, permission, ownerType);
         }
 
-        public void Remove(string path, ulong owner)
+        public void Remove(string path, ulong owner, ulong guildId)
         {
             var foundPath = _database.GetData().DefaultIfEmpty(null).FirstOrDefault(x => x.Path.Equals(path));
             if (foundPath == null)
@@ -70,7 +70,7 @@ namespace PermissionHandler
             if (foundPath.Permissions.Where(x => x.Owner == owner).DefaultIfEmpty(null).FirstOrDefault() == null)
                 throw new Exception("The supplied user is not a member of this permission path");
 
-            _database.RemovePermission(path, owner);
+            _database.RemovePermission(path, owner, guildId);
         }
 
         public bool CheckPermission(SocketGuildUser sktUser,
@@ -93,7 +93,7 @@ namespace PermissionHandler
             foreach (var role in sktUser.Roles)
             {
                 var rolePerm = permissionNode.Permissions.DefaultIfEmpty(null)
-                    .FirstOrDefault(x => x.Owner.Equals(role.Id));
+                    .FirstOrDefault(x => x.Owner.Equals(role.Id) && x.GuildId.Equals(sktUser.Guild.Id));
 
                 switch (rolePerm?.Permission)
                 {
@@ -113,11 +113,11 @@ namespace PermissionHandler
             // Find explicit user allow
             if (!canPermit)
                 canPermit = permissionNode.Permissions
-                    .Any(x => x.Owner.Equals(sktUser.Id) && x.Permission == NodePermission.Allow);
+                    .Any(x => x.Owner.Equals(sktUser.Id) && x.GuildId.Equals(sktUser.Guild.Id) && x.Permission == NodePermission.Allow);
 
             // Find explicit user deny
             var foundExplicitDeny = permissionNode.Permissions
-                .Any(x => x.Owner.Equals(sktUser.Id) && x.Permission == NodePermission.Deny);
+                .Any(x => x.Owner.Equals(sktUser.Id) && x.GuildId.Equals(sktUser.Guild.Id) && x.Permission == NodePermission.Deny);
 
             return canPermit && !foundExplicitDeny && !foundExplicitRoleDeny;
         }
