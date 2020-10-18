@@ -13,16 +13,22 @@ mkdir .\Release_Builder\netcoreapp3.1 > NUL
 mkdir .\Release_Builder\netcoreapp3.1\Plugins > NUL
 
 echo Copying new files (net472)...
-copy /Y .\AGNSharpBot_v2\bin\Release\net472 .\Release_Builder\net472 > NUL
+xcopy .\AGNSharpBot_v2\bin\Release\net472 .\Release_Builder\net472 /E /I
 xcopy AGNSharpBot_v2\html_docs Release_Builder\net472\html_docs /E /I
 
 echo Copying new files (netstandard)...
-copy /Y .\AGNSharpBot_v2\bin\Release\netcoreapp3.1 .\Release_Builder\netcoreapp3.1 > NUL
+xcopy .\AGNSharpBot_v2\bin\Release\netcoreapp3.1 .\Release_Builder\netcoreapp3.1 /E /I
 xcopy AGNSharpBot_v2\html_docs Release_Builder\netstandard2.0\html_docs /E /I
 
 echo Copying new files (netstandard)...
 copy /Y .\AGNSharpBot_v2\bin\Release\netcoreapp3.1 .\Release_Builder\netcoreapp3.1 > NUL
 xcopy AGNSharpBot_v2\html_docs Release_Builder\netcoreapp3.1\html_docs /E /I
+
+echo Cleaning Release...
+del /Q .\Release_Builder\netcoreapp3.1\*.json
+del /Q .\Release_Builder\netcoreapp3.1\*.pdb
+del /Q .\Release_Builder\net472\*.json
+del /Q .\Release_Builder\net472\*.pdb
 
 echo Copying Plugins...
 
