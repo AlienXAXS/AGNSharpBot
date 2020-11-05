@@ -75,7 +75,7 @@ namespace HomeLabReporting.APCPDU.Telnet
                         tcpClient.Disconnect();
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //await sktMessage.Channel.SendMessageAsync($"Error while processing command:\r\n{ex.Message}");
                     tcpClient.Disconnect();

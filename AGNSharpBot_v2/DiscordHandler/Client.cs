@@ -32,7 +32,12 @@ namespace AGNSharpBot.DiscordHandler
             _services = services;
 
             var _config = new DiscordSocketConfig
-                {MessageCacheSize = 100, DefaultRetryMode = RetryMode.AlwaysRetry, AlwaysDownloadUsers = true};
+                {
+                    MessageCacheSize = 100,
+                    DefaultRetryMode = RetryMode.AlwaysRetry,
+                    AlwaysDownloadUsers = true,
+                    GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.GuildPresences
+                };
             _discordSocket = new DiscordSocketClient(_config);
             _discordSocket.Log += message =>
             {

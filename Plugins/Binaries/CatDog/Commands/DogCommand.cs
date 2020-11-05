@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using CommandHandler;
 using Discord.WebSocket;
+using GlobalLogger;
 
 namespace CatDog.Commands
 {
@@ -27,7 +28,7 @@ namespace CatDog.Commands
             }
         }
 
-        [Command("dog", "Posts an image of a dog into the channel you put the command in - putting gif.")]
+        [Command("dog", "Posts an image of a dog into the channel you put the command in.")]
         [Alias("dog", "woof", "doggo")]
         [Permissions(Permissions.PermissionTypes.Guest)]
         public async void Dog(string[] parameters, SocketMessage sktMessage, DiscordSocketClient discordSocketClient)
@@ -65,8 +66,7 @@ namespace CatDog.Commands
             }
             catch (Exception ex)
             {
-                await sktMessage.Channel.SendMessageAsync(
-                    "Unable to load doggo, It's probs Jo's fault - she killed the dog via aggressive petting.");
+                GlobalLogger.Log4NetHandler.Log($"Error while attempting to get a doggo", Log4NetHandler.LogLevel.ERROR, exception:ex);
             }
         }
 

@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\Discord.Net\src\Discord.Net.Webhook\Discord.Net.Webhook.csproj" />
     <ProjectReference Include="..\..\Discord.Net\src\Discord.Net.WebSocket\Discord.Net.WebSocket.csproj" />
     <ProjectReference Include="..\CommandHandler\CommandHandler.csproj" />
+    <ProjectReference Include="..\DiscordMenu\DiscordMenu.csproj" />
     <ProjectReference Include="..\GlobalLogger\GlobalLogger.csproj" />
     <ProjectReference Include="..\PluginManager\PluginManager.csproj" />
     <ProjectReference Include="..\pubg-dotnet\pubg-dotnet.csproj" />

@@ -123,7 +123,7 @@ namespace HomeLabReporting.SNMP
                     if (socket == null)
                         return;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     inLength = -1;
                 }

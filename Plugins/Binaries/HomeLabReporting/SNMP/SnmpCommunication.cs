@@ -30,7 +30,7 @@ namespace HomeLabReporting.SNMP
             TrapReceiver.Instance.OnTrapReceived += RaisedOnTrapReceived;
         }
 
-        private async void RaisedOnTrapReceived(object sender, IpAddress ipAddress, VbCollection snmpVbCollection)
+        private void RaisedOnTrapReceived(object sender, IpAddress ipAddress, VbCollection snmpVbCollection)
         {
             var snmpHost = _snmpHosts.FirstOrDefault(x => x.IpAddress ==
                                                           (ipAddress.ToString().Contains(":")
@@ -52,14 +52,14 @@ namespace HomeLabReporting.SNMP
 
             var foundTrap = false;
             foreach (var snmpVb in snmpVbCollection)
-            foreach (var trapDefinition in snmpHost.SnmpHostTraps)
-                // Do we have a match?
-                if (snmpVb.Oid.ToString().Equals(trapDefinition.Oid))
-                {
-                    trapDefinition.LastValue = new SnmpHostValueDefinition(snmpVb.Value.ToString());
-                    //await Logger.Instance.Log($"[SNMP TRAP] From {snmpHost.Name} -['{trapDefinition.ReadableName}' has a value of '{trapDefinition.LastValue.Value}']-", Logger.LoggerType.ConsoleAndDiscord, Logger.Instance.NewDiscordMention(trapDefinition.MentionSettings.UserId, trapDefinition.MentionSettings.GuildId, trapDefinition.MentionSettings.ChannelId));
-                    foundTrap = true;
-                }
+                foreach (var trapDefinition in snmpHost.SnmpHostTraps)
+                    // Do we have a match?
+                    if (snmpVb.Oid.ToString().Equals(trapDefinition.Oid))
+                    {
+                        trapDefinition.LastValue = new SnmpHostValueDefinition(snmpVb.Value.ToString());
+                        //await Logger.Instance.Log($"[SNMP TRAP] From {snmpHost.Name} -['{trapDefinition.ReadableName}' has a value of '{trapDefinition.LastValue.Value}']-", Logger.LoggerType.ConsoleAndDiscord, Logger.Instance.NewDiscordMention(trapDefinition.MentionSettings.UserId, trapDefinition.MentionSettings.GuildId, trapDefinition.MentionSettings.ChannelId));
+                        foundTrap = true;
+                    }
 
             if (!foundTrap)
             {

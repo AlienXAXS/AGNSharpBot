@@ -131,7 +131,7 @@ namespace PluginManager
             return foundEntry.Enabled;
         }
 
-        private async void InitPluginsReady()
+        private void InitPluginsReady()
         {
             if (_hasExecutedPlugins) return;
             _hasExecutedPlugins = true;
@@ -146,7 +146,7 @@ namespace PluginManager
             foreach (var plugin in Plugins)
             {
 #if DEBUG
-                if ( plugin.Name != "Spotify Stats") continue;
+                if (plugin.Name != "GameWatcher") continue;
 #endif
                 Log4NetHandler.Log($"Plugin {plugin.Name} found, attempting ExecutePlugin procedure.",
                     Log4NetHandler.LogLevel.INFO);

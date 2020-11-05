@@ -140,8 +140,6 @@ namespace Auditor.WebServer
                 default:
                     return new ReturnValue(true, "Unknown command, use help");
             }
-
-            return null;
         }
 
         private class ReturnValue
