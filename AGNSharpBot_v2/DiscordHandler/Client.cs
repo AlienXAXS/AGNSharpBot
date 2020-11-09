@@ -36,7 +36,7 @@ namespace AGNSharpBot.DiscordHandler
                     MessageCacheSize = 100,
                     DefaultRetryMode = RetryMode.AlwaysRetry,
                     AlwaysDownloadUsers = true,
-                    GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.GuildPresences
+                    GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.GuildPresences | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildMembers
                 };
             _discordSocket = new DiscordSocketClient(_config);
             _discordSocket.Log += message =>
