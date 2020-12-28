@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -14,7 +15,6 @@ namespace AGNSharpBot
 {
     internal class Program
     {
-        private static EventHandler _handler;
         private static bool _running = true;
 
         private readonly Client _discordClient = Client.Instance;
@@ -81,7 +81,7 @@ namespace AGNSharpBot
                     else if (System.IO.File.Exists(libFile))
                         return System.Reflection.Assembly.LoadFile(libFile);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return null;
                 }

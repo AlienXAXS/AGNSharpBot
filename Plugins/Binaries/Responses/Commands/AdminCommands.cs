@@ -3,6 +3,7 @@ using System.Linq;
 using CommandHandler;
 using Discord;
 using Discord.WebSocket;
+using Newtonsoft.Json;
 
 namespace Responses.Commands
 {
@@ -104,6 +105,80 @@ namespace Responses.Commands
 
             await sktMessage.Channel.SendMessageAsync(
                 $"Channel ID is {sktMessage.Channel.Id} which is in the guild {_guildID}");
+        }
+
+        [Command("grm","Guild Root Management")]
+        public async void RemoveBotFromGuild(string[] parameters, SocketMessage sktMessage,
+            DiscordSocketClient discordSocketClient)
+        {
+            if (parameters.Length == 1)
+            {
+                await sktMessage.Channel.SendMessageAsync("`Guild Root Management`\r\n" +
+                                                          "Try !grm help for help");
+                return;
+            }
+
+            if (!sktMessage.Author.Id.Equals(316565781985099777))
+            {
+                await sktMessage.Channel.SendMessageAsync(
+                    $"Sorry {sktMessage.Author.Username}, you do not have the permissions to run this command.");
+                return;
+            }
+
+            switch (parameters[1].ToLower())
+            {
+                case "help":
+                    await sktMessage.Channel.SendMessageAsync(
+                        "This has no help, if you do not know how to use this command already, you should not be using it at all");
+                    break;
+
+                case "rm":
+                    if (parameters.Length == 3)
+                    {
+                        try
+                        {
+                            ulong.TryParse(parameters[2], out var guildID);
+                            var guildToRemove = discordSocketClient.Guilds.DefaultIfEmpty(null)
+                                .FirstOrDefault(x => x.Id == guildID);
+
+                            if (guildToRemove != null)
+                            {
+                                var guildName = guildToRemove.Name;
+                                await guildToRemove.LeaveAsync();
+                                await sktMessage.Channel.SendMessageAsync($"I removed myself from {guildName}, yeet!");
+                            }
+                            else
+                            {
+                                await sktMessage.Channel.SendMessageAsync(
+                                    "Unable to leave the supplied guild, as I believe I am not in it");
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            await sktMessage.Channel.SendMessageAsync($"Could not convert {parameters[2]} to a ulong");
+                        }
+                    }
+                    else
+                    {
+                        await sktMessage.Channel.SendMessageAsync("Missing parameter");
+                    }
+                    break;
+
+                case "list":
+                    var guildList = $"I am in {discordSocketClient.Guilds.Count} guilds, here is the list:\r\n\r\n";
+                    foreach (var guild in discordSocketClient.Guilds)
+                    {
+                        guildList += $"{guild.Name} ({guild.Id} | {guild.MemberCount})\r\n";
+                    }
+
+                    await sktMessage.Channel.SendMessageAsync(guildList);
+                    break;
+
+                default:
+                    break;
+            }
+
+            //discordSocketClient.Guilds.First().LeaveAsync()
         }
 
         /*
