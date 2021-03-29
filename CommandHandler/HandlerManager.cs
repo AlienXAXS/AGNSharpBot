@@ -101,9 +101,23 @@ namespace CommandHandler
                     return;
                 }
 
+                if (paramCommand.Equals("version", StringComparison.OrdinalIgnoreCase))
+                {
+                    await socketMessage.Channel.SendMessageAsync("AGNSharpBot v0.2.1 - Created by AlienX");
+                    return;
+                }
+
                 if (paramCommand.Equals("plugins", StringComparison.OrdinalIgnoreCase) ||
                     paramCommand.Equals("plugin", StringComparison.OrdinalIgnoreCase))
                 {
+
+                    // Disallow anyone bar an Administrator to run this command
+                    if (!sktGuildUser.Roles.Any(x => x.Permissions.Administrator))
+                    {
+                        return;
+                    }
+
+
                     var embed = new EmbedBuilder();
                     var plugins = PluginHandler.Instance.GetPlugins();
                     if (parameters.Length == 1)
