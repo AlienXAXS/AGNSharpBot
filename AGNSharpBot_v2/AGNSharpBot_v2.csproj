@@ -74,6 +74,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="4.1.0" />
     <PackageReference Include="Figgle" Version="0.4.0" />
     <PackageReference Include="JsonApiSerializer" Version="1.7.4" />
     <PackageReference Include="log4net" Version="2.0.10" />
