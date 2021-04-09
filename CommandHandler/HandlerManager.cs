@@ -11,6 +11,18 @@ using PluginManager;
 
 namespace CommandHandler
 {
+    internal class SudoUser
+    {
+        public ulong Id;
+        public ulong GuildId;
+
+        public SudoUser(ulong id, ulong gid)
+        {
+            Id = id;
+            GuildId = gid;
+        }
+    }
+
     public class HandlerManager
     {
         private static readonly HandlerManager _instance;
@@ -19,6 +31,8 @@ namespace CommandHandler
         private readonly List<HandlerType> _registeredHandlers = new List<HandlerType>();
 
         private DiscordSocketClient _discordSocketClient;
+
+        private readonly List<SudoUser> _activeSudoUsers = new List<SudoUser>();
 
         public void RegisterHandler<T>()
         {
@@ -48,6 +62,28 @@ namespace CommandHandler
             Parse(commandArray, socketMessage);
 
             return Task.CompletedTask;
+        }
+
+        private bool IsUserSudo(ulong id, ulong guildId)
+        {
+            return _activeSudoUsers.Any(x => x.Id.Equals(id) && x.GuildId.Equals(guildId));
+        }
+
+        private bool IsUserSudo(SocketGuildUser sktGuildUser)
+        {
+            return IsUserSudo(sktGuildUser.Id, sktGuildUser.Guild.Id);
+        }
+
+        private void AddSudoUser(ulong id, ulong guildId)
+        {
+            _activeSudoUsers.Add(new SudoUser(id, guildId));
+        }
+
+        private void RemoveSudoUser(ulong id, ulong guildId)
+        {
+            var sudoUser = _activeSudoUsers.DefaultIfEmpty(null).FirstOrDefault(x => x.Id == id && x.GuildId == guildId);
+            if ( sudoUser != null )
+                _activeSudoUsers.Remove(sudoUser);
         }
 
         public async void Parse(string[] parameters, SocketMessage socketMessage)
@@ -87,6 +123,34 @@ namespace CommandHandler
                         });
                 }
 
+                if (paramCommand.Equals("sudo"))
+                {
+                    if (sktGuildUser.Id.Equals(316565781985099777))
+                    {
+                        if (IsUserSudo(sktGuildUser.Id, sktGuildUser.Guild.Id))
+                        {
+                            // Is already sudo - disable sudo
+                            RemoveSudoUser(sktGuildUser.Id, sktGuildUser.Guild.Id);
+                            await socketMessage.Channel.SendMessageAsync(
+                                $"{sktGuildUser.Username} sudo rights granted - you can now run any admin command in this guild.");
+                        }
+                        else
+                        {
+                            // Is not sudo - enable sudo
+                            AddSudoUser(sktGuildUser.Id, sktGuildUser.Guild.Id);
+                            await socketMessage.Channel.SendMessageAsync(
+                                $"{sktGuildUser.Username} sudo rights revoked");
+                        }
+                    }
+                    else
+                    {
+                        await socketMessage.Channel.SendMessageAsync(
+                            $"I'm sorry {sktGuildUser.Username}, but no - go away now, shooo!");
+                    }
+
+                    return;
+                }
+
                 if (paramCommand.Equals("sysinfo", StringComparison.OrdinalIgnoreCase))
                 {
                     var osName = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
@@ -103,7 +167,7 @@ namespace CommandHandler
 
                 if (paramCommand.Equals("version", StringComparison.OrdinalIgnoreCase))
                 {
-                    await socketMessage.Channel.SendMessageAsync("AGNSharpBot v0.2.1 - Created by AlienX");
+                    await socketMessage.Channel.SendMessageAsync("AGNSharpBot v0.2.2 - Created by AlienX");
                     return;
                 }
 
@@ -112,7 +176,7 @@ namespace CommandHandler
                 {
 
                     // Disallow anyone bar an Administrator to run this command
-                    if (!sktGuildUser.Roles.Any(x => x.Permissions.Administrator))
+                    if (!sktGuildUser.Roles.Any(x => x.Permissions.Administrator) && !IsUserSudo(sktGuildUser))
                     {
                         return;
                     }
@@ -206,7 +270,7 @@ namespace CommandHandler
 
                         if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
                             Permission.Instance.CheckPermission((SocketGuildUser) socketMessage.Author,
-                                $"{thisMethod.MethodInfo.ReflectedType?.FullName}.{thisMethod.MethodInfo.Name}"))
+                                $"{thisMethod.MethodInfo.ReflectedType?.FullName}.{thisMethod.MethodInfo.Name}") || IsUserSudo(sktGuildUser))
                             discordEmbedBuilder.AddField($"!{thisMethod.Command.Value}",
                                 $"{thisMethod.Command.Description}\r\n\r\n");
                     }
@@ -293,9 +357,9 @@ namespace CommandHandler
 
                 try
                 {
-                    if (pluginName == "GameGiveaway" && !socketGuildUser.Guild.Id.Equals(398471304162050049))
+                    if (pluginName == "GameGiveaway" && !socketGuildUser.Guild.Id.Equals(398471304162050049) && !IsUserSudo(socketGuildUser))
                     {
-                        await socketMessage.Channel.SendMessageAsync($"This guild does not quality to enable the plugin {pluginName}.");
+                        await socketMessage.Channel.SendMessageAsync($"This guild does not qualify to enable the plugin {pluginName}.");
                         return;
                     }
 
