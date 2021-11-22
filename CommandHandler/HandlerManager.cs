@@ -132,14 +132,14 @@ namespace CommandHandler
                             // Is already sudo - disable sudo
                             RemoveSudoUser(sktGuildUser.Id, sktGuildUser.Guild.Id);
                             await socketMessage.Channel.SendMessageAsync(
-                                $"{sktGuildUser.Username} sudo rights granted - you can now run any admin command in this guild.");
+                                $"{sktGuildUser.Username} sudo rights revoked");
                         }
                         else
                         {
                             // Is not sudo - enable sudo
                             AddSudoUser(sktGuildUser.Id, sktGuildUser.Guild.Id);
                             await socketMessage.Channel.SendMessageAsync(
-                                $"{sktGuildUser.Username} sudo rights revoked");
+                                $"{sktGuildUser.Username} sudo rights granted - you can now run any admin command in this guild.");
                         }
                     }
                     else
@@ -167,7 +167,7 @@ namespace CommandHandler
 
                 if (paramCommand.Equals("version", StringComparison.OrdinalIgnoreCase))
                 {
-                    await socketMessage.Channel.SendMessageAsync("AGNSharpBot v0.2.2 - Created by AlienX");
+                    await socketMessage.Channel.SendMessageAsync("AGNSharpBot v0.2.3 - Created by AlienX");
                     return;
                 }
 
@@ -176,9 +176,12 @@ namespace CommandHandler
                 {
 
                     // Disallow anyone bar an Administrator to run this command
-                    if (!sktGuildUser.Roles.Any(x => x.Permissions.Administrator) && !IsUserSudo(sktGuildUser))
+                    if (!IsUserSudo(sktGuildUser))
                     {
-                        return;
+                        if (!sktGuildUser.Roles.Any(x => x.Permissions.Administrator))
+                        {
+                            return;
+                        }
                     }
 
 
@@ -312,7 +315,7 @@ namespace CommandHandler
                                 messageAuthor.Guild.Id))
                             {
                                 if (thisMethod.Permissions?.Value == Permissions.PermissionTypes.Guest ||
-                                    hasExplicitPermission)
+                                    hasExplicitPermission || IsUserSudo(sktGuildUser))
                                 {
                                     // Execute the method
                                     var paramArray = new object[] {parameters, socketMessage, _discordSocketClient};
