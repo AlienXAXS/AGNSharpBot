@@ -19,7 +19,7 @@ namespace Auditor
         public string Name => "Auditor";
 
         public string Description =>
-            "Audits all actions of users within your guild, accessable and searchable via a web interface.";
+            "Audits all actions of users within your guild, accessible and searchable via a web interface.";
 
         public EventRouter EventRouter { get; set; }
 
