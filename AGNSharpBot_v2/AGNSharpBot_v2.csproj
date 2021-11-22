@@ -49,7 +49,9 @@
     <None Include="..\Plugins\Binaries\ASCIIArt\bin\Debug\netstandard2.0\ASCIIArt.dll" Link="Plugins\ASCIIArt.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Plugins\Binaries\Auditor\bin\Debug\netstandard2.0\Auditor.dll" Link="Plugins\Auditor.dll" />
+    <None Include="..\Plugins\Binaries\Auditor\bin\Debug\netstandard2.0\Auditor.dll" Link="Plugins\Auditor.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="..\Plugins\Binaries\CatDog\bin\Debug\netstandard2.0\CatDog.dll" Link="Plugins\CatDog.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

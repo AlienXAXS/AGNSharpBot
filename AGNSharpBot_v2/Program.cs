@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -35,6 +36,7 @@ namespace AGNSharpBot
         {
             Client.Instance.Dispose();
             PluginHandler.Instance.Dispose();
+            InternalDatabase.Handler.Instance.Dispose();
             Log4NetHandler.Log("Shutting down application...", Log4NetHandler.LogLevel.INFO);
             Thread.Sleep(1500);
             _running = false;

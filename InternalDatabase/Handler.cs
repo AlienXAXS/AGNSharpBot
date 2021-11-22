@@ -48,5 +48,14 @@ namespace InternalDatabase
             _connections.Add(new Connection(connectionName));
             return _connections[_connections.Count - 1];
         }
+
+        public void Dispose()
+        {
+            foreach (var connection in _connections)
+            {
+                Log4NetHandler.Log($"Closing database {connection.DatabaseName}", Log4NetHandler.LogLevel.INFO);
+                connection.DbConnection.Close();
+            }
+        }
     }
 }
