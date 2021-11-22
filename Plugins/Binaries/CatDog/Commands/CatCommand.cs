@@ -65,12 +65,12 @@ namespace CatDog.Commands
                 {
                     await message.DeleteAsync();
 
-                    if (!Directory.Exists(".\\temp"))
-                        Directory.CreateDirectory(".\\temp");
+                    if (!Directory.Exists("./temp"))
+                        Directory.CreateDirectory("./temp");
 
                     var randomNumberGenerator = new Random();
                     var rng = randomNumberGenerator.Next(10000, 50000);
-                    var fileName = $".\\temp\\{rng}." + (gif ? "cat.gif" : "cat.png");
+                    var fileName = $"./temp/{rng}." + (gif ? "cat.gif" : "cat.png");
 
                     var fs = File.Create(fileName);
                     stream.Seek(0, SeekOrigin.Begin);
