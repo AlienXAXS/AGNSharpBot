@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Auditor;
 using CommandHandler;
 using Discord;
 using Discord.WebSocket;
@@ -105,6 +109,122 @@ namespace Responses.Commands
 
             await sktMessage.Channel.SendMessageAsync(
                 $"Channel ID is {sktMessage.Channel.Id} which is in the guild {_guildID}");
+        }
+
+        [Command("rmiu", "Removes inactive users from the guild (!rmiu <days> [roleid to keep] [..] [..] [..])")]
+        public async void RemoveInactiveUsers(string[] parameters, SocketMessage sktMessage,
+            DiscordSocketClient discordSocketClient)
+        {
+            var db = InternalDatabase.Handler.Instance.GetConnection("Auditor");
+            if (db == null)
+            {
+                await sktMessage.Channel.SendMessageAsync("Unable to connect to the Auditor Database, try again later");
+                return;
+            }
+
+            if (int.TryParse(parameters[1], out var dayCount))
+            {
+                var isDryRun = false;
+                var dt = DateTime.Now.AddDays(dayCount * -1);
+                var dryRunMessage = $"Parameters: {String.Join(",",parameters)}\r\nTimestamp: {dt.ToUniversalTime().Ticks}\r\n\r\n";
+                if (parameters.Length >= 3)
+                {
+                    if (parameters[2].Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        isDryRun = true;
+                    }
+                }
+
+                var skipRoles = new List<ulong>();
+                for (var i = 2; i < parameters.Length; i++)
+                {
+                    if ( ulong.TryParse(parameters[i], out var ulongResult ) )
+                        skipRoles.Add(ulongResult);
+                }
+
+                var tableMapping = db.DbConnection.TableMappings.DefaultIfEmpty(null).FirstOrDefault(x => x.TableName.Equals("AuditEntry"));
+                if (tableMapping == null)
+                {
+                    await sktMessage.Channel.SendMessageAsync(
+                        "Unable to locate the AuditEntry database table, something has gone weirdly wrong...");
+                    return;
+                }
+
+                if (sktMessage.Channel is SocketGuildChannel _channel)
+                {
+                    var kickedUserCount = 0;
+                    var currentIteration = 0;
+                    var totalUsers = _channel.Guild.Users.Count;
+
+                    await sktMessage.Channel.SendMessageAsync(
+                        $"Attempting to find users who have not been active in {dayCount} days... This will take awhile! IsDryRun:{isDryRun}");
+
+                    foreach (var user in _channel.Guild.Users.Where(x => !x.IsBot && !x.Roles.Any(y => y.Permissions.Administrator)))
+                    {
+                        currentIteration++;
+                        var percentCompletion = (int)Math.Round((double)currentIteration * 100 / totalUsers);
+                        
+                        if (percentCompletion % 10 == 0)
+                        {
+                            await sktMessage.Channel.SendMessageAsync(
+                                $"Current Task Completion: {percentCompletion}% ({currentIteration}/{totalUsers})");
+                        }
+
+                        if (skipRoles.Any())
+                        {
+                            if (user.Roles.Any(role => skipRoles.Any(zz => zz.Equals(role.Id))))
+                            {
+                                dryRunMessage = $"{dryRunMessage}[SKIP] {user.Username} skipped as they belong to a skipped role\r\n";
+                                continue;
+                            }
+                        }
+
+                        var queryResults = db.DbConnection.Query(tableMapping, "SELECT * FROM AuditEntry WHERE Type = 2 AND UserId = ? AND GuildId = ? AND Timestamp > ?", new object[] { (long)user.Id, (long)user.Guild.Id, (long)dt.ToUniversalTime().Ticks });
+                        if (queryResults.Count == 0)
+                        {
+                            if (isDryRun)
+                            {
+                                dryRunMessage = $"{dryRunMessage}[KICK] {user.Username} would have been kicked for inactivity.\r\n";
+                            }
+                            else
+                            {
+                                await user.SendMessageAsync(
+                                    $"You were kicked by AGNSharpBot: 'You have not been active within this guild: {_channel.Guild.Name}, and therefore have been removed.  If you believe this was in error, you're free to rejoin at https://www.agngaming.com/discord'");
+                                await user.KickAsync(
+                                    $"You were kicked by AGNSharpBot: 'You have not been active within this guild: {_channel.Guild.Name}, and therefore have been removed.  If you believe this was in error, you're free to rejoin at https://www.agngaming.com/discord'");
+                            }
+                            kickedUserCount++;
+                        }
+                        else
+                        {
+                            var auditEntry = (AuditorSql.AuditEntry) queryResults.Last();
+                            dryRunMessage = $"{dryRunMessage}[KEPT] {user.Username} last spoke {auditEntry.Timestamp}\r\n";
+                        }
+                    }
+
+                    if (isDryRun)
+                    {
+                        await sktMessage.Channel.SendMessageAsync($"I would have kicked {kickedUserCount} users from this guild, results below.");
+
+                        var stream = new MemoryStream();
+                        var writer = new StreamWriter(stream);
+                        await writer.WriteAsync(dryRunMessage);
+                        await writer.FlushAsync();
+                        stream.Position = 0;
+
+                        await sktMessage.Channel.SendFileAsync(stream, "results.txt");
+                    }
+                    else
+                    {
+                        await sktMessage.Channel.SendMessageAsync($"I have kicked {kickedUserCount} users from this guild.");
+                    }
+                }
+            }
+            else
+            {
+                await sktMessage.Channel.SendMessageAsync(
+                    $"{parameters[1]} is not a supported day offset, please supply the correct offset");
+            }
         }
 
         [Command("grm","Guild Root Management")]

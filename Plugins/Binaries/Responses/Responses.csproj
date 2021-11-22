@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\..\InternalDatabase\InternalDatabase.csproj" />
     <ProjectReference Include="..\..\..\PermissionHandler\PermissionHandler.csproj" />
     <ProjectReference Include="..\..\..\PluginManager\PluginManager.csproj" />
+    <ProjectReference Include="..\Auditor\Auditor.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Figgle" Version="0.4.0" />
