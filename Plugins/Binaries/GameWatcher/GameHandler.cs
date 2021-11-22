@@ -246,7 +246,7 @@ namespace GameWatcher
                             $"[{newGuildUser.Id} | {randomNumber}] User {newGuildUser.Username} has started an activity {newGuildUser.Activity.Name}, checking to see if it's in the game watcher database",
                             Log4NetHandler.LogLevel.DEBUG);
 
-                        if (!DatabaseHandler.Instance.Exists(game.Name, socketGuild.Id)) return;
+                        if (!DatabaseHandler.Instance.Exists(game.Name, socketGuild.Id, true)) return;
 
                         Log4NetHandler.Log($"[{newGuildUser.Id} | {randomNumber}] Game is in db, processing...",
                             Log4NetHandler.LogLevel.DEBUG);

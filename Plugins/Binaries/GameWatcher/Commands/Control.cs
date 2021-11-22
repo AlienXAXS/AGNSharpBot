@@ -37,6 +37,7 @@ namespace GameWatcher.Commands
                 case "help":
                     await sktMessage.Channel.SendMessageAsync("`Game Watcher Control`\r\n" +
                                                               "`!gamewatcher add \"GAME NAME\"` - Adds a game to the database.\r\n" +
+                                                              "`!gamewatcher addalias \"GAME NAME\" \"ALIAS NAME\"` - Adds an Alias to a already existing game (1 per game).\r\n" +
                                                               "`!gamewatcher remove \"GAME NAME\"` - Removes a game from the database.\r\n" +
                                                               "`!gamewatcher list` - Lists all games that are added to the database.\r\n" +
                                                               "`!gamewatcher scan` - Scans all users for games.");
@@ -50,6 +51,15 @@ namespace GameWatcher.Commands
                     }
 
                     AddGame(parameters[2], sktMessage);
+                    break;
+
+                case "addalias":
+                    if (parameters.Length != 4)
+                    {
+                        await sktMessage.Channel.SendMessageAsync("Invalid command syntax");
+                    }
+
+                    AddGameAlias(parameters[2], parameters[3], sktMessage);
                     break;
 
                 case "remove":
@@ -144,6 +154,62 @@ namespace GameWatcher.Commands
                 await sktMessage.Channel.SendMessageAsync(
                     $"There was an exception attempting to execute your command, please contact the bot author.\r\n\r\nException Details: {ex.Message}");
                 Log4NetHandler.Log("Exception in GameWatcher ListGames", Log4NetHandler.LogLevel.ERROR, exception: ex);
+            }
+        }
+
+        private async void AddGameAlias(string gameName, string alias, SocketMessage sktMessage)
+        {
+            if (sktMessage.Channel is SocketGuildChannel sktMessageChannel)
+            {
+                var guildId = sktMessageChannel.Guild.Id;
+                try
+                {
+
+                    if (DatabaseHandler.Instance.Exists(gameName, guildId))
+                    {
+                        DatabaseHandler.Instance.AddAlias(gameName, alias, guildId);
+                        await sktMessage.Channel.SendMessageAsync(
+                            $"Successfully set the alias of {gameName} to {alias}");
+                    }
+                    else
+                    {
+                        await sktMessage.Channel.SendMessageAsync(
+                            $"The game {gameName} does not exist.  I cannot add an Alias for games that do not exist!");
+                    }
+                }
+                catch (GameNotFoundException)
+                {
+                    await sktMessage.Channel.SendMessageAsync($"Unable to add an alias to the game {gameName} as it does not exist.");
+                }
+                catch (Exception ex)
+                {
+                    await sktMessage.Channel.SendMessageAsync(
+                        $"Database failure.\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                }
+            }
+        }
+
+        private async void RemoveGameAlias(string gameName, string alias, SocketMessage sktMessage)
+        {
+            if (sktMessage.Channel is SocketGuildChannel sktMessageChannel)
+            {
+                var guildId = sktMessageChannel.Guild.Id;
+                try
+                {
+                    if (DatabaseHandler.Instance.Exists(gameName, guildId))
+                    {
+                        DatabaseHandler.Instance.RemoveAlias(gameName, alias, guildId);
+                    }
+                }
+                catch (GameNotFoundException)
+                {
+                    await sktMessage.Channel.SendMessageAsync($"Unable to add an alias to the game {gameName} as it does not exist.");
+                }
+                catch (Exception ex)
+                {
+                    await sktMessage.Channel.SendMessageAsync(
+                        $"Database failure.\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
+                }
             }
         }
 
