@@ -682,11 +682,11 @@ namespace PluginManager
                 return Task.CompletedTask;
             };
 
-            dsc.UserLeft += user =>
+            dsc.UserLeft += (guild, user) =>
             {
                 if (UserLeftEvent.HasSubscribers)
                 {
-                    var guildId = user.Guild.Id;
+                    var guildId = guild.Id;
                     foreach (var sub in UserLeftEvent.Subscriptions)
                     {
                         var moduleName = sub.Method.Module.Name;
@@ -697,6 +697,11 @@ namespace PluginManager
 
                 return Task.CompletedTask;
             };
+        }
+
+        private Task Dsc_UserLeft(SocketGuild arg1, SocketUser arg2)
+        {
+            throw new NotImplementedException();
         }
     }
 }

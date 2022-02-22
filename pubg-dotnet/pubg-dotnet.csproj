@@ -13,7 +13,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>Pubg.Net</RootNamespace>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Product>Pubg.Net</Product>
@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="JsonApiSerializer" Version="1.7.4" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
 </Project>

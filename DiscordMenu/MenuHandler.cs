@@ -96,8 +96,7 @@ namespace DiscordMenu
             DiscordSocketClient.ReactionAdded += DiscordSocketClientOnReactionAdded;
         }
 
-        private Task DiscordSocketClientOnReactionAdded(Cacheable<IUserMessage, ulong> cacheable,
-            ISocketMessageChannel socketMessageChannel, SocketReaction reaction)
+        private Task DiscordSocketClientOnReactionAdded(Cacheable<IUserMessage, ulong> cacheable, Cacheable<IMessageChannel, ulong> socketMessageChannel, SocketReaction reaction)
         {
             // Ensure that the person clicking reactions is the person who started this
             if (reaction.UserId != Author.Id) return Task.CompletedTask;
