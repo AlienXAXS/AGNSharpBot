@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -25,6 +26,9 @@ namespace PluginManager
 
         internal readonly AsyncEvent<Func<SocketGuild, Task>> GuildMembersDownloadedEvent =
             new AsyncEvent<Func<SocketGuild, Task>>();
+
+        internal readonly AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>> PrescenceUpdatedEvent = 
+            new AsyncEvent<Func<SocketUser, SocketPresence, SocketPresence, Task>>();
 
         internal readonly AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>> GuildMemberUpdatedEvent =
             new AsyncEvent<Func<SocketGuildUser, SocketGuildUser, Task>>();
@@ -443,6 +447,12 @@ namespace PluginManager
             remove => UserUpdatedEvent.Remove(value);
         }
 
+        public event Func<SocketUser, SocketPresence, SocketPresence, Task> PresenceUpdated
+        {
+            add => PrescenceUpdatedEvent.Add(value);
+            remove => PrescenceUpdatedEvent.Remove(value);
+        }
+
         /// <summary> Fired when a guild member is updated, or a member presence is updated. </summary>
         public event Func<SocketGuildUser, SocketGuildUser, Task> GuildMemberUpdated
         {
@@ -670,10 +680,29 @@ namespace PluginManager
                 return Task.CompletedTask;
             };
 
+            dsc.PresenceUpdated += (user, oldPresence, newPresence) =>
+            {
+                if (PrescenceUpdatedEvent.HasSubscribers)
+                {
+                    if (user is SocketGuildUser socketGuildUser)
+                    {
+                        var guildId = socketGuildUser.Guild.Id;
+                        foreach (var sub in PrescenceUpdatedEvent.Subscriptions)
+                        {
+                            var moduleName = sub.Method.Module.Name;
+                            if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
+                                sub.Invoke(user, oldPresence, newPresence);
+                        }
+                    }
+                }
+
+                return Task.CompletedTask;
+            };
+
             dsc.GuildMemberUpdated += (oldUser, newUser) =>
             {
                 if (!oldUser.HasValue) return Task.CompletedTask;
-
+                
                 if (GuildMemberUpdatedEvent.HasSubscribers)
                 {
                     var guildId = newUser.Guild.Id;
