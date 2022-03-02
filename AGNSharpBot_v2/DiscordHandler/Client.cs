@@ -38,7 +38,7 @@ namespace AGNSharpBot.DiscordHandler
                     MessageCacheSize = 100,
                     DefaultRetryMode = RetryMode.AlwaysRetry,
                     AlwaysDownloadUsers = true,
-                    GatewayIntents = GatewayIntents.GuildMessages | GatewayIntents.Guilds | GatewayIntents.GuildMessageReactions | GatewayIntents.DirectMessages | GatewayIntents.GuildPresences | GatewayIntents.GuildVoiceStates | GatewayIntents.GuildMembers
+                    GatewayIntents = GatewayIntents.All
                 };
             _discordSocket = new DiscordSocketClient(_config);
             _discordSocket.Log += message =>
@@ -82,6 +82,11 @@ namespace AGNSharpBot.DiscordHandler
                 Log4NetHandler.Log($"The guild {guild.Name} ({guild.Id}) is now unavailable",
                     Log4NetHandler.LogLevel.DEBUG);
 
+                return Task.CompletedTask;
+            };
+            _discordSocket.GuildMembersDownloaded += guild =>
+            {
+                Log4NetHandler.Log($"Guild {guild.Name} user list downloaded", Log4NetHandler.LogLevel.INFO);
                 return Task.CompletedTask;
             };
         }
