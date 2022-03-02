@@ -96,6 +96,10 @@ namespace AGNSharpBot
             {
                 Log4NetHandler.Log($"Unhandled Exception in sender: {sender}", Log4NetHandler.LogLevel.ERROR,
                     exception: (Exception) e.ExceptionObject);
+
+#if DEBUG
+                Console.ReadLine();
+#endif
             };
 
             try
@@ -141,6 +145,10 @@ namespace AGNSharpBot
                 Console.WriteLine("Press <ENTER> to exit");
                 Console.ReadKey();
             }
+
+#if DEBUG
+            Console.ReadLine();
+#endif
         }
 
         private async Task GetUserInputAsync()
