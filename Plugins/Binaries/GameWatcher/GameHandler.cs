@@ -69,7 +69,7 @@ namespace GameWatcher
             if (newGuildUser.IsBot) return;
 
             var newGameActivity = (Game)newGuildUser.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
-            var oldGameActivity = (Game)oldGuildUser.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
+            var oldGameActivity = (Game)oldGuildUser?.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
             
             var randomNumber = Thread.CurrentThread.ManagedThreadId;
             try
