@@ -516,15 +516,17 @@ namespace PluginManager
 
             dsc.UserIsTyping += (user, channel) =>
             {
+                if ( !channel.HasValue ) return Task.CompletedTask;
+
                 if (UserIsTypingEvent.HasSubscribers)
-                    if (channel is SocketGuildChannel socketChannel)
+                    if (channel.Value is SocketGuildChannel socketChannel)
                     {
                         var guildId = socketChannel.Guild.Id;
                         foreach (var sub in UserIsTypingEvent.Subscriptions)
                         {
                             var moduleName = sub.Method.Module.Name;
                             if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
-                                sub.Invoke(user, channel);
+                                sub.Invoke((SocketUser)user.Value, (ISocketMessageChannel)channel.Value);
                         }
                     }
 
@@ -651,15 +653,17 @@ namespace PluginManager
 
             dsc.MessageDeleted += (cacheable, channel) =>
             {
+                if (!channel.HasValue) return Task.CompletedTask;
+
                 if (MessageDeletedEvent.HasSubscribers)
-                    if (channel is SocketGuildChannel socketChannel)
+                    if (channel.Value is SocketGuildChannel socketChannel)
                     {
                         var guildId = socketChannel.Guild.Id;
                         foreach (var sub in MessageDeletedEvent.Subscriptions)
                         {
                             var moduleName = sub.Method.Module.Name;
                             if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
-                                sub.Invoke(cacheable, channel);
+                                sub.Invoke(cacheable, (ISocketMessageChannel)channel.Value);
                         }
                     }
 
@@ -668,6 +672,8 @@ namespace PluginManager
 
             dsc.GuildMemberUpdated += (oldUser, newUser) =>
             {
+                if (!oldUser.HasValue) return Task.CompletedTask;
+
                 if (GuildMemberUpdatedEvent.HasSubscribers)
                 {
                     var guildId = newUser.Guild.Id;
@@ -675,7 +681,7 @@ namespace PluginManager
                     {
                         var moduleName = sub.Method.Module.Name;
                         if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
-                            sub.Invoke(oldUser, newUser);
+                            sub.Invoke(oldUser.Value, newUser);
                     }
                 }
 
@@ -691,7 +697,7 @@ namespace PluginManager
                     {
                         var moduleName = sub.Method.Module.Name;
                         if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
-                            sub.Invoke(user);
+                            sub.Invoke((SocketGuildUser)user);
                     }
                 }
 

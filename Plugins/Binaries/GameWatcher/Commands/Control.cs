@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using CommandHandler;
 using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using GameWatcher.DB;
 using GameWatcher.DB.Tables;
@@ -15,7 +15,7 @@ namespace GameWatcher.Commands
 {
     internal class Control
     {
-        [Command("gamewatcher", "Manages the Game Watcher, add and remove games to watch for.")]
+        [CommandHandler.Command("gamewatcher", "Manages the Game Watcher, add and remove games to watch for.")]
         public async void GameWatcher(string[] parameters, SocketMessage sktMessage,
             DiscordSocketClient discordSocketClient)
         {
@@ -108,10 +108,13 @@ namespace GameWatcher.Commands
                 foreach (var user in uList)
                     try
                     {
-                        if (user.Activity != null && user.Activity is Game)
+                        foreach (var activity in user.Activities)
                         {
-                            await GameHandler.Instance.GameScan(null, user);
-                            Thread.Sleep(1000);
+                            if (activity != null && activity.Type == ActivityType.Playing || activity.Type == ActivityType.Streaming)
+                            {
+                                await GameHandler.Instance.GameScan(null, user);
+                                Thread.Sleep(1000);
+                            }
                         }
                     }
                     catch (Exception ex)

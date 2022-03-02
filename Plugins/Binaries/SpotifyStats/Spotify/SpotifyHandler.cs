@@ -46,56 +46,23 @@ namespace SpotifyStats.Spotify
         {
             try
             {
+                SpotifyGame newSpotifyInfo = (SpotifyGame)newMember.Activities.DefaultIfEmpty(null)
+                    .FirstOrDefault(x => x.Type == ActivityType.Listening);
+                SpotifyGame oldSpotifyInfo = (SpotifyGame)oldMember.Activities.DefaultIfEmpty(null)
+                    .FirstOrDefault(x => x.Type == ActivityType.Listening);
+
+                if (newSpotifyInfo == null) return;
+
                 //Ensure that the previous member and the new one do not contain the same listening data.
-                if (oldMember?.Activity is SpotifyGame sGameOld)
-                    if (newMember.Activity is SpotifyGame sGameNew)
-                        if (sGameOld.TrackId == sGameNew.TrackId)
-                            return;
+                if (oldSpotifyInfo != null)
+                    if (oldSpotifyInfo.TrackId == newSpotifyInfo.TrackId)
+                        return;
 
-                // check to see if the new member has an activity
-                if (newMember.Activity?.Type == ActivityType.Listening)
-                {
-                    // It's spotify listing type
-                    Log4NetHandler.Log($"User {newMember.Username} is listening to spotify",
-                        Log4NetHandler.LogLevel.DEBUG);
+                // It's spotify listing type
+                Log4NetHandler.Log($"User {newMember.Username} is listening to spotify", Log4NetHandler.LogLevel.DEBUG);
 
-                    if (newMember.Activity is SpotifyGame spotifyGame)
-                    {
-                        var returnedSong = SQLiteHandler.AddSongAndListener(dbConnection, spotifyGame.TrackId,
-                            spotifyGame.Artists.First(), spotifyGame.TrackTitle, newMember.Id);
-                        var group = returnedSong.Listeners.GroupBy(x => x.DiscordId).OrderByDescending(x => x.Count());
 
-                        var top = group.Take(3);
-
-                        var topUsersList = (from topEntry in top
-                                let foundUser = newMember.Guild.GetUser((ulong) topEntry.Key)
-                                where foundUser != null
-                                select new TopPlayEntry {Username = foundUser.Username, PlayCount = topEntry.Count()})
-                            .ToList();
-
-                        var discordEmbedBuilder = new EmbedBuilder();
-                        discordEmbedBuilder.WithTitle($"{returnedSong.Song.Artist} - {returnedSong.Song.Name}")
-                            .WithThumbnailUrl(spotifyGame.AlbumArtUrl).WithUrl(spotifyGame.TrackUrl);
-
-                        discordEmbedBuilder.AddField("Play Count", returnedSong.Listeners.Count, true);
-                        discordEmbedBuilder.AddField("Person Listening",
-                            newMember?.Nickname ?? newMember.Username, true);
-
-                        Log4NetHandler.Log(
-                            $"User {newMember.Username} Listening to Spotify | SID:{spotifyGame.SessionId} | ID: {spotifyGame.TrackId} | A:{spotifyGame.Artists.First()} | T: {spotifyGame.TrackTitle}",
-                            Log4NetHandler.LogLevel.DEBUG);
-
-                        var outputString = "";
-                        for (var i = 0; i <= topUsersList.Count - 1; i++)
-                            outputString +=
-                                $"{i + 1}. {topUsersList[i].Username}: Played {topUsersList[i].PlayCount} time(s)\r\n";
-
-                        discordEmbedBuilder.AddField("Top Users", outputString);
-
-                        //TODO: Fix this shit
-                        //GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.GetLogger().Log(null, GlobalLogger.AdvancedLogger.AdvancedLoggerHandler.Instance.LoggerType.ConsoleAndDiscord, discordEmbed: discordEmbedBuilder.Build());
-                    }
-                }
+                SQLiteHandler.AddSongAndListener(dbConnection, newSpotifyInfo.TrackId, newSpotifyInfo.Artists.First(), newSpotifyInfo.TrackTitle, newMember.Id);
             }
             catch (Exception ex)
             {
