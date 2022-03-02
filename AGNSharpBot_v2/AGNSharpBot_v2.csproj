@@ -5,7 +5,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="x64\**" />
@@ -51,9 +51,6 @@
     <None Include="..\Plugins\Binaries\GameWatcher\bin\Debug\netcoreapp3.1\GameWatcher.dll" Link="Plugins\GameWatcher.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Plugins\Binaries\HomeLabReporting\bin\Debug\netcoreapp3.1\HomeLabReporting.dll" Link="Plugins\HomeLabReporting.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="..\Plugins\Binaries\JoinQuitMessages\bin\Debug\netcoreapp3.1\JoinQuitMessages.dll" Link="Plugins\JoinQuitMessages.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -64,9 +61,11 @@
     <None Include="..\Plugins\Binaries\SpotifyStats\bin\Debug\netcoreapp3.1\SpotifyStats.dll" Link="Plugins\SpotifyStats.dll" />
   </ItemGroup>
   <PropertyGroup>
-    <PostBuildEvent>if x$(ConfigurationName)==xRelease (
-$(SolutionDir)MakeRelease.bat
-)</PostBuildEvent>
     <StartupObject>AGNSharpBot.Program</StartupObject>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="if x$(ConfigurationName)==xDebug (Powershell.exe -file $(SolutionDir)ComposeDebug.ps1)&#xD;&#xA;if x$(ConfigurationName)==xRelease (Powershell.exe -file $(SolutionDir)ComposeRelease.ps1)" />
+  </Target>
 </Project>
