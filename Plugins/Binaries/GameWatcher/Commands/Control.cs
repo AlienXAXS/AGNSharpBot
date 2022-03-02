@@ -112,7 +112,7 @@ namespace GameWatcher.Commands
                         {
                             if (activity != null && activity.Type == ActivityType.Playing || activity.Type == ActivityType.Streaming)
                             {
-                                await GameHandler.Instance.GameScan(null, user);
+                                await GameHandler.Instance.GameScan(user, null, null);
                                 Thread.Sleep(1000);
                             }
                         }

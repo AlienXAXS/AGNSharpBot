@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -61,16 +62,27 @@ namespace GameWatcher
             }
         }
 
-        public async Task GameScan(SocketGuildUser oldGuildUser, SocketGuildUser newGuildUser)
+        public async Task GameScan(SocketGuildUser newGuildUser, SocketPresence oldPresence, SocketPresence newPresence)
         {
             // When the bot starts up, we have to clean the roles on the guilds.
             // we make sure that task is done before we accept new calls.
             if (!RolesReady) return;
             if (newGuildUser.IsBot) return;
 
-            var newGameActivity = (Game)newGuildUser.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
-            var oldGameActivity = (Game)oldGuildUser?.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
+            var newGameActivity = (bool) newPresence?.Activities.Any()
+                ? (Game) newPresence?.Activities.DefaultIfEmpty(null).FirstOrDefault(x =>
+                    x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming)
+                : null;
+
+            var oldGameActivity = (bool) oldPresence?.Activities.Any()
+                ? (Game) oldPresence?.Activities.DefaultIfEmpty(null).FirstOrDefault(x =>
+                    x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming)
+                : null;
             
+            if ( !oldPresence.Activities.Any() && !newPresence.Activities.Any() )
+                newGameActivity = (Game)newGuildUser.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
+
+
             var randomNumber = Thread.CurrentThread.ManagedThreadId;
             try
             {

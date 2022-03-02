@@ -31,7 +31,7 @@ namespace GameWatcher
                 GameHandler.Instance.StartGameWatcherTimer();
 
                 HandlerManager.Instance.RegisterHandler<Control>();
-                EventRouter.GuildMemberUpdated += DiscordClientOnGuildMemberUpdatedEvent;
+                EventRouter.PresenceUpdated += DiscordClientOnGuildMemberUpdatedEvent;
             }
             catch (Exception ex)
             {
@@ -40,13 +40,16 @@ namespace GameWatcher
             }
         }
 
-        public void Dispose()
+        private Task DiscordClientOnGuildMemberUpdatedEvent(SocketUser user, SocketPresence oldPresence, SocketPresence newPresence)
         {
+            if ( user is SocketGuildUser socketGuildUser )
+                _ = GameHandler.Instance.GameScan(socketGuildUser, oldPresence, newPresence);
+
+            return Task.CompletedTask;
         }
 
-        private async Task DiscordClientOnGuildMemberUpdatedEvent(SocketGuildUser arg1, SocketGuildUser arg2)
+        public void Dispose()
         {
-            await GameHandler.Instance.GameScan(arg1, arg2);
         }
     }
 }
