@@ -167,7 +167,7 @@ namespace CommandHandler
 
                 if (paramCommand.Equals("version", StringComparison.OrdinalIgnoreCase))
                 {
-                    await socketMessage.Channel.SendMessageAsync("AGNSharpBot v0.2.3 - Created by AlienX");
+                    await socketMessage.Channel.SendMessageAsync("AGNSharpBot v0.3 - Created by AlienX");
                     return;
                 }
 
