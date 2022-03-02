@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
-using Auditor.WebServer;
 using CommandHandler;
 using Discord;
 using Discord.WebSocket;
@@ -28,10 +27,7 @@ namespace Auditor
             // Register our SQL Tables
             Handler.Instance.NewConnection().RegisterTable<AuditorSql.AuditEntry>()
                 .RegisterTable<AuditorSql.AuditorNancyLoginSession>();
-
-            // Register commands
-            HandlerManager.Instance.RegisterHandler<ControllerCommands>();
-
+            
             // Setup discord hooks
             EventRouter.MessageDeleted += DiscordClientOnMessageDeleted;
             EventRouter.MessageUpdated += DiscordClientOnMessageUpdated;
@@ -39,15 +35,10 @@ namespace Auditor
             EventRouter.GuildMemberUpdated += DiscordClientOnGuildMemberUpdated;
             EventRouter.UserJoined += DiscordClientOnUserJoined;
             EventRouter.UserLeft += DiscordClientOnUserLeft;
-
-            // Start nancy
-            NancyServer.Instance.DiscordSocketClient = EventRouter.GetDiscordSocketClient();
-            NancyServer.Instance.Start();
         }
 
         public void Dispose()
         {
-            NancyServer.Instance.Dispose();
         }
 
         private void WriteToDatabase(AuditorSql.AuditEntry.AuditType type, ulong channelId = 0, ulong userId = 0,
