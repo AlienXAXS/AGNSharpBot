@@ -79,8 +79,8 @@ namespace GameWatcher
                     x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming)
                 : null;
             
-            if ( !oldPresence.Activities.Any() && !newPresence.Activities.Any() )
-                newGameActivity = (Game)newGuildUser.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
+            //if ( !oldPresence.Activities.Any() && !newPresence.Activities.Any() )
+            //    newGameActivity = (Game)newGuildUser.Activities.DefaultIfEmpty(null).FirstOrDefault(x => x != null && x.Type == ActivityType.Playing || x.Type == ActivityType.Streaming);
 
 
             var randomNumber = Thread.CurrentThread.ManagedThreadId;

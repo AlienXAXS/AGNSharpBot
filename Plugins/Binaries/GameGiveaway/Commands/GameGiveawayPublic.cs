@@ -11,77 +11,53 @@ using Responses.Commands.GameGiveaway.SQL;
 
 namespace GameGiveaway.Commands
 {
-    internal class GameGiveawayHumbleMenu
+    internal class GameGiveawayPublic
     {
-        private const double GiveawayAccessDurationInDays = 30.0;
-        private bool _isFinished;
-        private readonly MenuHandler _menu = new MenuHandler();
-        public SocketMessage SktMessage { get; set; }
-        public DiscordSocketClient DiscordSocketClient { get; set; }
+        private readonly int GiveawayAccessDurationInDays = 30;
 
-        public async void StartMenu()
+        [Command("gamegiveaway", "Game Giveaway - Get free Steam Keys")]
+        [Alias("gg", "ggz")]
+        [Permissions(Permissions.PermissionTypes.Guest)]
+        public async void GameGiveawayCmd(string[] parameters, SocketMessage sktMessage,
+            DiscordSocketClient discordSocketClient)
         {
-            var usersDb = Handler.Instance.GetConnection().DbConnection.Table<GameGiveawayUserDb>();
-            var dbUser = usersDb.DefaultIfEmpty(null)
-                .FirstOrDefault(x => x != null && x.DiscordId.Equals((long) SktMessage.Author.Id));
-
-            _menu.Author = SktMessage.Author;
-            _menu.DiscordSocketClient = DiscordSocketClient;
-            _menu.DiscordSocketGuildChannel = SktMessage.Channel;
-
-            // Humble check
-            if (dbUser != null)
+            var author = sktMessage.Author;
+            if (author is SocketGuildUser guildUser)
             {
-                if (dbUser.isHumbleRegistered)
+                var joinedRecently = DateTime.Now - guildUser.JoinedAt;
+                if (joinedRecently.Value.TotalDays < 30)
                 {
-                    await SktMessage.Channel.SendMessageAsync(
-                        "Sorry, but only non humble monthly registered people can use this service.");
+                    await sktMessage.Channel.SendMessageAsync(
+                        $"{author.Username}.  Thanks for trying to use the Game Giveaway system, but you are too new to use it.  You can try again later!");
                     return;
                 }
-
-                MenuOnOnMenuOptionSelected(_menu, new MenuOption(1, "No", "no"));
-                return;
             }
 
-            _menu.Init();
-            _menu.MenuTitle = "Are you Humble Monthly Registered?";
-            _menu.AddOption("Yes", "yes");
-            _menu.AddOption("No", "no");
-            _menu.Render(SktMessage.Channel);
-
-            _menu.OnMenuOptionSelected += MenuOnOnMenuOptionSelected;
-
-            var _myTask = new Task(async () =>
+            if (sktMessage.Author.Id.Equals(419551871443927082))
             {
-                var timeout = 30;
-                while (timeout > 0)
-                {
-                    timeout--;
-                    await Task.Delay(1000);
-                }
-
-                if (!_isFinished)
-                    _menu.Dispose("Menu has timed out");
-            });
-            _myTask.Start();
+                await sktMessage.Channel.SendMessageAsync(
+                    "Claim your own free game - simply type !gamegiveaway (or !gg for short) in chat.");
+                await sktMessage.DeleteAsync();
+            }
+            else
+            {
+                DoGiveaway(sktMessage);
+            }
         }
 
-        private async void MenuOnOnMenuOptionSelected(object selfMenu, MenuOption menuoption)
+        private async void DoGiveaway(SocketMessage SktMessage)
         {
             try
             {
-                var menu = (MenuHandler) selfMenu;
                 var gamesDbConnection = Handler.Instance.GetConnection().DbConnection.Table<GameGiveawayGameDb>();
                 var gamesDb = gamesDbConnection.Where(x => x.Used == false);
                 var usersDb = Handler.Instance.GetConnection().DbConnection.Table<GameGiveawayUserDb>();
                 var dbUser = usersDb.DefaultIfEmpty(null)
-                    .LastOrDefault(x => x != null && x.DiscordId.Equals((long) SktMessage.Author.Id));
-
-                _menu.Dispose();
+                    .LastOrDefault(x => x != null && x.DiscordId.Equals((long)SktMessage.Author.Id));
 
                 if (dbUser != null)
                 {
-                    dbUser.isHumbleRegistered = menuoption.Metadata.Equals("yes");
+                    dbUser.isHumbleRegistered = false;
                     usersDb.Connection.Update(dbUser);
                 }
                 else
@@ -89,36 +65,21 @@ namespace GameGiveaway.Commands
                     usersDb.Connection.Insert(new GameGiveawayUserDb
                     {
                         DateTime = DateTime.Now,
-                        DiscordId = (long) SktMessage.Author.Id,
-                        isHumbleRegistered = menuoption.Metadata.Equals("yes")
+                        DiscordId = (long)SktMessage.Author.Id,
+                        isHumbleRegistered = false
                     });
-                }
-
-                if (menuoption.Metadata.Equals("yes"))
-                {
-                    await SktMessage.Channel.SendMessageAsync(
-                        $"Thanks {SktMessage.Author.Username}, your preferences have been saved");
-
-                    return;
                 }
 
                 if (!gamesDb.Any())
                 {
                     await SktMessage.Channel.SendMessageAsync(
-                        "Sorry, I do not have any free games to give away at the moment, try again later though!");
+                        "Sorry, I do not have any free games to give away at the moment.  You can try again later though!");
                     return;
                 }
 
                 // Time check
                 if (dbUser != null)
                 {
-                    if (dbUser.isHumbleRegistered)
-                    {
-                        await SktMessage.Channel.SendMessageAsync(
-                            "Sorry, but Humble Monthly registered users cannot use this service");
-                        return;
-                    }
-
                     var lastAccessTimespan = dbUser.DateTime.AddDays(GiveawayAccessDurationInDays) - DateTime.Now;
                     if (lastAccessTimespan.TotalDays > 0)
                     {
@@ -128,13 +89,11 @@ namespace GameGiveaway.Commands
                     }
                 }
 
-                // Code will only reach here if the user either isn't in the claims database, or if they didn't claim within the last GiveawayAccessDurationInDays value
-
                 // Insert our user into the database
                 if (dbUser == null)
                 {
                     usersDb.Connection.Insert(new GameGiveawayUserDb
-                        {DiscordId = (long) SktMessage.Author.Id, DateTime = DateTime.Now});
+                    { DiscordId = (long)SktMessage.Author.Id, DateTime = DateTime.Now });
                 }
                 else
                 {
@@ -161,34 +120,6 @@ namespace GameGiveaway.Commands
                 await SktMessage.Channel.SendMessageAsync(
                     $"Sorry, an error stopped you from getting your free game. Please report this to AlienX.\r\n\r\n{ex.Message}\r\n\r\n{ex.StackTrace}");
             }
-        }
-    }
-
-    internal class GameGiveawayPublic
-    {
-        [Command("gamegiveaway", "Game Giveaway - Get free Steam Keys")]
-        [Alias("gg", "ggz")]
-        public async void GameGiveawayCmd(string[] parameters, SocketMessage sktMessage,
-            DiscordSocketClient discordSocketClient)
-        {
-            var author = sktMessage.Author;
-            if (author is SocketGuildUser guildUser)
-            {
-                var joinedRecently = DateTime.Now - guildUser.JoinedAt;
-                if (joinedRecently.Value.TotalDays < 30)
-                {
-                    await sktMessage.Channel.SendMessageAsync(
-                        $"Sorry {author.Username}, but you have to be active within the community in order to use this feature.");
-                    return;
-                }
-            }
-
-            var giveaway = new GameGiveawayHumbleMenu
-            {
-                SktMessage = sktMessage,
-                DiscordSocketClient = discordSocketClient
-            };
-            giveaway.StartMenu();
         }
     }
 }
