@@ -94,8 +94,6 @@ namespace PluginManager
                         if (!loaded)
                             Log4NetHandler.Log($"{item} Loaded: {loaded}", Log4NetHandler.LogLevel.ERROR);
                     }
-
-                    //turn false;
                 }
             }
 

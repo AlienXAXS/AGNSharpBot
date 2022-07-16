@@ -612,17 +612,16 @@ namespace PluginManager
             dsc.UserVoiceStateUpdated += (user, sktVoiceStateOld, sktVoiceStateNew) =>
             {
                 if (UserVoiceStateUpdatedEvent.HasSubscribers)
-                    if (sktVoiceStateNew.VoiceChannel != null && sktVoiceStateNew.VoiceChannel.Guild != null)
-                    {
-                        var guildId = sktVoiceStateNew.VoiceChannel.Guild.Id;
+                {
+                    var guildId = sktVoiceStateOld.VoiceChannel != null ? sktVoiceStateOld.VoiceChannel.Guild.Id : sktVoiceStateNew.VoiceChannel.Guild.Id;
 
-                        foreach (var sub in UserVoiceStateUpdatedEvent.Subscriptions)
-                        {
-                            var moduleName = sub.Method.Module.Name;
-                            if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
-                                sub.Invoke(user, sktVoiceStateOld, sktVoiceStateNew);
-                        }
+                    foreach (var sub in UserVoiceStateUpdatedEvent.Subscriptions)
+                    {
+                        var moduleName = sub.Method.Module.Name;
+                        if (PluginHandler.Instance.ShouldExecutePlugin(moduleName, guildId))
+                            sub.Invoke(user, sktVoiceStateOld, sktVoiceStateNew);
                     }
+                }
 
                 return Task.CompletedTask;
             };

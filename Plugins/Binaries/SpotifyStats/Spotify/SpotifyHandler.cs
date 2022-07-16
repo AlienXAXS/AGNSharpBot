@@ -47,9 +47,9 @@ namespace SpotifyStats.Spotify
             try
             {
                 SpotifyGame newSpotifyInfo = (SpotifyGame)newMember.Activities.DefaultIfEmpty(null)
-                    .FirstOrDefault(x => x.Type == ActivityType.Listening);
+                    .FirstOrDefault(x => x != null && x.Type == ActivityType.Listening);
                 SpotifyGame oldSpotifyInfo = (SpotifyGame)oldMember.Activities.DefaultIfEmpty(null)
-                    .FirstOrDefault(x => x.Type == ActivityType.Listening);
+                    .FirstOrDefault(x => x != null && x.Type == ActivityType.Listening);
 
                 if (newSpotifyInfo == null) return;
 

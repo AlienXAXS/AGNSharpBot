@@ -57,8 +57,15 @@
     <None Include="..\Plugins\Binaries\PUBGWeekly\bin\Debug\netcoreapp3.1\PUBGWeekly.dll" Link="Plugins\PUBGWeekly.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="..\Plugins\Binaries\Responses\bin\Debug\netcoreapp3.1\Responses.dll" Link="Plugins\Responses.dll" />
-    <None Include="..\Plugins\Binaries\SpotifyStats\bin\Debug\netcoreapp3.1\SpotifyStats.dll" Link="Plugins\SpotifyStats.dll" />
+    <None Include="..\Plugins\Binaries\Responses\bin\Debug\netcoreapp3.1\Responses.dll" Link="Plugins\Responses.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\SpotifyStats\bin\Debug\netcoreapp3.1\SpotifyStats.dll" Link="Plugins\SpotifyStats.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Plugins\Binaries\VoiceChannelRoles\bin\Debug\netcoreapp3.1\VoiceChannelRoles.dll" Link="Plugins\VoiceChannelRoles.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <PropertyGroup>
     <StartupObject>AGNSharpBot.Program</StartupObject>
