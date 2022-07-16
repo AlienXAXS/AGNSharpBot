@@ -27,6 +27,9 @@ namespace VoiceChannelRoles
 
         private Task EventRouterOnUserVoiceStateUpdated(SocketUser user, SocketVoiceState previousState, SocketVoiceState newState)
         {
+            if (previousState.VoiceChannel != null && newState.VoiceChannel != null &&
+                previousState.VoiceChannel.Id.Equals(newState.VoiceChannel.Id)) return Task.CompletedTask;
+
             if (user is SocketGuildUser _sktGuildUser)
             {
                 if (previousState.VoiceChannel == null && newState.VoiceChannel != null)
