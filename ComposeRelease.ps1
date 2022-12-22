@@ -1,18 +1,19 @@
-Set-Location "C:\Users\AlienX\Documents\GitHub\AGNSharpBot"
+Set-Location "C:\Users\markp\Documents\GitHub\AGNSharpBot"
 $currentPath = Get-Location
 Write-Host "Script running in location $currentPath"
 
 $plugins = Get-Item -Path ".\Plugins\Binaries\*"
-$pluginNames = Get-Item -Path ".\AGNSharpBot_v2\bin\Release\netcoreapp3.1\Plugins\*" -Filter "*.dll"
-$destPath = "\AGNSharpBot_v2\bin\Release\netcoreapp3.1\"
+$pluginNames = Get-Item -Path ".\AGNSharpBot_v2\bin\Release\net6.0\Plugins\*" -Filter "*.dll"
+$destPath = $currentPath.Path + "\AGNSharpBot_v2\bin\Release\net6.0\"
 
 foreach ( $plugin in $plugins )
 {
-    $pluginPath = $plugin.FullName + "\bin\Release\netcoreapp3.1"
+    $pluginPath = $plugin.FullName + "\bin\Release\net6.0"
     if ( [System.IO.Directory]::Exists($pluginPath) )
     {
-        $filesToMain = Get-Item -Path "$pluginPath\*" -Filter "*.dll" | Where-object { $pluginNames.Name -notcontains $_.Name }
-        $pluginFile = Get-Item -Path "$pluginPath\*" -Filter "*.dll" | Where-object { $pluginNames.Name -contains $_.Name }
+        $filesToMain = Get-Item -Path "$pluginPath\*" -Filter "*.dll" | Where-object { $_.Name -ne $($plugin.Name + ".dll") }
+        #$pluginFile = Get-Item -Path "$pluginPath\*" -Filter "*.dll" | Where-object { $pluginNames.Name -contains $_.Name }
+        $pluginFile = Get-Item -Path "$pluginPath\*" -Filter "*.dll" | Where-object { $_.Name -eq $($plugin.Name + ".dll") }
 
         foreach ( $file in $filesToMain )
         {
@@ -25,7 +26,7 @@ foreach ( $plugin in $plugins )
 
         foreach ( $file in $pluginFile )
         {
-            Copy-Item -Path $file.FullName -Destination ("$currentPath" + "$destPath\Plugins\")
+            Copy-Item -Path $file.FullName -Destination "$destPath\Plugins\"
             Write-Host "Copied $($file.Name) library to Plugin Directory";
         }
     }
