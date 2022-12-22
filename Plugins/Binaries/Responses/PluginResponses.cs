@@ -4,6 +4,7 @@ using Interface;
 using InternalDatabase;
 using PluginManager;
 using Responses.Commands;
+using Responses.GhostPingDetector;
 using Responses.Informational;
 using Responses.SQLTables;
 
@@ -13,6 +14,7 @@ namespace Responses
     public sealed class PluginResponses : IPlugin
     {
         string IPlugin.Name => "AdminUtilities";
+        public string Version => "0.2";
         public EventRouter EventRouter { get; set; }
 
         string IPlugin.Description => "Provides the guild with useful admin utilities, plus pictures of cats!";
@@ -23,7 +25,6 @@ namespace Responses
             // Last Online
             Handler.Instance.NewConnection().RegisterTable<LastOnlineTable>();
 
-
             var lastOnlineHandler = new LastOnlineDbHandler();
             lastOnlineHandler.StartOnlineScanner(EventRouter);
 
@@ -33,6 +34,14 @@ namespace Responses
             HandlerManager.Instance.RegisterHandler<AuthorisedCommands>();
             HandlerManager.Instance.RegisterHandler<AdminPermissions>();
             HandlerManager.Instance.RegisterHandler<ModerateUser>();
+
+
+            GhostPingHandler handler = new GhostPingHandler();
+            EventRouter.MessageReceived += async message =>
+            {
+                await handler.ClientOnMessageReceived(message);
+            };
+
         }
 
         void IPlugin.Dispose()
