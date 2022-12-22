@@ -13,6 +13,8 @@ namespace JoinQuitMessages
     public class PluginJoinQuitMessages : IPlugin
     {
         public string Name => "JoinQuitMessages";
+
+        public string Version => "0.1";
         public string Description => "Logs when people join and quit your discord server into a channel of your choice";
 
         public void ExecutePlugin()

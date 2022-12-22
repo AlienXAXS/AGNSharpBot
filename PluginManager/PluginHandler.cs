@@ -144,7 +144,7 @@ namespace PluginManager
             foreach (var plugin in Plugins)
             {
 
-                Log4NetHandler.Log($"Plugin {plugin.Name} found, attempting ExecutePlugin procedure.",
+                Log4NetHandler.Log($"Plugin {plugin.Name} v{plugin.Version} found, attempting ExecutePlugin procedure.",
                     Log4NetHandler.LogLevel.INFO);
 
                 // Set the event router

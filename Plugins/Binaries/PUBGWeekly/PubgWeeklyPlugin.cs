@@ -20,6 +20,8 @@ namespace PUBGWeekly
     {
         public PluginRouter PluginRouter { get; set; }
 
+        public string Version => "0.1";
+
         public string Name => "PUBGWeekly";
 
         public string Description => "AGN PUBG Weekly Helper Plugin - Organise Teams etc";

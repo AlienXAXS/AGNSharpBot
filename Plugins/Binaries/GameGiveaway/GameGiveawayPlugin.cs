@@ -14,6 +14,7 @@ namespace GameGiveaway
         string IPlugin.Name => "GameGiveaway";
         public EventRouter EventRouter { get; set; }
 
+        public string Version => "0.1";
         string IPlugin.Description => "Some useful admin utilities and commands.";
 
         void IPlugin.ExecutePlugin()

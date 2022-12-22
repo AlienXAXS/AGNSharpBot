@@ -7,6 +7,8 @@ namespace Interface
         string Name { get; }
         string Description { get; }
 
+        string Version { get; }
+
         EventRouter EventRouter { get; set; }
 
         void ExecutePlugin();

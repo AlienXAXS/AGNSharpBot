@@ -16,6 +16,8 @@ namespace GameWatcher
         private DiscordSocketClient _discordClient;
         public EventRouter EventRouter { get; set; }
         public string Name => "GameWatcher";
+
+        public string Version => "0.1";
         public PluginRouter PluginRouter { get; set; }
 
         public string Description =>

@@ -12,6 +12,7 @@ namespace CatDog
         public EventRouter EventRouter { get; set; }
         public PluginRouter PluginRouter { get; set; }
 
+        public string Version => "0.1";
         string IPlugin.Name => "CatDog";
 
         string IPlugin.Description =>

@@ -14,6 +14,8 @@ namespace VoiceChannelRoles
     public class Plugin : IPlugin
     {
         public string Name => "VoiceChannelRoles";
+
+        public string Version => "0.1";
         public string Description => "Allows the adding and removing of roles based on a users current voice channel.";
         public EventRouter EventRouter { get; set; }
         public void ExecutePlugin()

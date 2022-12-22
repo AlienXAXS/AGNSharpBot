@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -36,34 +36,7 @@
     <Folder Include="Plugins\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Plugins\Binaries\ASCIIArt\bin\Debug\netcoreapp3.1\ASCIIArt.dll" Link="Plugins\ASCIIArt.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\Auditor\bin\Debug\netcoreapp3.1\Auditor.dll" Link="Plugins\Auditor.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\CatDog\bin\Debug\netcoreapp3.1\CatDog.dll" Link="Plugins\CatDog.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\GameGiveaway\bin\Debug\netcoreapp3.1\GameGiveaway.dll" Link="Plugins\GameGiveaway.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\GameWatcher\bin\Debug\netcoreapp3.1\GameWatcher.dll" Link="Plugins\GameWatcher.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\JoinQuitMessages\bin\Debug\netcoreapp3.1\JoinQuitMessages.dll" Link="Plugins\JoinQuitMessages.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\PUBGWeekly\bin\Debug\netcoreapp3.1\PUBGWeekly.dll" Link="Plugins\PUBGWeekly.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\Responses\bin\Debug\netcoreapp3.1\Responses.dll" Link="Plugins\Responses.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\SpotifyStats\bin\Debug\netcoreapp3.1\SpotifyStats.dll" Link="Plugins\SpotifyStats.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Plugins\Binaries\VoiceChannelRoles\bin\Debug\netcoreapp3.1\VoiceChannelRoles.dll" Link="Plugins\VoiceChannelRoles.dll">
+    <None Include="..\Plugins\Binaries\Responses\bin\Debug\net6.0\Responses.dll" Link="Plugins\Responses.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

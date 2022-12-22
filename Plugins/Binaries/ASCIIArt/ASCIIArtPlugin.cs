@@ -10,6 +10,8 @@ namespace ASCIIArt
     {
         public EventRouter EventRouter { get; set; }
 
+        public string Version => "0.1";
+
         public string Name => "ASCIIArt";
 
         public string Description => "Renders text to ascii art.";
